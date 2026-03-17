@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "175626297901",
+    "project_id": "biomed-track",
+    "storage_bucket": "biomed-track.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175626297901:android:bae6dee3df0e03c677cea4",
+        "android_client_info": {
+          "package_name": "com.riramzy.biomedtrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBsHPW6NhrLYRnWFDajI8IzSveiwb-uds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
