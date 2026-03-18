@@ -102,6 +102,9 @@ dependencies {
     // ── iTextPDF ──────────────────────────────────────────────
     implementation(libs.itext7.core)
 
+    // ── Gson ──────────────────────────────────────────────────
+    implementation(libs.gson)
+
     // ── Testing ───────────────────────────────────────────────
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
