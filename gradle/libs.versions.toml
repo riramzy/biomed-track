@@ -37,6 +37,9 @@ poi = "5.2.5"
 # iTextPDF
 itext7 = "7.2.6"
 
+# Gson
+gson = "2.10.1"
+
 # Testing
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -98,6 +101,9 @@ poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" 
 
 # iTextPDF
 itext7-core = { group = "com.itextpdf", name = "itext7-core", version.ref = "itext7" }
+
+# Gson
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
