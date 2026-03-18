@@ -2,6 +2,7 @@ package com.riramzy.biomedtrack.domain.repo
 
 import com.riramzy.biomedtrack.domain.model.Task
 import kotlinx.coroutines.flow.Flow
+import com.riramzy.biomedtrack.domain.Result
 
 interface TaskRepo {
     fun getTasksForTechnician(technicianId: String): Flow<List<Task>>

@@ -4,6 +4,7 @@ import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.model.UserRole
 import kotlinx.coroutines.flow.Flow
+import com.riramzy.biomedtrack.domain.Result
 
 interface AuthRepo {
     suspend fun login(email: String, password: String): Result<Technician>
