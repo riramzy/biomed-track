@@ -30,6 +30,6 @@ class CreateUserUseCase @Inject constructor(
             return Result.Error("Password cannot be less than 6 characters")
         }
 
-        return authRepository.createUser(technician)
+        return authRepository.createUser(technician, password)
     }
 }
