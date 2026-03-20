@@ -10,7 +10,7 @@ interface AuthRepo {
     suspend fun login(email: String, password: String): Result<Technician>
     suspend fun logout(): Result<Unit>
     suspend fun getCurrentUser(): Technician?
-    suspend fun createUser(technician: Technician): Result<Technician>
+    suspend fun createUser(technician: Technician, password: String): Result<Technician>
     fun getAllUsers(): Flow<List<Technician>>
     suspend fun updateUserRole(userId: String, role: UserRole): Result<Unit>
     suspend fun updateUserDepartments(userId: String, departments: List<Department>): Result<Unit>
