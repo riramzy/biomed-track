@@ -221,3 +221,6 @@ val surfaceContainerHighestDarkHighContrast = Color(0xFF46464C)
 val redIndicatorLight = Color(0xFFFF0000)
 val greenIndicatorLight = Color(0xFF2BE900)
 val yellowIndicatorLight = Color(0xFFFFC300)
+
+val adminColorLight = Color(0xFF00C3D0)
+val supervisorColorLight = Color(0xFFFF8D28)

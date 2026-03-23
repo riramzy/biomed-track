@@ -3,13 +3,17 @@ package com.riramzy.biomedtrack
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.riramzy.biomedtrack.ui.components.BioMedInsightCard
 import com.riramzy.biomedtrack.ui.components.BioMedNavBar
+import com.riramzy.biomedtrack.ui.components.BioMedUserCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,16 +28,26 @@ class MainActivity : ComponentActivity() {
                         BioMedNavBar()
                     },
 
-                    floatingActionButtonPosition = FabPosition.Center
+                    floatingActionButtonPosition = FabPosition.Center,
                 ) { innerPadding ->
-                    BioMedInsightCard(
+                    Column(
                         modifier = Modifier.padding(innerPadding),
-                        icon = R.drawable.insight_online,
-                        title = "Healthy",
-                        isHealthy = true,
-                        value = "220",
-                        description = "Operating normally"
-                    )
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BioMedUserCard(
+                            username = "Khaled",
+                            role = "Admin"
+                        )
+
+                        BioMedInsightCard(
+                            icon = R.drawable.insight_online,
+                            title = "Healthy",
+                            isHealthy = true,
+                            value = "23",
+                            description = "Across all departments"
+                        )
+                    }
                 }
             }
         }
