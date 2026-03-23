@@ -1,5 +1,7 @@
 package com.riramzy.biomedtrack.ui.components
 
+import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,7 +35,6 @@ fun BioMedInsightCard(
     title: String,
     value: String,
     description: String,
-    isTotal: Boolean = true,
     isHealthy: Boolean = false,
     isService: Boolean = false,
     isDown: Boolean = false
@@ -43,7 +44,11 @@ fun BioMedInsightCard(
             .size(170.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+            }
         )
     ) {
         Column(
@@ -63,6 +68,11 @@ fun BioMedInsightCard(
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
+                    color = if (isSystemInDarkTheme()) {
+                        Color.White
+                    } else {
+                        Color.Black
+                    }
                 )
 
                 Icon(
@@ -99,12 +109,12 @@ fun BioMedInsightCard(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Black,
                     fontSize = 32.sp,
-                    color = if (isService) {
-                        MaterialTheme.indicatorColors.yellow
-                    } else if (isHealthy) {
+                    color = if (isHealthy) {
                         MaterialTheme.indicatorColors.green
                     } else if (isDown) {
                         MaterialTheme.indicatorColors.red
+                    } else if (isService){
+                        MaterialTheme.indicatorColors.yellow
                     } else {
                         Color.Black
                     },
@@ -114,25 +124,48 @@ fun BioMedInsightCard(
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Normal,
                     fontSize = 11.sp,
-                    color = Color.Black.copy(0.5f)
+                    color = if (isSystemInDarkTheme()) {
+                        Color.White.copy(0.5f)
+                    } else {
+                        Color.Black.copy(0.5f)
+                    }
                 )
             }
         }
     }
 }
 
-@Preview(device = "spec:width=1080px,height=2340px,dpi=640", showSystemUi = false,
+@Preview(
+    device = "spec:width=411dp,height=891dp", showSystemUi = false,
     showBackground = true
 )
 @Composable
 fun BioMedInsightCardPreview() {
     BioMedTheme {
         BioMedInsightCard(
-            icon = R.drawable.insight_service,
-            title = "Due Service",
-            isService = true,
+            icon = R.drawable.insight_online,
+            title = "Healthy",
+            isHealthy = true,
             value = "23",
-            description = "Needs attention"
+            description = "Across all departments"
+        )
+    }
+}
+
+@Preview(
+    device = "spec:width=411dp,height=891dp", showSystemUi = false,
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+fun BioMedInsightCardDarkPreview() {
+    BioMedTheme {
+        BioMedInsightCard(
+            icon = R.drawable.insight_online,
+            title = "Healthy",
+            isHealthy = true,
+            value = "23",
+            description = "Across all departments"
         )
     }
 }

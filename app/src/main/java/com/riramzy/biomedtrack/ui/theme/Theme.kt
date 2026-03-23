@@ -262,12 +262,24 @@ data class IndicatorColors(
     val yellow: Color = Color.Unspecified
 )
 
+@Immutable
+data class RoleColors(
+    val admin: Color = Color.Unspecified,
+    val supervisor: Color = Color.Unspecified,
+)
+
 val LocalIndicatorColors = staticCompositionLocalOf { IndicatorColors() }
+val LocalRoleColors = staticCompositionLocalOf { RoleColors() }
 
 val MaterialTheme.indicatorColors: IndicatorColors
     @Composable
     @ReadOnlyComposable
     get() = LocalIndicatorColors.current
+
+val MaterialTheme.roleColors: RoleColors
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalRoleColors.current
 
 @Composable
 fun BioMedTheme(
@@ -292,7 +304,12 @@ fun BioMedTheme(
       yellow = yellowIndicatorLight
   )
 
-  CompositionLocalProvider(LocalIndicatorColors provides indicatorColors) {
+    val roleColors = RoleColors(
+        admin = adminColorLight,
+        supervisor = supervisorColorLight
+    )
+
+  CompositionLocalProvider(LocalIndicatorColors provides indicatorColors, LocalRoleColors provides roleColors) {
       MaterialTheme(
           colorScheme = colorScheme,
           typography = AppTypography,

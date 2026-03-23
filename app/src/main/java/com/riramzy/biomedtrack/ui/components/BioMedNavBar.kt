@@ -1,5 +1,7 @@
 package com.riramzy.biomedtrack.ui.components
 
+import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,8 +40,12 @@ fun BioMedNavBar(
             .height(54.dp),
         shape = RoundedCornerShape(50.dp),
         colors = cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.primaryContainer
+            }
+        )
     ) {
         Row(
             modifier = Modifier
@@ -65,13 +71,21 @@ fun BioMedNavItem(
         modifier = Modifier
             .size(40.dp),
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.primary
+            }
         )
     ) {
         Icon(
             painter = painterResource(id = icon),
             modifier = Modifier.size(30.dp),
-            tint = Color.White,
+            tint = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                Color.White
+            },
             contentDescription = null,
         )
     }
@@ -87,7 +101,11 @@ fun BioMedNavItemExpanded(
             .wrapContentWidth(),
         shape = CircleShape,
         colors = cardColors(
-            containerColor = Color.White,
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                Color.White
+            }
         ),
     ) {
         Row(
@@ -101,13 +119,21 @@ fun BioMedNavItemExpanded(
             Icon(
                 painter = painterResource(id = icon),
                 modifier = Modifier.size(30.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                tint = if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
                 contentDescription = null,
             )
 
             Text(
                 text = "Dashboard",
-                color = MaterialTheme.colorScheme.primary,
+                color = if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Black,
                 modifier = Modifier.padding(horizontal = 4.dp)
@@ -116,10 +142,20 @@ fun BioMedNavItemExpanded(
     }
 }
 
-@Preview(device = "spec:width=1080px,height=2340px,dpi=640", showBackground = false)
+@Preview(device = "spec:width=411dp,height=891dp", showBackground = true)
 @Composable
 fun BioMedNavBarPreview() {
-    BioMedTheme() {
+    BioMedTheme {
+        BioMedNavBar()
+    }
+}
+
+@Preview(device = "spec:width=411dp,height=891dp", showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+@Composable
+fun BioMedNavBarDarkPreview() {
+    BioMedTheme {
         BioMedNavBar()
     }
 }
