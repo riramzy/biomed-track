@@ -34,9 +34,12 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
-fun BioMedActivityCard() {
+fun BioMedActivityCard(
+    modifier: Modifier = Modifier,
+    status: String = "Online"
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(386.dp)
             .height(155.dp),
         shape = RoundedCornerShape(25.dp),
@@ -70,11 +73,25 @@ fun BioMedActivityCard() {
                     modifier = Modifier
                         .size(34.dp),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.indicatorColors.green
+                        containerColor = when(status) {
+                            "Online" -> MaterialTheme.indicatorColors.green
+                            "Down" -> MaterialTheme.indicatorColors.red
+                            "Service" -> MaterialTheme.indicatorColors.yellow
+                            else -> if (isSystemInDarkTheme()) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            }
+                        }
                     )
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.activity_online),
+                        painter = when(status) {
+                            "Online" -> painterResource(id = R.drawable.activity_online)
+                            "Down" -> painterResource(R.drawable.activity_down)
+                            "Service" -> painterResource(R.drawable.activity_service)
+                            else -> painterResource(R.drawable.activity_log)
+                        },
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)
@@ -112,7 +129,10 @@ fun BioMedActivityCard() {
                         }
                     )
 
-                    BioMedStatusIndicator(modifier = Modifier.padding(top = 5.dp))
+                    BioMedStatusIndicator(
+                        modifier = Modifier.padding(top = 5.dp),
+                        status = status
+                    )
 
                     Column(
                         verticalArrangement = Arrangement.Center,
@@ -198,7 +218,9 @@ fun BioMedActivityCard() {
 @Composable
 fun BioMedActivityCardPreview() {
     BioMedTheme {
-        BioMedActivityCard()
+        BioMedActivityCard(
+            status = "Log"
+        )
     }
 }
 
@@ -208,6 +230,8 @@ fun BioMedActivityCardPreview() {
 @Composable
 fun BioMedActivityCardDarkPreview() {
     BioMedTheme {
-        BioMedActivityCard()
+        BioMedActivityCard(
+            status = "Log"
+        )
     }
 }

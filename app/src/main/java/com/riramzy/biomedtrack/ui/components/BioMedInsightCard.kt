@@ -31,13 +31,8 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 @Composable
 fun BioMedInsightCard(
     modifier: Modifier = Modifier,
-    icon: Int,
-    title: String,
     value: String,
-    description: String,
-    isHealthy: Boolean = false,
-    isService: Boolean = false,
-    isDown: Boolean = false
+    status: String = "Online"
 ) {
     Card(
         modifier = modifier
@@ -64,7 +59,12 @@ fun BioMedInsightCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = title,
+                    text = when(status) {
+                        "Online" -> "Healthy"
+                        "Down" -> "Currently Down"
+                        "Service" -> "Due Service"
+                        else -> "Total Equipment"
+                    },
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
@@ -76,17 +76,23 @@ fun BioMedInsightCard(
                 )
 
                 Icon(
-                    painter = painterResource(icon),
+                    painter = when(status) {
+                        "Online" -> painterResource(R.drawable.insight_online)
+                        "Down" -> painterResource(R.drawable.insight_down)
+                        "Service" -> painterResource(R.drawable.insight_service)
+                        else -> painterResource(R.drawable.inventory)
+                    },
                     modifier = Modifier
                         .size(20.dp),
-                    tint = if (isService) {
-                        MaterialTheme.indicatorColors.yellow
-                    } else if (isHealthy) {
-                        MaterialTheme.indicatorColors.green
-                    } else if (isDown) {
-                        MaterialTheme.indicatorColors.red
-                    } else {
-                        Color.Black
+                    tint = when(status) {
+                        "Online" -> MaterialTheme.indicatorColors.green
+                        "Down" -> MaterialTheme.indicatorColors.red
+                        "Service" -> MaterialTheme.indicatorColors.yellow
+                        else -> if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
                     },
                     contentDescription = null
                 )
@@ -109,18 +115,24 @@ fun BioMedInsightCard(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Black,
                     fontSize = 32.sp,
-                    color = if (isHealthy) {
-                        MaterialTheme.indicatorColors.green
-                    } else if (isDown) {
-                        MaterialTheme.indicatorColors.red
-                    } else if (isService){
-                        MaterialTheme.indicatorColors.yellow
-                    } else {
-                        Color.Black
+                    color = when(status) {
+                        "Online" -> MaterialTheme.indicatorColors.green
+                        "Down" -> MaterialTheme.indicatorColors.red
+                        "Service" -> MaterialTheme.indicatorColors.yellow
+                        else -> if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
                     },
                 )
                 Text(
-                    text = description,
+                    text = when(status) {
+                        "Online" -> "Operating normally"
+                        "Down" -> "Requires repair"
+                        "Service" -> "Needs attention"
+                        else -> "Across all departments"
+                    },
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Normal,
                     fontSize = 11.sp,
@@ -143,11 +155,8 @@ fun BioMedInsightCard(
 fun BioMedInsightCardPreview() {
     BioMedTheme {
         BioMedInsightCard(
-            icon = R.drawable.insight_online,
-            title = "Healthy",
-            isHealthy = true,
-            value = "23",
-            description = "Across all departments"
+            value = "220",
+            status = "Service"
         )
     }
 }
@@ -161,11 +170,8 @@ fun BioMedInsightCardPreview() {
 fun BioMedInsightCardDarkPreview() {
     BioMedTheme {
         BioMedInsightCard(
-            icon = R.drawable.insight_online,
-            title = "Healthy",
-            isHealthy = true,
             value = "23",
-            description = "Across all departments"
+            status = "Down"
         )
     }
 }

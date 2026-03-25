@@ -3,17 +3,8 @@ package com.riramzy.biomedtrack
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import com.riramzy.biomedtrack.ui.components.BioMedInsightCard
-import com.riramzy.biomedtrack.ui.components.BioMedNavBar
-import com.riramzy.biomedtrack.ui.components.BioMedUserCard
+import androidx.navigation.compose.rememberNavController
+import com.riramzy.biomedtrack.ui.screens.dashboard.DashboardScreen
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,32 +14,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BioMedTheme {
-                Scaffold(
-                    floatingActionButton = {
-                        BioMedNavBar()
-                    },
-
-                    floatingActionButtonPosition = FabPosition.Center,
-                ) { innerPadding ->
-                    Column(
-                        modifier = Modifier.padding(innerPadding),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        BioMedUserCard(
-                            username = "Khaled",
-                            role = "Admin"
-                        )
-
-                        BioMedInsightCard(
-                            icon = R.drawable.insight_online,
-                            title = "Healthy",
-                            isHealthy = true,
-                            value = "23",
-                            description = "Across all departments"
-                        )
-                    }
-                }
+                DashboardScreen(
+                    navController = rememberNavController()
+                )
             }
         }
     }
