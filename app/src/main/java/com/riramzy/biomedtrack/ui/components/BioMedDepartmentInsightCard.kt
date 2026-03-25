@@ -30,9 +30,11 @@ import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
-fun BioMedDepartmentInsightCard() {
+fun BioMedDepartmentInsightCard(
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(380.dp)
             .height(145.dp),
         shape = RoundedCornerShape(25.dp),

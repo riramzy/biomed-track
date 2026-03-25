@@ -36,9 +36,12 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
-fun BioMedEquipmentStatus() {
+fun BioMedEquipmentStatusCard(
+    modifier: Modifier = Modifier,
+    status: String = "Online"
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(380.dp)
             .height(90.dp),
         shape = RoundedCornerShape(20.dp),
@@ -61,7 +64,14 @@ fun BioMedEquipmentStatus() {
                     .padding(15.dp)
                     .size(35.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.indicatorColors.red),
+                    .background(
+                        when(status) {
+                            "Online" -> MaterialTheme.indicatorColors.green
+                            "Down" -> MaterialTheme.indicatorColors.red
+                            "Service" -> MaterialTheme.indicatorColors.yellow
+                            else -> MaterialTheme.colorScheme.primary
+                        }
+                    ),
             )
 
             Column(
@@ -147,9 +157,9 @@ fun LogMaintenancePill(
         shape = CircleShape,
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
-                Color.White
+                MaterialTheme.colorScheme.primaryContainer
             } else {
-                Color.Black
+                MaterialTheme.colorScheme.primary
             }
         )
     ) {
@@ -168,7 +178,7 @@ fun LogMaintenancePill(
                     painter = painterResource(id = R.drawable.activity_log),
                     contentDescription = null,
                     tint = if (isSystemInDarkTheme()) {
-                        Color.Black
+                        Color.White
                     } else {
                         Color.White
                     }
@@ -180,9 +190,11 @@ fun LogMaintenancePill(
 
 @Preview(device = "id:pixel_9", showBackground = true)
 @Composable
-fun BioMedEquipmentStatusPreview() {
+fun BioMedEquipmentStatusCardPreview() {
     BioMedTheme {
-        BioMedEquipmentStatus()
+        BioMedEquipmentStatusCard(
+            status = "Online"
+        )
     }
 }
 
@@ -190,8 +202,10 @@ fun BioMedEquipmentStatusPreview() {
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-fun BioMedEquipmentStatusDarkPreview() {
+fun BioMedEquipmentStatusCardDarkPreview() {
     BioMedTheme {
-        BioMedEquipmentStatus()
+        BioMedEquipmentStatusCard(
+            status = "Service"
+        )
     }
 }

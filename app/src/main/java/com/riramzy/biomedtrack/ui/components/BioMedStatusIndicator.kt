@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,8 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedStatusIndicator(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    status: String = "Online"
 ) {
     Card(
         modifier = modifier
@@ -39,7 +41,16 @@ fun BioMedStatusIndicator(
             .height(19.dp),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.indicatorColors.green
+            containerColor = when (status) {
+                "Online" -> MaterialTheme.indicatorColors.green
+                "Down" -> MaterialTheme.indicatorColors.red
+                "Service" -> MaterialTheme.indicatorColors.yellow
+                else -> if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.primary
+                }
+            }
         )
     ) {
         Row(
@@ -50,7 +61,7 @@ fun BioMedStatusIndicator(
                 .padding(horizontal = 6.dp)
         ) {
             Text(
-                text = "Online",
+                text = status,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.labelSmall,
@@ -80,7 +91,7 @@ fun BioMedStatusIndicator(
 @Composable
 fun BioMedStatusIndicatorPreview() {
     BioMedTheme {
-        BioMedStatusIndicator()
+        BioMedStatusIndicator(status = "Log")
     }
 }
 
@@ -91,6 +102,6 @@ fun BioMedStatusIndicatorPreview() {
 @Composable
 fun BioMedStatusIndicatorDarkPreview() {
     BioMedTheme {
-        BioMedStatusIndicator()
+        BioMedStatusIndicator(status = "Log")
     }
 }

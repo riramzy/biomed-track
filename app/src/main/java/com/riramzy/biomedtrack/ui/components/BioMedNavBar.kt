@@ -72,7 +72,7 @@ fun BioMedNavItem(
             .size(40.dp),
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondary
+                MaterialTheme.colorScheme.secondaryContainer
             } else {
                 MaterialTheme.colorScheme.primary
             }
