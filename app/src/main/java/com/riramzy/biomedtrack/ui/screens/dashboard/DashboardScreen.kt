@@ -53,7 +53,7 @@ fun DashboardScreen(navController: NavHostController) {
             contentPadding = PaddingValues(
                 bottom = innerPadding.calculateBottomPadding() + 100.dp
             ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
                 BioMedUserCard(
@@ -115,7 +115,9 @@ fun DashboardScreen(navController: NavHostController) {
                             start = 10.dp,
                             end = 10.dp,
                             bottom = 15.dp
-                        )
+                        ),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
                         modifier = Modifier
@@ -154,7 +156,9 @@ fun DashboardScreen(navController: NavHostController) {
                             start = 10.dp,
                             end = 10.dp,
                             bottom = 15.dp
-                        )
+                        ),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
                         modifier = Modifier
@@ -192,7 +196,9 @@ fun DashboardScreen(navController: NavHostController) {
                             start = 10.dp,
                             end = 10.dp,
                             bottom = 15.dp
-                        )
+                        ),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
                         modifier = Modifier
