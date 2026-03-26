@@ -30,12 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedButton(
+    modifier: Modifier = Modifier,
     withIcon: Boolean = false,
     icon: Int? = R.drawable.filter,
-    modifier: Modifier = Modifier
 ) {
     var isSelected: Boolean = false
 
@@ -51,7 +52,7 @@ fun BioMedButton(
                     if (isSelected) {
                         MaterialTheme.colorScheme.primary
                     } else {
-                        MaterialTheme.colorScheme.onSecondary
+                        MaterialTheme.colorScheme.secondaryContainer
                     }
                 } else {
                     if (isSelected) {
@@ -75,7 +76,7 @@ fun BioMedButton(
                                 if (isSelected) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
-                                    MaterialTheme.colorScheme.secondaryContainer
+                                    MaterialTheme.colorScheme.onSecondary
                                 }
                             } else {
                                 if (isSelected) {
@@ -141,7 +142,7 @@ fun BioMedButton(
                     if (isSelected) {
                         MaterialTheme.colorScheme.primary
                     } else {
-                        MaterialTheme.colorScheme.onSecondary
+                        MaterialTheme.colorScheme.secondaryContainer
                     }
                 } else {
                     if (isSelected) {
@@ -167,7 +168,203 @@ fun BioMedButton(
                     if (isSelected) {
                         MaterialTheme.colorScheme.onPrimary
                     } else {
-                        MaterialTheme.colorScheme.onPrimaryContainer
+                        MaterialTheme.colorScheme.onSecondaryContainer
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun BioMedEditButton(
+    modifier: Modifier = Modifier,
+    icon: Int? = R.drawable.edit
+) {
+    var isSelected: Boolean = false
+
+    IconButton(
+        onClick = { /*TODO*/ },
+        modifier = modifier
+            .width(100.dp)
+            .height(35.dp)
+            .clip(shape = RoundedCornerShape(25.dp)),
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = if (isSystemInDarkTheme()) {
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.White
+                }
+            } else {
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Black
+                }
+            }
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(22.dp)
+                    .clip(shape = CircleShape)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                Color.Black
+                            }
+                        } else {
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                Color.White
+                            }
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = icon!!),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(18.dp),
+                    tint = if (isSystemInDarkTheme()) {
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            Color.White
+                        }
+                    } else {
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            Color.Black
+                        }
+                    }
+                )
+            }
+
+            Text(
+                text = "Edit",
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isSystemInDarkTheme()) {
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        Color.Black
+                    }
+                } else {
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        Color.White
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun BioMedDeleteButton(
+    modifier: Modifier = Modifier,
+    icon: Int? = R.drawable.delete
+) {
+    var isSelected: Boolean = false
+
+    IconButton(
+        onClick = { /*TODO*/ },
+        modifier = modifier
+            .width(100.dp)
+            .height(35.dp)
+            .clip(shape = RoundedCornerShape(25.dp)),
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = if (isSystemInDarkTheme()) {
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.indicatorColors.red
+                }
+            } else {
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.indicatorColors.red
+                }
+            }
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(22.dp)
+                    .clip(shape = CircleShape)
+                    .background(
+                        color = if (isSystemInDarkTheme()) {
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                Color.White
+                            }
+                        } else {
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                Color.White
+                            }
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = icon!!),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(18.dp),
+                    tint = if (isSystemInDarkTheme()) {
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.indicatorColors.red
+                        }
+                    } else {
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.indicatorColors.red
+                        }
+                    }
+                )
+            }
+
+            Text(
+                text = "Delete",
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isSystemInDarkTheme()) {
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        Color.White
+                    }
+                } else {
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        Color.White
                     }
                 }
             )
@@ -177,9 +374,9 @@ fun BioMedButton(
 
 @Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
 @Composable
-fun BioMedButtonPreview() {
+fun BioMedButtonPreviewBioMed() {
     BioMedTheme {
-        BioMedButton()
+        BioMedEditButton()
     }
 }
 
@@ -187,8 +384,8 @@ fun BioMedButtonPreview() {
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-fun BioMedButtonDarkPreview() {
+fun BioMedButtonDarkPreviewBioMed() {
     BioMedTheme {
-        BioMedButton()
+        BioMedEditButton()
     }
 }
