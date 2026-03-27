@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -192,15 +193,15 @@ fun BioMedEditButton(
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = if (isSystemInDarkTheme()) {
                 if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    Color.Blue.copy(0.8f)
                 } else {
-                    Color.White
+                    Color.Blue
                 }
             } else {
                 if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    Color.Blue.copy(0.8f)
                 } else {
-                    Color.Black
+                    Color.Blue
                 }
             }
         )
@@ -216,13 +217,13 @@ fun BioMedEditButton(
                     .background(
                         color = if (isSystemInDarkTheme()) {
                             if (isSelected) {
-                                MaterialTheme.colorScheme.primary
+                                Color.Blue.copy(0.8f)
                             } else {
-                                Color.Black
+                                Color.White
                             }
                         } else {
                             if (isSelected) {
-                                MaterialTheme.colorScheme.primary
+                                Color.Blue.copy(0.8f)
                             } else {
                                 Color.White
                             }
@@ -237,15 +238,15 @@ fun BioMedEditButton(
                         .size(18.dp),
                     tint = if (isSystemInDarkTheme()) {
                         if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
-                        } else {
                             Color.White
+                        } else {
+                            Color.Blue
                         }
                     } else {
                         if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
+                            Color.White
                         } else {
-                            Color.Black
+                            Color.Blue
                         }
                     }
                 )
@@ -258,13 +259,13 @@ fun BioMedEditButton(
                 fontWeight = FontWeight.Bold,
                 color = if (isSystemInDarkTheme()) {
                     if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
+                        Color.White
                     } else {
-                        Color.Black
+                        Color.White
                     }
                 } else {
                     if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
+                        Color.White
                     } else {
                         Color.White
                     }
@@ -290,13 +291,13 @@ fun BioMedDeleteButton(
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = if (isSystemInDarkTheme()) {
                 if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.indicatorColors.red.copy(0.8f)
                 } else {
                     MaterialTheme.indicatorColors.red
                 }
             } else {
                 if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.indicatorColors.red.copy(0.8f)
                 } else {
                     MaterialTheme.indicatorColors.red
                 }
@@ -314,13 +315,13 @@ fun BioMedDeleteButton(
                     .background(
                         color = if (isSystemInDarkTheme()) {
                             if (isSelected) {
-                                MaterialTheme.colorScheme.primary
+                                MaterialTheme.indicatorColors.red.copy(0.8f)
                             } else {
                                 Color.White
                             }
                         } else {
                             if (isSelected) {
-                                MaterialTheme.colorScheme.primary
+                                MaterialTheme.indicatorColors.red.copy(0.8f)
                             } else {
                                 Color.White
                             }
@@ -335,13 +336,13 @@ fun BioMedDeleteButton(
                         .size(18.dp),
                     tint = if (isSystemInDarkTheme()) {
                         if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
+                            Color.White
                         } else {
                             MaterialTheme.indicatorColors.red
                         }
                     } else {
                         if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
+                            Color.White
                         } else {
                             MaterialTheme.indicatorColors.red
                         }
@@ -356,13 +357,13 @@ fun BioMedDeleteButton(
                 fontWeight = FontWeight.Bold,
                 color = if (isSystemInDarkTheme()) {
                     if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
+                        Color.White
                     } else {
                         Color.White
                     }
                 } else {
                     if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
+                        Color.White
                     } else {
                         Color.White
                     }
@@ -376,7 +377,10 @@ fun BioMedDeleteButton(
 @Composable
 fun BioMedButtonPreviewBioMed() {
     BioMedTheme {
-        BioMedEditButton()
+        Column {
+            BioMedDeleteButton()
+            BioMedEditButton()
+        }
     }
 }
 
@@ -386,6 +390,9 @@ fun BioMedButtonPreviewBioMed() {
 @Composable
 fun BioMedButtonDarkPreviewBioMed() {
     BioMedTheme {
-        BioMedEditButton()
+        Column {
+            BioMedDeleteButton()
+            BioMedEditButton()
+        }
     }
 }
