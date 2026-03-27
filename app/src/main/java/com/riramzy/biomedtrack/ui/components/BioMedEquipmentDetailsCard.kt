@@ -26,13 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
-fun BioMedEquipmentDetailsCard() {
+fun BioMedEquipmentDetailsCard(
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(380.dp)
             .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
