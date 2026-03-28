@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,8 +37,11 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 @Composable
 fun BioMedButton(
     modifier: Modifier = Modifier,
+    text: String = "Button",
     withIcon: Boolean = false,
     icon: Int? = R.drawable.filter,
+    customColor: Color? = null,
+    customTextColor: Color? = null
 ) {
     var isSelected: Boolean = false
 
@@ -53,7 +57,7 @@ fun BioMedButton(
                     if (isSelected) {
                         MaterialTheme.colorScheme.primary
                     } else {
-                        MaterialTheme.colorScheme.secondaryContainer
+                        MaterialTheme.colorScheme.onSecondary
                     }
                 } else {
                     if (isSelected) {
@@ -111,7 +115,7 @@ fun BioMedButton(
                 }
 
                 Text(
-                    text = "Filter",
+                    text = text,
                     style = MaterialTheme.typography.labelLarge,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
@@ -139,38 +143,46 @@ fun BioMedButton(
                 .height(35.dp),
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isSystemInDarkTheme()) {
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.primary
+                containerColor = if (customColor == null) {
+                    if (isSystemInDarkTheme()) {
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSecondary
+                        }
                     } else {
-                        MaterialTheme.colorScheme.secondaryContainer
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.primaryContainer
+                        }
                     }
                 } else {
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primaryContainer
-                    }
+                    customColor
                 }
             )
         ) {
             Text(
-                text = "Button",
+                text = text,
                 style = MaterialTheme.typography.labelLarge,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isSystemInDarkTheme()) {
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
+                color = if (customTextColor == null) {
+                    if (isSystemInDarkTheme()) {
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        }
                     } else {
-                        MaterialTheme.colorScheme.onPrimaryContainer
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        }
                     }
                 } else {
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSecondaryContainer
-                    }
+                    customTextColor
                 }
             )
         }
@@ -378,8 +390,7 @@ fun BioMedDeleteButton(
 fun BioMedButtonPreviewBioMed() {
     BioMedTheme {
         Column {
-            BioMedDeleteButton()
-            BioMedEditButton()
+            BioMedButton()
         }
     }
 }
@@ -391,8 +402,7 @@ fun BioMedButtonPreviewBioMed() {
 fun BioMedButtonDarkPreviewBioMed() {
     BioMedTheme {
         Column {
-            BioMedDeleteButton()
-            BioMedEditButton()
+            BioMedButton()
         }
     }
 }
