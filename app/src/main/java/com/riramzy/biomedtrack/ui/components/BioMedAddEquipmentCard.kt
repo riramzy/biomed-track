@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
-fun BioMedLogMaintenanceCard(
+fun BioMedAddEquipmentCard(
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -66,7 +67,7 @@ fun BioMedLogMaintenanceCard(
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "Log Maintenance",
+                            text = "Add Equipment",
                             style = MaterialTheme.typography.titleLarge,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -78,7 +79,7 @@ fun BioMedLogMaintenanceCard(
                         )
 
                         Text(
-                            text = "Record maintenance, repairs, and inspections",
+                            text = "Fill in the equipment details below",
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -98,33 +99,103 @@ fun BioMedLogMaintenanceCard(
                     .fillMaxWidth()
                     .height(745.dp)
                     .padding(bottom = 15.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
+                    BioMedHeader(
+                        title = "Equipment Details",
+                        height = 45,
+                        textSize = 16,
+                        modifier = Modifier
+                            .padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                bottom = 15.dp
+                            )
+                            .clip(
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                    )
+                }
+
+                item {
+                    BioMedTextField(
+                        title = "Name",
+                        isNoteCard = false
+                    )
+                }
+
+                item {
+                    BioMedTextField(
+                        title = "Model",
+                        isNoteCard = false
+                    )
+                }
+
+                item {
+                    BioMedTextField(
+                        title = "Serial Number",
+                        isNoteCard = false
+                    )
+                }
+
+                item {
+                    BioMedTextField(
+                        title = "Manufacturer",
+                        isNoteCard = false
+                    )
+                }
+
+                item {
+                    BioMedTextField(
+                        title = "Manufacturer",
+                        isNoteCard = false
+                    )
+                }
+                item {
+                    BioMedTextField(
+                        title = "Agent",
+                        isNoteCard = false
+                    )
+                }
+
+                item {
+                    BioMedHeader(
+                        title = "Classification",
+                        height = 45,
+                        textSize = 16,
+                        modifier = Modifier
+                            .padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                bottom = 15.dp
+                            )
+                            .clip(
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                    )
+                }
+
+                item {
                     BioMedSelector(
-                        title = "Equipment",
-                        placeholder = "Select Equipment",
+                        title = "Category",
+                        placeholder = "Dialysis Machine",
                         items = listOf(
-                            "Fresenius 4008S",
-                            "Gambro AK96",
-                            "Fresenius 4008 Classic",
-                            "Gambro AK98",
-                            "B.Braun Dialog",
-                            "B.Braun Dialog+"
+                            "Dialysis Machine",
+                            "Dialysis Unit",
+                            "Dialysis System"
                         )
                     )
                 }
 
                 item {
                     BioMedSelector(
-                        title = "Maintenance Type",
-                        placeholder = "Select Maintenance Type",
+                        title = "Department",
+                        placeholder = "Dialysis Unit",
                         items = listOf(
-                            "Regular",
-                            "Emergency",
-                            "Preventive",
-                            "Corrective"
+                            "Dental",
+                            "OR",
+                            "ICU",
+                            "PICU"
                         )
                     )
                 }
@@ -132,51 +203,60 @@ fun BioMedLogMaintenanceCard(
                 item {
                     BioMedSelector(
                         title = "Current Status",
-                        placeholder = "Select Current Status",
+                        placeholder = "Online",
                         items = listOf(
-                            "Online",
-                            "Due Service",
-                            "Down"
+                            "Down",
+                            "Due Service"
                         )
                     )
                 }
 
                 item {
-                    BioMedDateSelector()
-                }
-
-                item {
-                    BioMedTextField(
-                        title = "By",
-                        isNoteCard = false
+                    BioMedHeader(
+                        title = "Location and Dates",
+                        height = 45,
+                        textSize = 16,
+                        modifier = Modifier
+                            .padding(
+                                start = 20.dp,
+                                end = 20.dp,
+                                bottom = 15.dp
+                            )
+                            .clip(
+                                shape = RoundedCornerShape(15.dp)
+                            )
                     )
                 }
 
                 item {
-                    BioMedTextField(
-                        title = "Notes and Observations",
-                        isNoteCard = true
-                    )
-                }
-
-                item {
-                    BioMedMultipleItemsSelector(
-                        title = "Tasks Completed",
+                    BioMedSelector(
+                        title = "Location",
+                        placeholder = "Dialysis Unit",
                         items = listOf(
-                            "Cleaned filters and components",
-                            "Replaced brake pads",
-                            "Performed routine inspections",
-                            "Inspected electrical connections",
-                            "Tested safety features",
-                            "Replaced worn parts",
-                            "Updated firmware/software",
+                            "Dental",
+                            "OR",
+                            "ICU",
+                            "PICU"
                         )
+                    )
+                }
+
+                item {
+                    BioMedDateSelector(
+                        title = "Installation Date"
+                    )
+                }
+
+                item {
+                    BioMedDateSelector(
+                        title = "Warranty End Date"
                     )
                 }
 
                 item {
                     BioMedPhotoDocumentationCard(
-                        title = "Photo Documentation"
+                        title = "Photo Documentation",
+                        description = "Take photos of installation reports or documentations"
                     )
                 }
             }
@@ -201,7 +281,7 @@ fun BioMedLogMaintenanceCard(
                         MaterialTheme.colorScheme.primary
                     },
                     customTextColor = if (isSystemInDarkTheme()) {
-                        Color.White
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
                         MaterialTheme.colorScheme.onPrimary
                     }
@@ -225,20 +305,20 @@ fun BioMedLogMaintenanceCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
 @Composable
-fun BioMedLogMaintenanceCardPreview() {
+fun BioMedAddEquipmentCardPreview() {
     BioMedTheme {
-        BioMedLogMaintenanceCard()
+        BioMedAddEquipmentCard()
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true, showSystemUi = false,
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-fun BioMedLogMaintenanceCardDarkPreview() {
+fun BioMedAddEquipmentCardDarkPreview() {
     BioMedTheme {
-        BioMedLogMaintenanceCard()
+        BioMedAddEquipmentCard()
     }
 }
