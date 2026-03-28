@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +35,7 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedPhotoDocumentationCard(
     modifier: Modifier = Modifier,
     title: String = "Photo Documentation",
+    description: String = "Take photos of installation reports or documentations"
 ) {
     Column(
         modifier = modifier
@@ -106,11 +108,12 @@ fun BioMedPhotoDocumentationCard(
                     )
 
                     Text(
-                        text = "Take photos of repairs or error codes",
+                        text = description,
                         style = MaterialTheme.typography.labelLarge,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
