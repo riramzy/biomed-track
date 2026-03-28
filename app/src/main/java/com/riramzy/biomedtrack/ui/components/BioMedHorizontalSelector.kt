@@ -24,9 +24,10 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedHorizontalSelector(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    numberOfItems: Int = 5
 ) {
-    var isSelected: Boolean = false
+    var isSelected = false
 
     LazyRow(
         modifier = modifier
@@ -35,7 +36,7 @@ fun BioMedHorizontalSelector(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(5) {
+        items(numberOfItems) {
             TextButton(
                 onClick = {
                     isSelected = !isSelected
