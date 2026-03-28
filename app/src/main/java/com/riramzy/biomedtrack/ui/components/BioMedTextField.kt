@@ -167,7 +167,7 @@ fun BioMedTextField(
                                 if (text.isEmpty()) {
                                     Text(
                                         text = if (isNoteCard) {
-                                            "Describe the work performed, issues found,parts replaced, etc"
+                                            "Describe the work performed, issues found, parts replaced, etc"
                                         } else {
                                             "Enter name"
                                         },
