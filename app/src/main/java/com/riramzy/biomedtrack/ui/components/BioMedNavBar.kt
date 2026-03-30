@@ -32,32 +32,114 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedNavBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    withActionButton: Boolean = false,
+    actionButtonIcon: Int = R.drawable.add,
+    selectedPage: String = "Scheduler"
 ) {
-    Card(
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = modifier
-            .width(270.dp)
-            .height(54.dp),
-        shape = RoundedCornerShape(50.dp),
-        colors = cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondary
-            } else {
-                MaterialTheme.colorScheme.primaryContainer
-            }
-        )
     ) {
-        Row(
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .width(270.dp)
+                .height(54.dp),
+            shape = RoundedCornerShape(50.dp),
+            colors = cardColors(
+                containerColor = if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.onSecondary
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                }
+            )
         ) {
-            BioMedNavItemExpanded(R.drawable.dashboard)
-            BioMedNavItem(icon = R.drawable.scheduler)
-            BioMedNavItem(icon = R.drawable.inventory)
-            BioMedNavItem(icon = R.drawable.reports)
+            when (selectedPage) {
+                "Dashboard" -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.dashboard)
+                        BioMedNavItem(icon = R.drawable.scheduler)
+                        BioMedNavItem(icon = R.drawable.inventory)
+                        BioMedNavItem(icon = R.drawable.reports)
+                    }
+                }
+                "Scheduler" -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        BioMedNavItem(R.drawable.dashboard)
+                        BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.scheduler)
+                        BioMedNavItem(icon = R.drawable.inventory)
+                        BioMedNavItem(icon = R.drawable.reports)
+                    }
+                }
+                "Inventory" -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        BioMedNavItem(R.drawable.dashboard)
+                        BioMedNavItem(icon = R.drawable.scheduler)
+                        BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.inventory)
+                        BioMedNavItem(icon = R.drawable.reports)
+                    }
+                }
+                "Reports" -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        BioMedNavItem(R.drawable.dashboard)
+                        BioMedNavItem(icon = R.drawable.scheduler)
+                        BioMedNavItem(icon = R.drawable.inventory)
+                        BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.reports)
+                    }
+                }
+            }
+        }
+
+        if (withActionButton) {
+            IconButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(54.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.secondaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.primaryContainer
+                    }
+                )
+            ) {
+                Icon(
+                    painter = painterResource(id = actionButtonIcon),
+                    modifier = Modifier.size(34.dp),
+                    tint = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    contentDescription = null,
+                )
+            }
         }
     }
 }
@@ -93,6 +175,7 @@ fun BioMedNavItem(
 
 @Composable
 fun BioMedNavItemExpanded(
+    itemName: String = "Dashboard",
     icon: Int
 ) {
     Card(
@@ -128,7 +211,7 @@ fun BioMedNavItemExpanded(
             )
 
             Text(
-                text = "Dashboard",
+                text = itemName,
                 color = if (isSystemInDarkTheme()) {
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
