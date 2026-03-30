@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,9 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +42,8 @@ fun BioMedButton(
     withIcon: Boolean = false,
     icon: Int? = R.drawable.filter,
     customColor: Color? = null,
-    customTextColor: Color? = null
+    customTextColor: Color? = null,
+    customTextSize: Int? = null
 ) {
     var isSelected: Boolean = false
 
@@ -165,7 +167,11 @@ fun BioMedButton(
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
-                fontSize = 10.sp,
+                fontSize = if (customTextSize == null) {
+                    10.sp
+                } else {
+                    customTextSize.sp
+                },
                 fontWeight = FontWeight.Bold,
                 color = if (customTextColor == null) {
                     if (isSystemInDarkTheme()) {
@@ -183,7 +189,9 @@ fun BioMedButton(
                     }
                 } else {
                     customTextColor
-                }
+                },
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center
             )
         }
     }

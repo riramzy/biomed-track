@@ -38,18 +38,19 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 @Composable
 fun BioMedEquipmentStatusCard(
     modifier: Modifier = Modifier,
-    status: String = "Online"
+    status: String = "Online",
+    isAbbreviated: Boolean = false
 ) {
     Card(
         modifier = modifier
             .width(380.dp)
-            .height(90.dp),
+            .height(if (isAbbreviated) (50.dp) else (90.dp)),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
                 MaterialTheme.colorScheme.onSecondary
             } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+                MaterialTheme.colorScheme.primaryContainer.copy(0.7f)
             }
         )
     ) {
@@ -61,8 +62,8 @@ fun BioMedEquipmentStatusCard(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(15.dp)
-                    .size(35.dp)
+                    .padding(if (isAbbreviated) (10.dp) else (15.dp))
+                    .size(if (isAbbreviated) (24.dp) else (35.dp))
                     .clip(CircleShape)
                     .background(
                         when(status) {
@@ -76,8 +77,9 @@ fun BioMedEquipmentStatusCard(
 
             Column(
                 modifier = Modifier
-                    .weight(2f)
-                    .fillMaxHeight(),
+                    .weight(if (isAbbreviated) (1f) else (2f))
+                    .fillMaxHeight()
+                    .padding(if (isAbbreviated) (10.dp) else (0.dp)),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -104,43 +106,49 @@ fun BioMedEquipmentStatusCard(
                         Color.Black
                     }
                 )
-                Text(
-                    text = "Dialysis Unit",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Light,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+
+                if (!isAbbreviated) {
+                    Text(
+                        text = "Dialysis Unit",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Light,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
-            Column(
-                modifier = Modifier
-                    .padding(end = 15.dp),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "20/3/2026",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (isSystemInDarkTheme()) {
-                        Color.White
-                    } else {
-                        Color.Black
-                    }
-                )
 
-                Text(
-                    text = "Hemodialysis",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+            if (!isAbbreviated) {
+                Column(
+                    modifier = Modifier
+                        .padding(end = 15.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "20/3/2026",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    )
 
-                LogMaintenancePill(
-                    modifier = Modifier.padding(top = 5.dp)
-                )
+                    Text(
+                        text = "Hemodialysis",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+
+                    LogMaintenancePill(
+                        modifier = Modifier.padding(top = 5.dp)
+                    )
+                }
             }
         }
     }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -34,7 +33,7 @@ fun BioMedEditEquipmentCard(
     Card(
         modifier = modifier
             .width(380.dp)
-            .wrapContentHeight(),
+            .height(760.dp),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -259,47 +258,6 @@ fun BioMedEditEquipmentCard(
                         description = "Take photos of installation reports or documentations"
                     )
                 }
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(
-                        start = 20.dp,
-                        end = 20.dp,
-                        bottom = 15.dp
-                    )
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-            ) {
-                BioMedButton(
-                    modifier = Modifier.padding(end = 10.dp),
-                    text = "Save",
-                    customColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    customTextColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    }
-                )
-
-                BioMedButton(
-                    text = "Cancel",
-                    customColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.primaryContainer
-                    },
-                    customTextColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.onSecondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    }
-                )
             }
         }
     }
