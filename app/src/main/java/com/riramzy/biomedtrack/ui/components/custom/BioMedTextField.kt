@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
@@ -21,17 +21,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,11 +36,15 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 @Composable
 fun BioMedTextField(
     modifier: Modifier = Modifier,
-    title: String = "By",
-    isNoteCard: Boolean = true
+    label: String = "By",
+    placeholder: String = "Placeholder",
+    value: String = "Value",
+    onValueChange: (String) -> Unit = {},
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    isNoteCard: Boolean = false,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
-    var text by remember { mutableStateOf("") }
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -55,7 +55,7 @@ fun BioMedTextField(
             )
     ) {
         Text(
-            text = title,
+            text = label,
             style = MaterialTheme.typography.labelLarge,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -90,7 +90,7 @@ fun BioMedTextField(
                         MaterialTheme.colorScheme.primaryContainer.copy(0.4f)
                     }
                 ),
-                border =  if (text.isEmpty()) {
+                border =  if (value.isEmpty()) {
                     BorderStroke(
                         width = 1.dp,
                         color = if (isSystemInDarkTheme()) {
@@ -118,15 +118,11 @@ fun BioMedTextField(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     BasicTextField(
-                        value = text,
-                        onValueChange = {
-                            text = it
+                        value = value,
+                        onValueChange = { newValue ->
+                            onValueChange(newValue)
                         },
-                        singleLine = if (isNoteCard) {
-                            false
-                        } else {
-                            true
-                        },
+                        singleLine = !isNoteCard,
                         textStyle = TextStyle.Default.copy(
                             color = if (isSystemInDarkTheme()) {
                                 Color.White
@@ -134,7 +130,8 @@ fun BioMedTextField(
                                 Color.Black
                             }
                         ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardOptions = keyboardOptions,
+                        visualTransformation = visualTransformation,
                         cursorBrush = SolidColor(
                             if (isSystemInDarkTheme()) {
                                 MaterialTheme.colorScheme.primary
@@ -143,42 +140,49 @@ fun BioMedTextField(
                             }
                         ),
                         decorationBox = { innerTextField ->
-                            Box(
-                                modifier = Modifier
-                                    .height(
-                                        if (isNoteCard) {
-                                            93.dp
-                                        } else {
-                                            45.dp
-                                        }
-                                    )
-                                    .fillMaxWidth()
-                                    .background(
-                                        color = Color.Unspecified,
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(horizontal = 6.dp, vertical = 0.dp),
-                                contentAlignment = if (isNoteCard) {
-                                    Alignment.TopStart
-                                } else {
-                                    Alignment.CenterStart
-                                }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                if (text.isEmpty()) {
-                                    Text(
-                                        text = if (isNoteCard) {
-                                            "Describe the work performed, issues found, parts replaced, etc"
-                                        } else {
-                                            "Enter name"
-                                        },
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Normal,
-                                    )
+                                Box(
+                                    modifier = Modifier
+                                        .height(
+                                            if (isNoteCard) {
+                                                93.dp
+                                            } else {
+                                                45.dp
+                                            }
+                                        )
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                        .background(
+                                            color = Color.Unspecified,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 6.dp, vertical = 0.dp),
+                                    contentAlignment = if (isNoteCard) {
+                                        Alignment.TopStart
+                                    } else {
+                                        Alignment.CenterStart
+                                    }
+                                ) {
+                                    if (value.isEmpty()) {
+                                        Text(
+                                            text = placeholder,
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Normal,
+                                        )
+                                    }
+
+                                    innerTextField()
                                 }
 
-                                innerTextField()
+                                if (trailingIcon != null) {
+                                    trailingIcon()
+                                }
                             }
                         }
                     )
