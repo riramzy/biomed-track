@@ -50,6 +50,7 @@ import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.components.user.BioMedUserCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +88,11 @@ fun DashboardScreenContent(
                 floatingActionButton = {
                     BioMedNavBar(
                         selectedPage = "Dashboard",
-                        withActionButton = false
+                        withActionButton = false,
+                        onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
+                        onSchedulerClick = { navController.navigate(Screen.Scheduler.route) },
+                        onInventoryClick = { navController.navigate(Screen.Inventory.route) },
+                        onReportsClick = { navController.navigate(Screen.Reports.route) }
                     )
                 },
                 floatingActionButtonPosition = FabPosition.Center,
@@ -149,7 +154,11 @@ fun DashboardScreenContent(
                 floatingActionButton = {
                     BioMedNavBar(
                         selectedPage = "Dashboard",
-                        withActionButton = false
+                        withActionButton = false,
+                        onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
+                        onSchedulerClick = { navController.navigate(Screen.Scheduler.route) },
+                        onInventoryClick = { navController.navigate(Screen.Inventory.route) },
+                        onReportsClick = { navController.navigate(Screen.Reports.route) }
                     )
                 },
                 floatingActionButtonPosition = FabPosition.Center,
@@ -190,7 +199,11 @@ fun DashboardScreenContent(
                 floatingActionButton = {
                     BioMedNavBar(
                         selectedPage = "Dashboard",
-                        withActionButton = false
+                        withActionButton = false,
+                        onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
+                        onSchedulerClick = { navController.navigate(Screen.Scheduler.route) },
+                        onInventoryClick = { navController.navigate(Screen.Inventory.route) },
+                        onReportsClick = { navController.navigate(Screen.Reports.route) }
                     )
                 },
                 floatingActionButtonPosition = FabPosition.Center,
