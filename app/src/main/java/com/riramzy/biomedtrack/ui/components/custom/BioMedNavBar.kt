@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
@@ -19,23 +20,33 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedNavBar(
     modifier: Modifier = Modifier,
-    withActionButton: Boolean = false,
+    withActionButton: Boolean = true,
+    isActionButtonText: Boolean = true,
+    actionButtonText: String = "Add",
     actionButtonIcon: Int = R.drawable.add,
-    selectedPage: String = "Scheduler"
+    selectedPage: String = "Scheduler",
+    onActionButtonClick: () -> Unit = {},
+    onDashboardClick: () -> Unit = {},
+    onSchedulerClick: () -> Unit = {},
+    onInventoryClick: () -> Unit = {},
+    onReportsClick: () -> Unit = {}
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -65,9 +76,9 @@ fun BioMedNavBar(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.dashboard)
-                        BioMedNavItem(icon = R.drawable.scheduler)
-                        BioMedNavItem(icon = R.drawable.inventory)
-                        BioMedNavItem(icon = R.drawable.reports)
+                        BioMedNavItem(icon = R.drawable.scheduler, onNavItemClick = { onSchedulerClick() })
+                        BioMedNavItem(icon = R.drawable.inventory, onNavItemClick = { onInventoryClick() })
+                        BioMedNavItem(icon = R.drawable.reports, onNavItemClick = { onReportsClick() })
                     }
                 }
                 "Scheduler" -> {
@@ -78,10 +89,10 @@ fun BioMedNavBar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        BioMedNavItem(R.drawable.dashboard)
+                        BioMedNavItem(R.drawable.dashboard, onNavItemClick = { onDashboardClick() })
                         BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.scheduler)
-                        BioMedNavItem(icon = R.drawable.inventory)
-                        BioMedNavItem(icon = R.drawable.reports)
+                        BioMedNavItem(icon = R.drawable.inventory, onNavItemClick = { onInventoryClick() })
+                        BioMedNavItem(icon = R.drawable.reports, onNavItemClick = { onReportsClick() })
                     }
                 }
                 "Inventory" -> {
@@ -92,10 +103,10 @@ fun BioMedNavBar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        BioMedNavItem(R.drawable.dashboard)
-                        BioMedNavItem(icon = R.drawable.scheduler)
+                        BioMedNavItem(R.drawable.dashboard, onNavItemClick = { onDashboardClick() })
+                        BioMedNavItem(icon = R.drawable.scheduler, onNavItemClick = { onSchedulerClick() })
                         BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.inventory)
-                        BioMedNavItem(icon = R.drawable.reports)
+                        BioMedNavItem(icon = R.drawable.reports, onNavItemClick = { onReportsClick() })
                     }
                 }
                 "Reports" -> {
@@ -106,39 +117,85 @@ fun BioMedNavBar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        BioMedNavItem(R.drawable.dashboard)
-                        BioMedNavItem(icon = R.drawable.scheduler)
-                        BioMedNavItem(icon = R.drawable.inventory)
+                        BioMedNavItem(R.drawable.dashboard, onNavItemClick = { onDashboardClick() })
+                        BioMedNavItem(icon = R.drawable.scheduler, onNavItemClick = { onSchedulerClick() })
+                        BioMedNavItem(icon = R.drawable.inventory, onNavItemClick = { onInventoryClick() })
                         BioMedNavItemExpanded(itemName = selectedPage, icon = R.drawable.reports)
+                    }
+                }
+                else -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        BioMedNavItem(R.drawable.dashboard, onNavItemClick = { onDashboardClick() })
+                        BioMedNavItem(icon = R.drawable.scheduler, onNavItemClick = { onSchedulerClick() })
+                        BioMedNavItem(icon = R.drawable.inventory, onNavItemClick = { onInventoryClick() })
+                        BioMedNavItem(icon = R.drawable.reports, onNavItemClick = { onReportsClick() })
                     }
                 }
             }
         }
 
         if (withActionButton) {
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(54.dp),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.primaryContainer
-                    }
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = actionButtonIcon),
-                    modifier = Modifier.size(34.dp),
-                    tint = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    contentDescription = null,
-                )
+            if (isActionButtonText) {
+                TextButton (
+                    onClick = {},
+                    modifier = Modifier
+                        .height(54.dp)
+                        .padding(start = 8.dp),
+                    colors = buttonColors(
+                        containerColor = if (isSystemInDarkTheme()) {
+                            MaterialTheme.colorScheme.secondaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.primaryContainer
+                        }
+                    )
+                ) {
+                    Text(
+                        text = actionButtonText,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(10.dp),
+                        textAlign = TextAlign.Center,
+                        color = if (isSystemInDarkTheme()) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        }
+                    )
+                }
+            } else {
+                IconButton(
+                    onClick = { onActionButtonClick() },
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .size(54.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = if (isSystemInDarkTheme()) {
+                            MaterialTheme.colorScheme.secondaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.primaryContainer
+                        }
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = actionButtonIcon),
+                        modifier = Modifier.size(34.dp),
+                        tint = if (isSystemInDarkTheme()) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        },
+                        contentDescription = null,
+                    )
+                }
             }
         }
     }
@@ -147,9 +204,10 @@ fun BioMedNavBar(
 @Composable
 fun BioMedNavItem(
     icon: Int,
+    onNavItemClick: () -> Unit = {}
 ) {
     IconButton(
-        onClick = { /*TODO*/ },
+        onClick = { onNavItemClick() },
         modifier = Modifier
             .size(40.dp),
         colors = IconButtonDefaults.iconButtonColors(
@@ -162,7 +220,8 @@ fun BioMedNavItem(
     ) {
         Icon(
             painter = painterResource(id = icon),
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier
+                .size(30.dp),
             tint = if (isSystemInDarkTheme()) {
                 MaterialTheme.colorScheme.primary
             } else {
