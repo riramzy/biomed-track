@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -6,12 +6,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
@@ -31,12 +31,12 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedSearchBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    value: String = "",
+    onValueChange: (String) -> Unit = {}
 ) {
     Card(
-        modifier = modifier
-            .width(393.dp)
-            .height(31.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -58,32 +58,22 @@ fun BioMedSearchBar(
                 contentDescription = null,
                 modifier = Modifier
                     .size(18.dp),
-                tint = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.primary
-                }
+                tint = MaterialTheme.colorScheme.primary
             )
 
             BasicTextField(
-                value = "",
-                onValueChange = {},
+                value = value,
+                onValueChange = { onValueChange(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 8.dp),
                 singleLine = true,
                 maxLines = 1,
-                cursorBrush = SolidColor(
-                    if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    }
-                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 decorationBox = { innerTextField ->
                     Box(
                         modifier = Modifier
-                            .height(45.dp)
+                            .fillMaxHeight()
                             .fillMaxWidth()
                             .background(
                                 color = Color.Unspecified,
@@ -104,7 +94,11 @@ fun BioMedSearchBar(
 @Composable
 fun BioMedSearchBarPreview() {
     BioMedTheme {
-        BioMedSearchBar()
+        BioMedSearchBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp)
+        )
     }
 }
 
@@ -114,7 +108,11 @@ fun BioMedSearchBarPreview() {
 @Composable
 fun BioMedSearchBarDarkPreview() {
     BioMedTheme {
-        BioMedSearchBar()
+        BioMedSearchBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp)
+        )
     }
 }
 

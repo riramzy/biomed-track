@@ -1,12 +1,13 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,21 +26,23 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 @Composable
 fun BioMedHorizontalSelector(
     modifier: Modifier = Modifier,
-    numberOfItems: Int = 5
+    items: List<String> = emptyList(),
+    selectedItem: String? = null,
+    onItemSelected: (String) -> Unit = {}
 ) {
-    var isSelected = false
-
     LazyRow(
         modifier = modifier
-            .width(386.dp)
+            .wrapContentWidth()
             .height(35.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(numberOfItems) {
+        items(items) { item ->
+            val isSelected = item == selectedItem
+
             TextButton(
                 onClick = {
-                    isSelected = !isSelected
+                    onItemSelected(item)
                 },
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(25.dp),
@@ -60,11 +63,10 @@ fun BioMedHorizontalSelector(
                 )
             ) {
                 Text(
-                    text = "Department",
+                    text = item,
                     style = MaterialTheme.typography.labelLarge,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxSize(),
                     textAlign = TextAlign.Center,
                     color = if (isSelected) {
                         MaterialTheme.colorScheme.onPrimary
@@ -81,7 +83,10 @@ fun BioMedHorizontalSelector(
 @Composable
 fun BioMedHorizontalSelectorPreview() {
     BioMedTheme {
-        BioMedHorizontalSelector()
+        BioMedHorizontalSelector(
+            items = listOf("All", "Dialysis Unit", "OR", "ICU", "PCU"),
+            selectedItem = "OR"
+        )
     }
 }
 
@@ -91,6 +96,9 @@ fun BioMedHorizontalSelectorPreview() {
 @Composable
 fun BioMedHorizontalSelectorDarkPreview() {
     BioMedTheme {
-        BioMedHorizontalSelector()
+        BioMedHorizontalSelector(
+            items = listOf("All", "Dialysis Unit", "OR", "ICU", "PCU"),
+            selectedItem = "All"
+        )
     }
 }
