@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.permission.Permission
+import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetAllEquipmentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +21,7 @@ sealed class InventoryUiState {
     data object Loading: InventoryUiState()
     data class Success(
         val equipment: List<Equipment>,
+        val departments: List<Department>,
         val selectedDepartment: Department?,
         val searchQuery: String,
         val canAddEquipment: Boolean,
@@ -30,26 +33,25 @@ sealed class InventoryUiState {
 @HiltViewModel
 class InventoryVm @Inject constructor(
     private val getAllEquipmentsUseCase: GetAllEquipmentUseCase,
+    private val departmentRepo: DepartmentRepo,
     private val sessionManager: SessionManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow<InventoryUiState>(InventoryUiState.Loading)
     val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
-
-    private var _searchQuery = MutableStateFlow("")
-    private var _selectedDepartment = MutableStateFlow<Department?>(null)
+    private val _searchQuery = MutableStateFlow("")
+    private val _selectedDepartment = MutableStateFlow<Department?>(null)
 
     init {
         _uiState .value = InventoryUiState.Loading
-
         viewModelScope.launch {
             combine(
                 getAllEquipmentsUseCase(),
                 _searchQuery,
                 _selectedDepartment,
-                sessionManager.currentUser
-            ) { equipment, query, department, user ->
-                val filteredByDepartment = if (department != null) {
-                    equipment.filter { it.department == department }
+                departmentRepo.getAllDepartments()
+            ) { equipment, query, selectedDepartment, departments ->
+                val filteredByDepartment = if (selectedDepartment != null) {
+                    equipment.filter { it.department == selectedDepartment }
                 } else {
                     equipment
                 }
@@ -64,14 +66,13 @@ class InventoryVm @Inject constructor(
                     }
                 }
 
-                val hasPermission = user?.assignedDepartments?.contains(department) ?: false
-
                 InventoryUiState.Success(
                     equipment = filteredByQuery,
-                    selectedDepartment = department,
+                    departments = departments,
+                    selectedDepartment = selectedDepartment,
                     searchQuery = query,
-                    canAddEquipment = hasPermission,
-                    canDeleteEquipment = hasPermission
+                    canAddEquipment = sessionManager.hasPermission(Permission.ADD_EQUIPMENT),
+                    canDeleteEquipment = sessionManager.hasPermission(Permission.DELETE_EQUIPMENT)
                 )
             }.catch { e ->
                 _uiState.value = InventoryUiState.Error(e.message ?: "Failed to connect to database")
@@ -85,7 +86,7 @@ class InventoryVm @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun filterByDepartment(department: Department) {
+    fun filterByDepartment(department: Department?) {
         _selectedDepartment.value = department
     }
 }
