@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.screens.equipment
+package com.riramzy.biomedtrack.ui.screens.equipment.details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.screens.equipment
+package com.riramzy.biomedtrack.ui.screens.equipment.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
