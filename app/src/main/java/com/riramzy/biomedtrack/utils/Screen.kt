@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.navigation
+package com.riramzy.biomedtrack.utils
 
 sealed class Screen(val route: String) {
     object Splash: Screen("splash")

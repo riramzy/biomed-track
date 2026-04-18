@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
@@ -45,7 +45,9 @@ fun BioMedSelector(
     modifier: Modifier = Modifier,
     title: String,
     placeholder: String,
-    items: List<String>
+    items: List<String>,
+    selectedItem: String = "",
+    onItemSelected: (String) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -117,22 +119,18 @@ fun BioMedSelector(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = placeholder,
+                            text = selectedItem.ifEmpty { placeholder },
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Normal
                         )
 
-                        IconButton(
-                            onClick = { /*TODO*/ },
+                        Icon(
+                            painter = painterResource(R.drawable.dropdown),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.dropdown),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                        )
                     }
                 }
 
@@ -158,6 +156,7 @@ fun BioMedSelector(
                                 Text(item)
                             },
                             onClick = {
+                                onItemSelected(item)
                                 expanded = false
                             }
                         )
