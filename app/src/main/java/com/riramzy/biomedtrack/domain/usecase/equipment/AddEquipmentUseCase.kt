@@ -1,7 +1,7 @@
 package com.riramzy.biomedtrack.domain.usecase.equipment
 
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.permission.hasPermission
@@ -25,6 +25,26 @@ class AddEquipmentUseCase @Inject constructor(
 
         if (equipment.serialNumber.isBlank()) {
             return Result.Error("Equipment serial number cannot be blank")
+        }
+
+        if (equipment.manufacturer.isBlank()) {
+            return Result.Error("Equipment manufacturer cannot be blank")
+        }
+
+        if (equipment.agent.isBlank()) {
+            return Result.Error("Equipment agent cannot be blank")
+        }
+
+        if (equipment.category.isBlank()) {
+            return Result.Error("Equipment category cannot be blank")
+        }
+
+        if (equipment.location.isBlank()) {
+            return Result.Error("Equipment location cannot be blank")
+        }
+
+        if (equipment.installDate.isBlank()) {
+            return Result.Error("Equipment install date cannot be blank")
         }
 
         return equipmentRepository.addEquipment(equipment)

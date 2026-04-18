@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
@@ -19,7 +19,6 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,24 +37,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BioMedDateSelector(
     modifier: Modifier = Modifier,
     title: String = "Date",
+    selectedDate: String = "Select Date",
+    onDateSelected: (String) -> Unit = {}
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
-
     val datePickerState = rememberDatePickerState()
-
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        val date = java.time.Instant.ofEpochMilli(it)
-            .atZone(java.time.ZoneId.systemDefault())
-            .toLocalDate()
-            .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-        date.toString()
-    } ?: "Select Date"
 
     Column(
         modifier = modifier
@@ -116,22 +111,18 @@ fun BioMedDateSelector(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = selectedDate,
+                        text = selectedDate.ifEmpty { "Select Date" },
                         style = MaterialTheme.typography.labelLarge,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal
                     )
 
-                    IconButton(
-                        onClick = { /*TODO*/ },
+                    Icon(
+                        painter = painterResource(R.drawable.date),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.date),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    )
                 }
             }
 
@@ -143,6 +134,13 @@ fun BioMedDateSelector(
                     confirmButton = {
                         TextButton(
                             onClick = {
+                                datePickerState.selectedDateMillis?.let {
+                                    val date = Instant.ofEpochMilli(it)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate()
+                                        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                    onDateSelected(date)
+                                }
                                 showDatePicker = false
                             }
                         ) {
