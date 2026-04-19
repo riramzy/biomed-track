@@ -1,6 +1,5 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.add
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
@@ -31,7 +30,7 @@ data class AddEquipmentUiState(
     val departments: List<Department> = emptyList(),
     val currentStatus: EquipmentStatus? = null,
     val installDate: String = "",
-    val warrantyEndDate: String = "",
+    val warrantyEndDate: String? = "",
     val isLoading: Boolean = false,
     val isError: String? = null,
     val isSuccess: Boolean = false
@@ -76,8 +75,6 @@ class AddEquipmentVm @Inject constructor(
     }
 
     fun onAction(action: AddEquipmentAction) {
-        Log.d("DEBUG", action.toString())
-
         when(action) {
             is AddEquipmentAction.UpdateName -> { _uiState.update { it.copy(name = action.name) } }
             is AddEquipmentAction.UpdateModel -> { _uiState.update { it.copy(model = action.model) } }
@@ -138,7 +135,7 @@ class AddEquipmentVm @Inject constructor(
                         _uiState.update { it.copy(isError = "Please select an install date", isLoading = false) }
                         return@launch
                     }
-                    if (currentState.warrantyEndDate.isEmpty()) {
+                    if (currentState.warrantyEndDate == null) {
                         _uiState.update { it.copy(isError = "Please select a warranty end date", isLoading = false) }
                         return@launch
                     }
@@ -167,7 +164,6 @@ class AddEquipmentVm @Inject constructor(
                 department = currentState.department,
                 status = currentState.currentStatus,
                 installDate = currentState.installDate,
-                contractInfo = "${currentState.agent}, ${currentState.manufacturer}",
                 serviceIntervalDays = 30,
                 createdBy = sessionManager.currentUser.value!!.name
             )
