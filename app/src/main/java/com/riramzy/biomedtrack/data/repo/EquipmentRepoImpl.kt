@@ -7,10 +7,10 @@ import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.EquipmentDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
+import com.riramzy.biomedtrack.utils.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -92,12 +92,12 @@ class EquipmentRepoImpl @Inject constructor(
 
     override suspend fun addEquipment(equipment: Equipment): Result<Unit> {
         return try {
-            firebaseFirestore
+            val docRef = firebaseFirestore
                 .collection(FirestoreCollections.EQUIPMENT)
-                .document(equipment.id)
-                .set(equipment.toDto())
-                .await()
-            equipmentDao.insertEquipment(equipment.toEntity())
+                .document()
+            val finalEquipment = equipment.copy(id = docRef.id)
+            docRef.set(finalEquipment.toDto()).await()
+            equipmentDao.insertEquipment(finalEquipment.toEntity())
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to add equipment", e)
