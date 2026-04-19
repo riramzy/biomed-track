@@ -34,7 +34,6 @@ fun AddEquipmentScreen(
 ) {
     val state by addEquipmentVm.uiState.collectAsStateWithLifecycle()
 
-
     AddEquipmentScreenContent(
         navController = navController,
         state = state,
