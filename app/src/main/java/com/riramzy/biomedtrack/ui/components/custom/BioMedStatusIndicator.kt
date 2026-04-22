@@ -1,4 +1,4 @@
-package com.riramzy.biomedtrack.ui.components
+package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -29,11 +29,14 @@ import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 
 @Composable
 fun BioMedStatusIndicator(
     modifier: Modifier = Modifier,
-    status: String = "Online"
+    status: String = "Assigned",
+    color: Color = MaterialTheme.indicatorColors.green,
+    changeable: Boolean = true
 ) {
     Card(
         modifier = modifier
@@ -42,46 +45,58 @@ fun BioMedStatusIndicator(
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = when (status) {
-                "Online" -> MaterialTheme.indicatorColors.green
-                "Down" -> MaterialTheme.indicatorColors.red
-                "Service" -> MaterialTheme.indicatorColors.yellow
-                else -> if (isSystemInDarkTheme()) {
+                EquipmentStatus.ONLINE.name -> MaterialTheme.indicatorColors.green
+                EquipmentStatus.DOWN.name -> MaterialTheme.indicatorColors.red
+                EquipmentStatus.SERVICE.name -> MaterialTheme.indicatorColors.yellow
+                "Log" -> if (isSystemInDarkTheme()) {
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
                     MaterialTheme.colorScheme.primary
+                }
+                else -> if (isSystemInDarkTheme()) {
+                    color
+                } else {
+                    color
                 }
             }
         )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 6.dp)
         ) {
-            Text(
-                text = status,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 4.dp)
-            )
-
-            IconButton(
-                onClick = {},
-                modifier = Modifier.size(10.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 6.dp)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.dropdown),
-                    contentDescription = null,
-                    tint = Color.White
+                Text(
+                    text = status,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
                 )
+
+                if (changeable) {
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.size(10.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.dropdown),
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                }
             }
         }
-
     }
 }
 

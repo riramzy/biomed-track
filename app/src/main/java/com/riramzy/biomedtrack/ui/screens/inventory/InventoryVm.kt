@@ -7,7 +7,9 @@ import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
+import com.riramzy.biomedtrack.domain.usecase.equipment.ChangeEquipmentStatusUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetAllEquipmentUseCase
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +35,7 @@ sealed class InventoryUiState {
 @HiltViewModel
 class InventoryVm @Inject constructor(
     private val getAllEquipmentsUseCase: GetAllEquipmentUseCase,
+    private val changeEquipmentStatusUseCase: ChangeEquipmentStatusUseCase,
     private val departmentRepo: DepartmentRepo,
     private val sessionManager: SessionManager
 ): ViewModel() {
@@ -88,5 +91,11 @@ class InventoryVm @Inject constructor(
 
     fun filterByDepartment(department: Department?) {
         _selectedDepartment.value = department
+    }
+
+    fun changeStatus(equipment: Equipment, newStatus: EquipmentStatus, notes: String) {
+        viewModelScope.launch {
+            changeEquipmentStatusUseCase(equipment, newStatus, notes)
+        }
     }
 }

@@ -7,7 +7,7 @@ import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.StatusChangeLogDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.StatusChangeLog
 import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
 import kotlinx.coroutines.CoroutineScope
