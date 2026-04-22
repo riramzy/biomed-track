@@ -23,6 +23,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,13 +38,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedHorizontalSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedSearchBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
+import com.riramzy.biomedtrack.ui.components.equipment.BioMedChangeStatusDialog
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentOverviewCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Screen
 
 @Composable
@@ -56,7 +62,10 @@ fun InventoryScreen(
         state = state,
         onSearchQueryChange = { inventoryVm.searchInventory(it) },
         onDepartmentSelected = { inventoryVm.filterByDepartment(it) },
-        onRetryClick = {  }
+        onRetryClick = {  },
+        onStatusChangeConfirm = { equipment, status, note ->
+            inventoryVm.changeStatus(equipment, status, note)
+        }
     )
 }
 
@@ -66,7 +75,8 @@ fun InventoryScreenContent(
     state: InventoryUiState = InventoryUiState.Loading,
     onSearchQueryChange: (String) -> Unit = {},
     onDepartmentSelected: (Department?) -> Unit = {},
-    onRetryClick: () -> Unit = {}
+    onRetryClick: () -> Unit = {},
+    onStatusChangeConfirm: (Equipment, EquipmentStatus, String) -> Unit = { _, _, _ -> }
 ) {
     when(state) {
         is InventoryUiState.Error -> {
@@ -162,6 +172,8 @@ fun InventoryScreenContent(
             }
         }
         is InventoryUiState.Success -> {
+            var selectedEquipment by remember { mutableStateOf<Equipment?>(null) }
+
             Scaffold(
                 topBar = {
                     BioMedTopAppBar(
@@ -314,9 +326,25 @@ fun InventoryScreenContent(
                             category = equipment.category,
                             department = equipment.department,
                             nextServiceDate = equipment.nextMaintenanceDate,
-                            onCardClick = { navController.navigate(Screen.EquipmentDetail.createRoute(equipment.id)) }
+                            onCardClick = {
+                                navController.navigate(Screen.EquipmentDetail.createRoute(equipment.id))
+                            },
+                            onStatusClick = {
+                                selectedEquipment = equipment
+                            }
                         )
                     }
+                }
+
+                selectedEquipment?.let { equipment ->
+                    BioMedChangeStatusDialog(
+                        equipmentName = "${equipment.name} ${equipment.model}",
+                        onDismiss = { selectedEquipment = null },
+                        onConfirm = { newStatus, note ->
+                            onStatusChangeConfirm(equipment, newStatus, note)
+                            selectedEquipment = null
+                        }
+                    )
                 }
             }
         }

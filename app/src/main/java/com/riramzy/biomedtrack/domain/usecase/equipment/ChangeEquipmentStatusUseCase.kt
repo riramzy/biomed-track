@@ -1,9 +1,9 @@
 package com.riramzy.biomedtrack.domain.usecase.equipment
 
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Equipment
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.StatusChangeLog
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
@@ -27,16 +27,18 @@ class ChangeEquipmentStatusUseCase @Inject constructor(
         }
 
         val statusChangeLog = StatusChangeLog(
+            id = UUID.randomUUID().toString(),
             equipmentId = equipment.id,
             equipmentName = equipment.name,
+            equipmentModel = equipment.model,
+            equipmentSerial = equipment.serialNumber,
+            department = equipment.department,
             previousStatus = equipment.status,
             newStatus = newStatus,
-            notes = notes,
             changedBy = currentUser.id,
             changedByName = currentUser.name,
-            department = equipment.department,
             timestamp = System.currentTimeMillis().toString(),
-            id = UUID.randomUUID().toString(),
+            notes = notes
         )
 
         val updateResult = equipmentRepository.updateEquipment(equipment.copy(status = newStatus))
