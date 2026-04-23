@@ -2,13 +2,11 @@ package com.riramzy.biomedtrack.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
-import com.riramzy.biomedtrack.domain.model.MaintenanceType
-import kotlin.String
+import com.riramzy.biomedtrack.utils.MaintenanceType
 
 @Entity(tableName = "maintenance_log")
 data class MaintenanceLogEntity(
@@ -16,13 +14,13 @@ data class MaintenanceLogEntity(
     val equipmentId: String,
     val equipmentName: String,
     val equipmentSerial: String,
-    val department: String,
-    val type: String,
+    val department: Department,
+    val type: MaintenanceType,
     val technicianId: String,
     val technicianName: String,
     val date: String,
-    val currentStatus: String,
-    val checklist: String,
+    val currentStatus: EquipmentStatus,
+    val checklist: List<ChecklistItem>,
     val notes: String,
     val photoUrl: String? = null,
     val workDone: String
@@ -32,13 +30,13 @@ data class MaintenanceLogEntity(
         equipmentId = equipmentId,
         equipmentName = equipmentName,
         equipmentSerial = equipmentSerial,
-        department = Department.valueOf(department),
-        type = MaintenanceType.valueOf(type),
+        department = department,
+        type = type,
         technicianId = technicianId,
         technicianName = technicianName,
         date = date,
-        currentStatus = EquipmentStatus.valueOf(currentStatus),
-        checklist = Gson().fromJson(checklist, Array<ChecklistItem>::class.java).toList(),
+        currentStatus = currentStatus,
+        checklist = checklist,
         notes = notes,
         photoUrl = photoUrl,
         workDone = workDone
@@ -50,13 +48,13 @@ fun MaintenanceLog.toEntity() = MaintenanceLogEntity(
     equipmentId = equipmentId,
     equipmentName = equipmentName,
     equipmentSerial = equipmentSerial,
-    department = department.name,
-    type = type.name,
+    department = department,
+    type = type,
     technicianId = technicianId,
     technicianName = technicianName,
     date = date,
-    currentStatus = currentStatus.name,
-    checklist = Gson().toJson(checklist),
+    currentStatus = currentStatus,
+    checklist = checklist,
     notes = notes,
     photoUrl = photoUrl,
     workDone = workDone

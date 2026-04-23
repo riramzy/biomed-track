@@ -1,11 +1,11 @@
 package com.riramzy.biomedtrack.domain.usecase.maintenance
 
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
+import com.riramzy.biomedtrack.utils.Result
 import java.time.LocalDate
 import javax.inject.Inject
 
