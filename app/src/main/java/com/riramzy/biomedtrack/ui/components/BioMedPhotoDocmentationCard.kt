@@ -3,15 +3,16 @@ package com.riramzy.biomedtrack.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -28,23 +30,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedPhotoDocumentationCard(
     modifier: Modifier = Modifier,
     title: String = "Photo Documentation",
-    description: String = "Take photos of installation reports or documentations"
+    description: String = "Take photos of reports of documentations",
+    capturedPhotoUri: String? = null,
+    addPhotoClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(
-                start = 20.dp,
-                end = 20.dp,
-                bottom = 15.dp
-            )
     ) {
         Text(
             text = title,
@@ -62,11 +64,11 @@ fun BioMedPhotoDocumentationCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Card(
-                modifier = Modifier
-                    .width(328.dp)
-                    .height(165.dp),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor =  if (isSystemInDarkTheme()) {
@@ -85,36 +87,71 @@ fun BioMedPhotoDocumentationCard(
                 )
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.camera),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .size(40.dp),
-                        contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(
-                            MaterialTheme.colorScheme.primary
+                    if (capturedPhotoUri != null) {
+                        AsyncImage(
+                            model = capturedPhotoUri,
+                            contentDescription = "Captured Photo",
+                            modifier = Modifier
+                                .padding(bottom = 8.dp)
+                                .size(40.dp)
                         )
-                    )
+                    } else {
+                        Image(
+                            painter = painterResource(R.drawable.camera),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(bottom = 8.dp)
+                                .size(40.dp),
+                            contentScale = ContentScale.Fit,
+                            colorFilter = ColorFilter.tint(
+                                MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
 
                     BioMedButton(
-                        text = "Add Photo",
+                        text = if (capturedPhotoUri != null) "Change Photo" else "Add Photo",
                         modifier = Modifier
-                            .padding(bottom = 8.dp)
+                            .width(120.dp)
+                            .padding(bottom = 8.dp),
+                        onClick = { addPhotoClick() }
                     )
 
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.secondary,
-                        textAlign = TextAlign.Center
-                    )
+                    if (capturedPhotoUri != null) {
+                        Box(
+                            modifier
+                                .background(
+                                    color = MaterialTheme.indicatorColors.green,
+                                    shape = CircleShape
+                                )
+                        ) {
+                            Text(
+                                text = "Picture captured successfully",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 15.dp, vertical = 2.dp)
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.secondary,
+                            textAlign = TextAlign.Center
+
+                        )
+                    }
                 }
             }
         }

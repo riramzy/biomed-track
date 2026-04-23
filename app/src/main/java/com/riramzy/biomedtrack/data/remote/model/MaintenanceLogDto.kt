@@ -2,10 +2,9 @@ package com.riramzy.biomedtrack.data.remote.model
 
 import androidx.annotation.Keep
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
-import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
-import com.riramzy.biomedtrack.domain.model.MaintenanceType
+import com.riramzy.biomedtrack.utils.MaintenanceType
 
 @Keep
 data class MaintenanceLogDto(
@@ -13,7 +12,7 @@ data class MaintenanceLogDto(
     val equipmentId: String = "",
     val equipmentName: String = "",
     val equipmentSerial: String = "",
-    val department: String = "",
+    val department: DepartmentDto = DepartmentDto(),
     val type: String = "",
     val technicianId: String = "",
     val technicianName: String = "",
@@ -29,7 +28,7 @@ data class MaintenanceLogDto(
         equipmentId = equipmentId,
         equipmentName = equipmentName,
         equipmentSerial = equipmentSerial,
-        department = Department.valueOf(department),
+        department = department.toDomain(),
         type = MaintenanceType.valueOf(type),
         technicianId = technicianId,
         technicianName = technicianName,
@@ -53,7 +52,7 @@ fun MaintenanceLog.toDto() = MaintenanceLogDto(
     equipmentId = equipmentId,
     equipmentName = equipmentName,
     equipmentSerial = equipmentSerial,
-    department = department.name,
+    department = department.toDto(),
     type = type.name,
     technicianId = technicianId,
     technicianName = technicianName,

@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,7 +37,7 @@ fun BioMedTextField(
     modifier: Modifier = Modifier,
     label: String = "By",
     placeholder: String = "Placeholder",
-    value: String = "Value",
+    value: String = "",
     onValueChange: (String) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -48,11 +47,6 @@ fun BioMedTextField(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(
-                start = 20.dp,
-                end = 20.dp,
-                bottom = 15.dp
-            )
     ) {
         Text(
             text = label,
@@ -74,14 +68,8 @@ fun BioMedTextField(
         ) {
             Card(
                 modifier = Modifier
-                    .width(328.dp)
-                    .height(
-                        if (isNoteCard) {
-                            93.dp
-                        } else {
-                            45.dp
-                        }
-                    ),
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = if (isSystemInDarkTheme()) {
@@ -94,7 +82,7 @@ fun BioMedTextField(
                     BorderStroke(
                         width = 1.dp,
                         color = if (isSystemInDarkTheme()) {
-                            MaterialTheme.colorScheme.secondary
+                            MaterialTheme.colorScheme.secondaryContainer
                         } else {
                             MaterialTheme.colorScheme.primaryContainer
                         }
@@ -103,7 +91,7 @@ fun BioMedTextField(
                     BorderStroke(
                         width = 1.dp,
                         color = if (isSystemInDarkTheme()) {
-                            MaterialTheme.colorScheme.secondaryContainer
+                            MaterialTheme.colorScheme.secondary
                         } else {
                             MaterialTheme.colorScheme.primary
                         }
@@ -112,10 +100,8 @@ fun BioMedTextField(
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxSize()
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
                 ) {
                     BasicTextField(
                         value = value,
@@ -132,13 +118,7 @@ fun BioMedTextField(
                         ),
                         keyboardOptions = keyboardOptions,
                         visualTransformation = visualTransformation,
-                        cursorBrush = SolidColor(
-                            if (isSystemInDarkTheme()) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.primary
-                            }
-                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         decorationBox = { innerTextField ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -147,14 +127,6 @@ fun BioMedTextField(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .height(
-                                            if (isNoteCard) {
-                                                93.dp
-                                            } else {
-                                                45.dp
-                                            }
-                                        )
-                                        .fillMaxWidth()
                                         .weight(1f)
                                         .background(
                                             color = Color.Unspecified,

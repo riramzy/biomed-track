@@ -1,9 +1,9 @@
 package com.riramzy.biomedtrack.domain.repo
 
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import kotlinx.coroutines.flow.Flow
-import com.riramzy.biomedtrack.domain.Result
 
 interface MaintenanceRepo {
     fun getEquipmentLog(equipmentId: String): Flow<List<MaintenanceLog>>
