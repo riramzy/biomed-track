@@ -8,18 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,80 +33,92 @@ import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.components.custom.BioMedStatusIndicator
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+import com.riramzy.biomedtrack.utils.ActivityItem
+import com.riramzy.biomedtrack.utils.ActivityType
+import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
+import com.riramzy.biomedtrack.utils.Timestamps.toRelativeTime
 
 @Composable
 fun BioMedNotificationsCard(
     modifier: Modifier = Modifier,
-    status: String = "Assigned",
-    isRead: Boolean = false
+    item: ActivityItem = ActivityItem(
+        id = "1",
+        title = "Task Assigned to You",
+        equipmentId = "1",
+        equipmentName = "Fresenius",
+        equipmentModel = "4008S",
+        equipmentSerial = "434344050",
+        departmentName = "Dialysis Unit",
+        technicianName = "Ramzy Habel",
+        type = ActivityType.TASK_ASSIGNED,
+        timestamp = 1/1/2026,
+        dueDate = "28/4/2026",
+        status = EquipmentStatus.SERVICE.name
+    ),
+    onCardClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
-            .width(386.dp)
-            .height(124.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isRead) {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-                }
+            containerColor = if (item.isRead) {
+                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
             } else {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                }
+                MaterialTheme.colorScheme.primaryContainer
             }
-        )
+        ),
+        onClick = { onCardClick() }
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.padding(15.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 15.dp,
-                        end = 15.dp,
-                        top = 10.dp,
-                        bottom = 10.dp
-                    ),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(
-                    onClick = { /*TODO*/ },
+                Box(
                     modifier = Modifier
-                        .size(34.dp),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = when(status) {
-                            "Online" -> MaterialTheme.indicatorColors.green
-                            "Down" -> MaterialTheme.indicatorColors.red
-                            "Service" -> MaterialTheme.indicatorColors.yellow
-                            "Log" -> if (isSystemInDarkTheme()) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.primary
+                        .size(34.dp)
+                        .background(
+                            shape = CircleShape,
+                            color = when(item.type) {
+                                ActivityType.STATUS_CHANGE ->
+                                    when(item.status) {
+                                        EquipmentStatus.ONLINE.name -> MaterialTheme.indicatorColors.green
+                                        EquipmentStatus.SERVICE.name -> MaterialTheme.indicatorColors.yellow
+                                        EquipmentStatus.DOWN.name -> MaterialTheme.indicatorColors.red
+                                        else -> MaterialTheme.indicatorColors.green
+                                    }
+                                ActivityType.MAINTENANCE_LOG -> if (isSystemInDarkTheme()) {
+                                    MaterialTheme.colorScheme.secondaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.secondary
+                                }
+                                ActivityType.TASK_ASSIGNED -> if (isSystemInDarkTheme()) {
+                                    MaterialTheme.colorScheme.tertiaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.tertiary
+                                }
                             }
-                            else -> if (isSystemInDarkTheme()) {
-                                MaterialTheme.colorScheme.tertiaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.tertiary
-                            }
-                        }
-                    )
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = when(status) {
-                            "Online" -> painterResource(id = R.drawable.activity_online)
-                            "Down" -> painterResource(R.drawable.activity_down)
-                            "Service" -> painterResource(R.drawable.activity_service)
-                            "Assigned" -> painterResource(R.drawable.profile)
-                            else -> painterResource(R.drawable.activity_log)
+                        painter = when(item.type) {
+                            ActivityType.STATUS_CHANGE ->
+                                when(item.status) {
+                                    EquipmentStatus.ONLINE.name -> painterResource(id = R.drawable.activity_online)
+                                    EquipmentStatus.SERVICE.name -> painterResource(R.drawable.activity_service)
+                                    EquipmentStatus.DOWN.name -> painterResource(R.drawable.activity_down)
+                                    else -> painterResource(R.drawable.activity_down)
+                                }
+                            ActivityType.MAINTENANCE_LOG -> painterResource(R.drawable.activity_log)
+                            ActivityType.TASK_ASSIGNED -> painterResource(R.drawable.profile)
                         },
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
@@ -125,7 +133,7 @@ fun BioMedNotificationsCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Status Changed to Online",
+                        text = item.title,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelSmall,
@@ -137,7 +145,7 @@ fun BioMedNotificationsCard(
                     )
 
                     Text(
-                        text = "Fresenius 4008S - 4545885N70",
+                        text = "${item.equipmentName} ${item.equipmentModel} - ${item.equipmentSerial}",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelSmall,
@@ -150,7 +158,19 @@ fun BioMedNotificationsCard(
 
                     BioMedStatusIndicator(
                         modifier = Modifier.padding(top = 5.dp),
-                        status = status,
+                        status = when (item.type.name) {
+                            ActivityType.STATUS_CHANGE.name -> {
+                                when (item.status) {
+                                    EquipmentStatus.ONLINE.name -> EquipmentStatus.ONLINE.name
+                                    EquipmentStatus.SERVICE.name -> EquipmentStatus.SERVICE.name
+                                    EquipmentStatus.DOWN.name -> EquipmentStatus.DOWN.name
+                                    else -> ""
+                                }
+                            }
+                            ActivityType.TASK_ASSIGNED.name -> "ASSIGNED"
+                            ActivityType.MAINTENANCE_LOG.name -> "LOG"
+                            else -> ""
+                        },
                         changeable = false
                     )
 
@@ -159,20 +179,39 @@ fun BioMedNotificationsCard(
                         horizontalAlignment = Alignment.Start,
                         modifier = Modifier.padding(top = 5.dp)
                     ) {
-                        Text(
-                            text = "Dialysis Unit",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = if (isSystemInDarkTheme()) {
-                                Color.White
-                            } else {
-                                Color.Black
-                            }
-                        )
+                        if (item.type == ActivityType.TASK_ASSIGNED) {
+                            Text(
+                                text = "Due: ${item.dueDate}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isSystemInDarkTheme()) {
+                                    Color.White
+                                } else {
+                                    Color.Black
+                                }
+                            )
+                        } else {
+                            Text(
+                                text = item.departmentName,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isSystemInDarkTheme()) {
+                                    Color.White
+                                } else {
+                                    Color.Black
+                                }
+                            )
+                        }
+
 
                         Text(
-                            text = "By Ramsey Ibrahim",
+                            text = if (item.type == ActivityType.TASK_ASSIGNED) {
+                                "Assigned by ${item.technicianName}"
+                            } else {
+                                "By ${item.technicianName}"
+                            },
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.labelSmall,
@@ -194,7 +233,7 @@ fun BioMedNotificationsCard(
                         horizontalArrangement = Arrangement.End
                     ) {
                         Text(
-                            text = "12m ago",
+                            text = item.timestamp.toRelativeTime(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Normal,
                             style = MaterialTheme.typography.labelSmall,
@@ -202,7 +241,7 @@ fun BioMedNotificationsCard(
                             color = MaterialTheme.colorScheme.secondary
                         )
 
-                        if (!isRead) {
+                        if (!item.isRead) {
                             Box(
                                 modifier = Modifier
                                     .padding(start = 5.dp)
@@ -220,7 +259,7 @@ fun BioMedNotificationsCard(
                     }
 
                     Text(
-                        text = "13/3/2026",
+                        text = item.timestamp.toDateString(),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall,
@@ -237,7 +276,22 @@ fun BioMedNotificationsCard(
 @Composable
 fun BioMedNotificationsCardPreview() {
     BioMedTheme {
-        BioMedNotificationsCard()
+        BioMedNotificationsCard(
+            item = ActivityItem(
+                id = "1",
+                title = "Task Assigned to You",
+                equipmentId = "1",
+                equipmentName = "Fresenius",
+                equipmentModel = "4008S",
+                equipmentSerial = "434344050",
+                departmentName = "Dialysis Unit",
+                technicianName = "Ramzy Habel",
+                type = ActivityType.TASK_ASSIGNED,
+                timestamp = System.currentTimeMillis(),
+                dueDate = System.currentTimeMillis().toDateString(),
+                status = EquipmentStatus.ONLINE.name
+            )
+        )
     }
 }
 
@@ -248,6 +302,21 @@ fun BioMedNotificationsCardPreview() {
 @Composable
 fun BioMedNotificationsCardDarkPreview() {
     BioMedTheme {
-        BioMedNotificationsCard()
+        BioMedNotificationsCard(
+            item = ActivityItem(
+                id = "1",
+                title = "Task Assigned to You",
+                equipmentId = "1",
+                equipmentName = "Fresenius",
+                equipmentModel = "4008S",
+                equipmentSerial = "434344050",
+                departmentName = "Dialysis Unit",
+                technicianName = "Ramzy Habel",
+                type = ActivityType.TASK_ASSIGNED,
+                timestamp = System.currentTimeMillis(),
+                dueDate = System.currentTimeMillis().toDateString(),
+                status = EquipmentStatus.ONLINE.name
+            )
+        )
     }
 }
