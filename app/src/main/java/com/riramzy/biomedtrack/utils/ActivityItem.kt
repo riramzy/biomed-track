@@ -4,6 +4,7 @@ data class ActivityItem(
     val id: String,
     val type: ActivityType,
     val title: String,
+    val equipmentId: String,
     val equipmentName: String,
     val equipmentModel: String,
     val equipmentSerial: String,
