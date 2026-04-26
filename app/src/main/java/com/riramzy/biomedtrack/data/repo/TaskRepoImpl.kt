@@ -1,12 +1,13 @@
 package com.riramzy.biomedtrack.data.repo
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.riramzy.biomedtrack.data.local.dao.TaskDao
 import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.TaskDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.repo.TaskRepo
 import jakarta.inject.Inject
@@ -107,6 +108,19 @@ class TaskRepoImpl @Inject constructor(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to delete task", e)
+        }
+    }
+
+    override suspend fun markAsRead(logId: String, userId: String): Result<Unit> {
+        return try {
+            firebaseFirestore
+                .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
+                .document(logId)
+                .update("readBy", FieldValue.arrayUnion(userId))
+                .await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to mark as read", e)
         }
     }
 }

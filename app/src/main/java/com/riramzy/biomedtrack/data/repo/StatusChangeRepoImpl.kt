@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.data.repo
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.riramzy.biomedtrack.data.local.dao.StatusChangeLogDao
@@ -49,29 +50,29 @@ class StatusChangeRepoImpl @Inject constructor(
     }
 
     override fun getStatusChangeForEquipment(equipmentId: String): Flow<List<StatusChangeLog>> = callbackFlow {
-        val listener = firebaseFirestore
-            .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
-            .whereEqualTo("equipmentId", equipmentId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
+            val listener = firebaseFirestore
+                .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
+                .whereEqualTo("equipmentId", equipmentId)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
 
-                val statusChanges = snapshot?.documents?.mapNotNull {
-                    it.toObject(StatusChangeLogDto::class.java)?.toDomain()
-                } ?: emptyList()
+                    val statusChanges = snapshot?.documents?.mapNotNull {
+                        it.toObject(StatusChangeLogDto::class.java)?.toDomain()
+                    } ?: emptyList()
 
-                trySend(statusChanges)
+                    trySend(statusChanges)
 
-                CoroutineScope(Dispatchers.IO).launch {
-                    for (statusChange in statusChanges) {
-                        statusChangeDao.insertStatusChangeLog(statusChange.toEntity())
+                    CoroutineScope(Dispatchers.IO).launch {
+                        for (statusChange in statusChanges) {
+                            statusChangeDao.insertStatusChangeLog(statusChange.toEntity())
+                        }
                     }
                 }
-            }
-        awaitClose { listener.remove() }
-    }
+            awaitClose { listener.remove() }
+        }
 
     override suspend fun logStatusChange(statusChangeLog: StatusChangeLog): Result<Unit> {
         return try {
@@ -83,6 +84,19 @@ class StatusChangeRepoImpl @Inject constructor(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to log status change", e)
+        }
+    }
+
+    override suspend fun markAsRead(logId: String, userId: String): Result<Unit> {
+        return try {
+            firebaseFirestore
+                .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
+                .document(logId)
+                .update("readBy", FieldValue.arrayUnion(userId))
+                .await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to mark as read", e)
         }
     }
 }
