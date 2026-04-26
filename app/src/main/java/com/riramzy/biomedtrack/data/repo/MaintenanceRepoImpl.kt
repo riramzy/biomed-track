@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.data.repo
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.riramzy.biomedtrack.data.local.dao.MaintenanceLogDao
 import com.riramzy.biomedtrack.data.local.entity.toEntity
@@ -23,6 +24,30 @@ class MaintenanceRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val maintenanceDao: MaintenanceLogDao,
 ): MaintenanceRepo {
+    override fun getAllMaintenanceLogs(): Flow<List<MaintenanceLog>> = callbackFlow {
+        val listener = firebaseFirestore
+            .collection(FirestoreCollections.MAINTENANCE_LOGS)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val logs = snapshot?.documents?.mapNotNull {
+                    it.toObject(MaintenanceLogDto::class.java)?.toDomain()
+                } ?: emptyList()
+
+                trySend(logs)
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (log in logs) {
+                        maintenanceDao.insertMaintenanceLog(log.toEntity())
+                    }
+                }
+            }
+        awaitClose { listener.remove() }
+    }
+
     override fun getEquipmentLog(equipmentId: String): Flow<List<MaintenanceLog>> = callbackFlow {
         val listener = firebaseFirestore
             .collection(FirestoreCollections.MAINTENANCE_LOGS)
@@ -129,6 +154,19 @@ class MaintenanceRepoImpl @Inject constructor(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to delete maintenance log", e)
+        }
+    }
+
+    override suspend fun markAsRead(logId: String, userId: String): Result<Unit> {
+        return try {
+            firebaseFirestore
+                .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
+                .document(logId)
+                .update("readBy", FieldValue.arrayUnion(userId))
+                .await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to mark as read", e)
         }
     }
 }

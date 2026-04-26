@@ -8,4 +8,5 @@ interface StatusChangeRepo {
     fun getStatusChangeForEquipment(equipmentId: String): Flow<List<StatusChangeLog>>
     fun getRecentStatusChanges(limit: Int): Flow<List<StatusChangeLog>>
     suspend fun logStatusChange(statusChangeLog: StatusChangeLog): Result<Unit>
+    suspend fun markAsRead(logId: String, userId: String): Result<Unit>
 }
