@@ -7,12 +7,11 @@ import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.TechnicianDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Technician
-import com.riramzy.biomedtrack.domain.model.UserRole
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
+import com.riramzy.biomedtrack.utils.Result
+import com.riramzy.biomedtrack.utils.UserRole
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -20,13 +19,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AuthRepoImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseFirestore: FirebaseFirestore,
     private val technicianDao: TechnicianDao,
-    private val sessionManager: SessionManager
 ): AuthRepo {
     override suspend fun createUser(technician: Technician, password: String): Result<Technician> {
         return try {
@@ -101,6 +100,7 @@ class AuthRepoImpl @Inject constructor(
                 .await()
                 .toObject(TechnicianDto::class.java)?.toDomain()
         } catch (e: Exception) {
+            e.printStackTrace()
             return null
         }
     }
@@ -153,7 +153,7 @@ class AuthRepoImpl @Inject constructor(
             firebaseFirestore
                 .collection(FirestoreCollections.TECHNICIANS)
                 .document(userId)
-                .update("assignedDepartments", departments.map { it.name })
+                .update("assignedDepartments", departments.map { it.toDto() })
                 .await()
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -184,6 +184,24 @@ class AuthRepoImpl @Inject constructor(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to activate user", e)
+        }
+    }
+
+    override suspend fun updateFcmToken(
+        userId: String,
+        token: String
+    ): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                firebaseFirestore
+                    .collection(FirestoreCollections.TECHNICIANS)
+                    .document(userId)
+                    .update("fcmToken", token)
+                    .await()
+                return@withContext Result.Success(Unit)
+            } catch (e: Exception) {
+               return@withContext Result.Error(e.message ?: "Failed to update fcm token", e)
+            }
         }
     }
 }
