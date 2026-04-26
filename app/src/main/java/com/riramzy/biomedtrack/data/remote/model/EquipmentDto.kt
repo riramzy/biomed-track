@@ -1,9 +1,8 @@
 package com.riramzy.biomedtrack.data.remote.model
 
 import androidx.annotation.Keep
-import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 
 @Keep
 data class EquipmentDto(
@@ -14,14 +13,15 @@ data class EquipmentDto(
     val manufacturer: String = "",
     val agent: String = "",
     val category: String = "",
-    val department: String = "",
+    val department: DepartmentDto = DepartmentDto(),
     val status: String = "",
     val location: String = "",
-    val installDate: String = "",
-    val lastMaintenanceDate: String? = null,
-    val nextMaintenanceDate: String? = null,
+    val installDate: Long = 0L,
+    val lastMaintenanceDate: Long? = null,
+    val nextMaintenanceDate: Long? = null,
     val serviceIntervalDays: Int = 90,
     val contractInfo: String? = null,
+    val warrantyEndDate: Long? = null,
     val createdBy: String = "",
     val assignedTo: String? = null
 ) {
@@ -33,7 +33,7 @@ data class EquipmentDto(
         manufacturer = manufacturer,
         agent = agent,
         category = category,
-        department = Department.valueOf(department),
+        department = department.toDomain(),
         status = EquipmentStatus.valueOf(status),
         location = location,
         installDate = installDate,
@@ -41,6 +41,7 @@ data class EquipmentDto(
         nextMaintenanceDate = nextMaintenanceDate,
         serviceIntervalDays = serviceIntervalDays,
         contractInfo = contractInfo,
+        warrantyEndDate = warrantyEndDate,
         createdBy = createdBy,
         assignedTo = assignedTo,
     )
@@ -54,7 +55,7 @@ fun Equipment.toDto() = EquipmentDto(
     manufacturer = manufacturer,
     agent = agent,
     category = category,
-    department = department.name,
+    department = department.toDto(),
     status = status.name,
     location = location,
     installDate = installDate,
@@ -62,6 +63,7 @@ fun Equipment.toDto() = EquipmentDto(
     nextMaintenanceDate = nextMaintenanceDate,
     serviceIntervalDays = serviceIntervalDays,
     contractInfo = contractInfo,
+    warrantyEndDate = warrantyEndDate,
     createdBy = createdBy,
     assignedTo = assignedTo,
 )

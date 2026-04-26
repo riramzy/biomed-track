@@ -29,8 +29,8 @@ data class AddEquipmentUiState(
     val department: Department? = null,
     val departments: List<Department> = emptyList(),
     val currentStatus: EquipmentStatus? = null,
-    val installDate: String = "",
-    val warrantyEndDate: String? = "",
+    val installDate: Long = 0L,
+    val warrantyEndDate: Long? = null,
     val isLoading: Boolean = false,
     val isError: String? = null,
     val isSuccess: Boolean = false
@@ -46,8 +46,8 @@ sealed class AddEquipmentAction {
     data class UpdateLocation(val location: String): AddEquipmentAction()
     data class UpdateDepartment(val department: Department): AddEquipmentAction()
     data class UpdateCurrentStatus(val currentStatus: EquipmentStatus): AddEquipmentAction()
-    data class UpdateInstallDate(val installDate: String): AddEquipmentAction()
-    data class UpdateWarrantyEndDate(val warrantyEndDate: String): AddEquipmentAction()
+    data class UpdateInstallDate(val installDate: Long): AddEquipmentAction()
+    data class UpdateWarrantyEndDate(val warrantyEndDate: Long): AddEquipmentAction()
     data object ResetError: AddEquipmentAction()
     data object Save: AddEquipmentAction()
 }
@@ -131,7 +131,7 @@ class AddEquipmentVm @Inject constructor(
                         _uiState.update { it.copy(isError = "Please select a location", isLoading = false) }
                         return@launch
                     }
-                    if (currentState.installDate.isEmpty()) {
+                    if (currentState.installDate == 0L) {
                         _uiState.update { it.copy(isError = "Please select an install date", isLoading = false) }
                         return@launch
                     }

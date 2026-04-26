@@ -34,12 +34,11 @@ class AddMaintenanceLogUseCase @Inject constructor(
 
         val nextMaintenanceDate = LocalDate.now()
             .plusDays(equipment.serviceIntervalDays.toLong())
-            .toString()
 
         val updatedEquipmentResult = equipmentRepository.updateEquipment(
             equipment.copy(
                 lastMaintenanceDate = log.date,
-                nextMaintenanceDate = nextMaintenanceDate
+                nextMaintenanceDate = nextMaintenanceDate.toEpochDay()
             )
         )
         if (updatedEquipmentResult is Result.Error) {
