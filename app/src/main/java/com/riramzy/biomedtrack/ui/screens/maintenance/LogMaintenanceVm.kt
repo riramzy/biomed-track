@@ -26,10 +26,11 @@ import javax.inject.Inject
 data class LogMaintenanceUiState(
     val equipmentName: String = "",
     val equipmentSerial: String = "",
+    val equipmentModel: String = "",
     val department: Department = Department("", "", 25),
     val type: MaintenanceType = MaintenanceType.REPAIR,
     val currentStatus: EquipmentStatus = EquipmentStatus.SERVICE,
-    val date: String = "",
+    val date: Long = System.currentTimeMillis(),
     val notes: String = "",
     val workDone: String = "",
     val technicianName: String = "",
@@ -46,7 +47,7 @@ sealed class LogMaintenanceAction {
     data class UpdateStatus(val status: EquipmentStatus): LogMaintenanceAction()
     data class ToggleChecklistItem(val item: ChecklistItem): LogMaintenanceAction()
     data class UpdateNotes(val notes: String): LogMaintenanceAction()
-    data class UpdateDate(val date: String): LogMaintenanceAction()
+    data class UpdateDate(val date: Long): LogMaintenanceAction()
     data class AddPhoto(val uri: String): LogMaintenanceAction()
     data object ResetError: LogMaintenanceAction()
     data object Save: LogMaintenanceAction()
@@ -173,6 +174,7 @@ class LogMaintenanceVm @Inject constructor(
                 id = logId,
                 equipmentId = equipmentId,
                 equipmentName = currentState.equipmentName,
+                equipmentModel = currentState.equipmentModel,
                 equipmentSerial = currentState.equipmentSerial,
                 department = currentState.department,
                 type = currentState.type,

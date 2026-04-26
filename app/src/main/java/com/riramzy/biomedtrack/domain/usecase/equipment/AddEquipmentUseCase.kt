@@ -43,7 +43,7 @@ class AddEquipmentUseCase @Inject constructor(
             return Result.Error("Equipment location cannot be blank")
         }
 
-        if (equipment.installDate.isBlank()) {
+        if (equipment.installDate == 0L) {
             return Result.Error("Equipment install date cannot be blank")
         }
 

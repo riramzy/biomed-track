@@ -1,10 +1,11 @@
 package com.riramzy.biomedtrack.domain.usecase.task
 
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.TaskRepo
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 import jakarta.inject.Inject
 
 class AddTaskUseCase @Inject constructor(
@@ -26,7 +27,7 @@ class AddTaskUseCase @Inject constructor(
             return Result.Error("Assigned to cannot be empty")
         }
 
-        if (task.dueDate.isBlank()) {
+        if (task.dueDate.toDateString().isBlank()) {
             return Result.Error("Due date cannot be empty")
         }
 
