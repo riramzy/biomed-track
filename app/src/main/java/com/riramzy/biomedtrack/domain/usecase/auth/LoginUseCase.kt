@@ -4,7 +4,7 @@ import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
 import javax.inject.Inject
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepo,
