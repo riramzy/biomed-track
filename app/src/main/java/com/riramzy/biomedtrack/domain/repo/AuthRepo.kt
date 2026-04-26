@@ -1,10 +1,10 @@
 package com.riramzy.biomedtrack.domain.repo
 
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Technician
-import com.riramzy.biomedtrack.domain.model.UserRole
+import com.riramzy.biomedtrack.utils.UserRole
 import kotlinx.coroutines.flow.Flow
-import com.riramzy.biomedtrack.domain.Result
 
 interface AuthRepo {
     suspend fun login(email: String, password: String): Result<Technician>
@@ -16,4 +16,5 @@ interface AuthRepo {
     suspend fun updateUserDepartments(userId: String, departments: List<Department>): Result<Unit>
     suspend fun deactivateUser(userId: String): Result<Unit>
     suspend fun activateUser(userId: String): Result<Unit>
+    suspend fun updateFcmToken(userId: String, token: String): Result<Unit>
 }
