@@ -16,8 +16,9 @@ data class StatusChangeLogDto(
     val newStatus: String = "",
     val changedBy: String = "",
     val changedByName: String = "",
-    val timestamp: String = "",
-    val notes: String? = null
+    val timestamp: Long = 0L,
+    val notes: String? = null,
+    val readBy: List<String> = emptyList()
 ) {
     fun toDomain() = StatusChangeLog(
         id = id,
@@ -31,7 +32,8 @@ data class StatusChangeLogDto(
         changedBy = changedBy,
         changedByName = changedByName,
         timestamp = timestamp,
-        notes = notes
+        notes = notes,
+        readBy = readBy
     )
 }
 
@@ -47,5 +49,6 @@ fun StatusChangeLog.toDto() = StatusChangeLogDto(
     changedBy = changedBy,
     changedByName = changedByName,
     timestamp = timestamp,
-    notes = notes
+    notes = notes,
+    readBy = readBy
 )

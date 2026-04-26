@@ -2,29 +2,33 @@ package com.riramzy.biomedtrack.data.remote.model
 
 import androidx.annotation.Keep
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
-import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
-import com.riramzy.biomedtrack.domain.model.TaskStatus
+import com.riramzy.biomedtrack.utils.TaskStatus
 
 @Keep
 data class TaskDto(
     val id: String = "",
     val equipmentId: String = "",
     val equipmentName: String = "",
-    val department: String = "",
+    val equipmentModel: String = "",
+    val equipmentSerial: String = "",
+    val department: DepartmentDto = DepartmentDto(),
     val assignedTo: String = "",
     val assignedToName: String = "",
     val assignedBy: String = "",
-    val dueDate: String = "",
+    val dueDate: Long = 0L,
     val status: String = "",
     val notes: String = "",
-    val scheduledChecklist: List<Map<String, Any>> = emptyList()
+    val scheduledChecklist: List<Map<String, Any>> = emptyList(),
+    val readBy: List<String> = emptyList()
 ) {
     fun toDomain() = Task(
         id = id,
         equipmentId = equipmentId,
         equipmentName = equipmentName,
-        department = Department.valueOf(department),
+        equipmentModel = equipmentModel,
+        equipmentSerial = equipmentSerial,
+        department = department.toDomain(),
         assignedTo = assignedTo,
         assignedToName = assignedToName,
         assignedBy = assignedBy,
@@ -37,7 +41,8 @@ data class TaskDto(
                 label = it["label"] as? String ?: "",
                 isChecked = it["isChecked"] as? Boolean ?: false
             )
-        }
+        },
+        readBy = readBy
     )
 }
 
@@ -45,7 +50,9 @@ fun Task.toDto() = TaskDto(
     id = id,
     equipmentId = equipmentId,
     equipmentName = equipmentName,
-    department = department.name,
+    equipmentModel = equipmentModel,
+    equipmentSerial = equipmentSerial,
+    department = department.toDto(),
     assignedTo = assignedTo,
     assignedToName = assignedToName,
     assignedBy = assignedBy,
@@ -54,5 +61,6 @@ fun Task.toDto() = TaskDto(
     notes = notes,
     scheduledChecklist = scheduledChecklist.map {
         mapOf("id" to it.id, "label" to it.label, "isChecked" to it.isChecked)
-    }
+    },
+    readBy = readBy
 )

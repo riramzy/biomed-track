@@ -18,8 +18,9 @@ data class StatusChangeLogEntity(
     val newStatus: EquipmentStatus,
     val changedBy: String,
     val changedByName: String,
-    val timestamp: String,
-    val notes: String?
+    val timestamp: Long,
+    val notes: String?,
+    val readBy: List<String> = emptyList()
 ) {
     fun toDomain() = StatusChangeLog(
         id = id,
@@ -33,7 +34,8 @@ data class StatusChangeLogEntity(
         changedBy = changedBy,
         changedByName = changedByName,
         timestamp = timestamp,
-        notes = notes
+        notes = notes,
+        readBy = readBy
     )
 }
 
@@ -49,5 +51,6 @@ fun StatusChangeLog.toEntity() = StatusChangeLogEntity(
     changedBy = changedBy,
     changedByName = changedByName,
     timestamp = timestamp,
-    notes = notes
+    notes = notes,
+    readBy = readBy
 )
