@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.data.remote.firebase
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -43,6 +44,7 @@ class BioMedMessagingService: FirebaseMessagingService() {
         showNotification(title, body, equipmentId)
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     fun showNotification(title: String?, body: String?, equipmentId: String?) {
         val channelId = "biomed_alerts"
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
