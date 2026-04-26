@@ -14,6 +14,7 @@ data class StatusChangeLog(
     val newStatus: EquipmentStatus,
     val changedBy: String,
     val changedByName: String,
-    val timestamp: String,
-    val notes: String?
+    val timestamp: Long,
+    val notes: String?,
+    val readBy: List<String> = emptyList()
 )

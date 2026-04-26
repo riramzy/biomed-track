@@ -2,8 +2,8 @@ package com.riramzy.biomedtrack.data.remote.model
 
 import androidx.annotation.Keep
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
-import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.MaintenanceType
 
 @Keep
@@ -11,22 +11,25 @@ data class MaintenanceLogDto(
     val id: String = "",
     val equipmentId: String = "",
     val equipmentName: String = "",
+    val equipmentModel: String = "",
     val equipmentSerial: String = "",
     val department: DepartmentDto = DepartmentDto(),
     val type: String = "",
     val technicianId: String = "",
     val technicianName: String = "",
-    val date: String = "",
+    val date: Long = 0L,
     val currentStatus: String = "",
     val checklist: List<Map<String, Any>> = emptyList(),
     val notes: String = "",
     val photoUrl: String? = null,
-    val workDone: String = ""
+    val workDone: String = "",
+    val readBy: List<String> = emptyList()
 ) {
     fun toDomain() = MaintenanceLog(
         id = id,
         equipmentId = equipmentId,
         equipmentName = equipmentName,
+        equipmentModel = equipmentModel,
         equipmentSerial = equipmentSerial,
         department = department.toDomain(),
         type = MaintenanceType.valueOf(type),
@@ -43,7 +46,8 @@ data class MaintenanceLogDto(
         },
         notes = notes,
         photoUrl = photoUrl,
-        workDone = workDone
+        workDone = workDone,
+        readBy = readBy
     )
 }
 
@@ -51,6 +55,7 @@ fun MaintenanceLog.toDto() = MaintenanceLogDto(
     id = id,
     equipmentId = equipmentId,
     equipmentName = equipmentName,
+    equipmentModel = equipmentModel,
     equipmentSerial = equipmentSerial,
     department = department.toDto(),
     type = type.name,
@@ -63,5 +68,6 @@ fun MaintenanceLog.toDto() = MaintenanceLogDto(
     },
     notes = notes,
     photoUrl = photoUrl,
-    workDone = workDone
+    workDone = workDone,
+    readBy = readBy
 )
