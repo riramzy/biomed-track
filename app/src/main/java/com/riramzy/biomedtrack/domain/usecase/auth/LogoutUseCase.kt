@@ -3,7 +3,7 @@ package com.riramzy.biomedtrack.domain.usecase.auth
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
 import jakarta.inject.Inject
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 
 class LogoutUseCase @Inject constructor(
     private val authRepository: AuthRepo,
