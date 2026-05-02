@@ -2,6 +2,7 @@ package com.riramzy.biomedtrack.ui.components.report
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,9 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 @Composable
 fun BioMedReportExportFormatCard(
     modifier: Modifier = Modifier,
+    selectedFormat: String = "PDF",
+    onFormatSelected: (String) -> Unit = {},
+    onGenerateReport: () -> Unit = {}
 ) {
     Column(
         modifier = modifier,
@@ -48,13 +52,17 @@ fun BioMedReportExportFormatCard(
             BioMedExportFormatItem(
                 title = "PDF",
                 icon = R.drawable.pdf,
-                note = "Best for sharing and printing"
+                note = "Best for sharing and printing",
+                isSelected = selectedFormat == "PDF",
+                modifier = Modifier.clickable { onFormatSelected("PDF") }
             )
 
             BioMedExportFormatItem(
                 title = "Excel",
                 icon = R.drawable.excel,
-                note = "Best for editing and analysis"
+                note = "Best for editing and analysis",
+                isSelected = selectedFormat == "Excel",
+                modifier = Modifier.clickable { onFormatSelected("Excel") }
             )
         }
 
@@ -72,7 +80,8 @@ fun BioMedReportExportFormatCard(
             } else {
                 MaterialTheme.colorScheme.onPrimary
             },
-            customTextSize = 14
+            customTextSize = 14,
+            onClick = onGenerateReport
         )
     }
 }

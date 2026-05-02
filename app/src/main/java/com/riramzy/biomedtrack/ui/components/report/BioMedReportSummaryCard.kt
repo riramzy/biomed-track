@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -36,11 +36,16 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedReportSummaryCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    totalEquipment: Int = 275,
+    healthy: Int = 220,
+    dueService: Int = 23,
+    down: Int = 17,
+    logsCount: Int = 40
 ) {
     Card(
         modifier = modifier
-            .width(386.dp)
+            .wrapContentWidth()
             .height(203.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
@@ -61,29 +66,29 @@ fun BioMedReportSummaryCard(
             BioMedReportItemCard(
                 icon = R.drawable.inventory,
                 title = "Total Equipment",
-                value = "275"
+                value = totalEquipment.toString()
             )
 
             BioMedReportItemCard(
                 icon = R.drawable.activity_online,
                 title = "Healthy",
-                value = "220"
+                value = healthy.toString()
             )
 
             BioMedReportItemCard(
                 icon = R.drawable.activity_service,
                 title = "Service Due",
-                value = "23"
+                value = dueService.toString()
             )
 
             BioMedReportItemCard(
                 icon = R.drawable.activity_down,
                 title = "Down",
-                value = "17"
+                value = down.toString()
             )
 
             Text(
-                text = "Reports will include 40 maintenance log entries for Down and Service Due Equipment",
+                text = "Reports will include $logsCount maintenance log entries for Down and Service Due Equipment",
                 style = MaterialTheme.typography.labelSmall,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Normal,

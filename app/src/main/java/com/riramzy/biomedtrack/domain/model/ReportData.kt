@@ -6,8 +6,8 @@ data class ReportData (
     val equipmentList: List<Equipment>,
     val maintenanceLogs: List<MaintenanceLog>,
     val department: Department?,
-    val startDate: String,
-    val endDate: String,
+    val startDate: Long,
+    val endDate: Long,
     val generatedAt: String = LocalDate.now().toString(),
     val generatedBy: String
 )

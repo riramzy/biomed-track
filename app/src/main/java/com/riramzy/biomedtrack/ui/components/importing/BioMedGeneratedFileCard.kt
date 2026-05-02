@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -40,12 +40,18 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 @Composable
 fun BioMedGeneratedFileCard(
     modifier: Modifier = Modifier,
-    icon: Int = R.drawable.excel,
-    isUploaded: Boolean = false
+    fileName: String = "hospital_equipment.xlsx",
+    fileSize: String = "10.6 MB",
+    fileFormat: String = "Excel",
+    isUploaded: Boolean = false,
+    onDownloadClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
+    onShareClick: () -> Unit = {},
+    onPreviewClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
-            .width(356.dp)
+            .fillMaxWidth()
             .height(70.dp),
         shape = RoundedCornerShape(50.dp),
         colors = CardDefaults.cardColors(
@@ -54,7 +60,8 @@ fun BioMedGeneratedFileCard(
             } else {
                 MaterialTheme.colorScheme.primaryContainer.copy(0.5f)
             }
-        )
+        ),
+        onClick = { onPreviewClick() }
     ) {
         Row(
             modifier = Modifier
@@ -67,7 +74,11 @@ fun BioMedGeneratedFileCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = icon),
+                    painter = if (fileFormat == "Excel") {
+                        painterResource(id = R.drawable.excel)
+                    } else {
+                        painterResource(id = R.drawable.pdf)
+                           },
                     contentDescription = null,
                     modifier = Modifier
                         .size(40.dp)
@@ -81,7 +92,7 @@ fun BioMedGeneratedFileCard(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "hospital_equipment.xlsx",
+                        text = fileName,
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -93,7 +104,7 @@ fun BioMedGeneratedFileCard(
                     )
 
                     Text(
-                        text = "10.6 MB",
+                        text = fileSize,
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
@@ -149,7 +160,7 @@ fun BioMedGeneratedFileCard(
             ) {
                 if (isUploaded) {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { onDeleteClick() },
                         modifier = Modifier
                             .size(22.dp),
                         colors = IconButtonDefaults.iconButtonColors(
@@ -168,7 +179,7 @@ fun BioMedGeneratedFileCard(
 
                 if (!isUploaded) {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { onShareClick() },
                         modifier = Modifier
                             .size(22.dp),
                         colors = IconButtonDefaults.iconButtonColors(
@@ -191,7 +202,7 @@ fun BioMedGeneratedFileCard(
 
                 if (!isUploaded) {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { onDownloadClick() },
                         modifier = Modifier
                             .size(22.dp),
                         colors = IconButtonDefaults.iconButtonColors(
