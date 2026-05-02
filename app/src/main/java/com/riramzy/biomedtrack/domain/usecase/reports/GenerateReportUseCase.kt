@@ -1,9 +1,9 @@
 package com.riramzy.biomedtrack.domain.usecase.reports
 
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.ReportData
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
@@ -17,8 +17,8 @@ class GenerateReportUseCase @Inject constructor(
     private val sessionManager: SessionManager
 ) {
     suspend operator fun invoke(
-        startDate: String,
-        endDate: String,
+        startDate: Long,
+        endDate: Long,
         department: Department?,
         includeHealthy: Boolean,
         includeDown: Boolean,
@@ -41,7 +41,7 @@ class GenerateReportUseCase @Inject constructor(
         val filteredEquipment = equipmentFilteredByDepartment.filter { equipment ->
             (includeHealthy && equipment.status == EquipmentStatus.ONLINE) ||
                     (includeDown && equipment.status == EquipmentStatus.DOWN) ||
-                    (includeServiceDue && equipment.status == EquipmentStatus.DUE_SERVICE)
+                    (includeServiceDue && equipment.status == EquipmentStatus.SERVICE)
         }
 
         val logs = maintenanceRepo.getLogsByDateRange(startDate, endDate, department)
