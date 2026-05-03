@@ -2,10 +2,9 @@ package com.riramzy.biomedtrack.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Technician
-import com.riramzy.biomedtrack.domain.model.UserRole
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Entity(tableName = "technician")
 data class TechnicianEntity(
@@ -13,8 +12,8 @@ data class TechnicianEntity(
     val name: String,
     val employeeId: String,
     val email: String,
-    val role: String,
-    val assignedDepartments: String,
+    val role: UserRole,
+    val assignedDepartments: List<Department>,
     val isActive: Boolean
 ) {
     fun toDomain() = Technician(
@@ -22,8 +21,8 @@ data class TechnicianEntity(
         name = name,
         employeeId = employeeId,
         email = email,
-        role = UserRole.valueOf(role),
-        assignedDepartments = Gson().fromJson(assignedDepartments, Array<Department>::class.java).toList(),
+        role = role,
+        assignedDepartments = assignedDepartments,
         isActive = isActive
     )
 }
@@ -33,7 +32,7 @@ fun Technician.toEntity() = TechnicianEntity(
     name = name,
     employeeId = employeeId,
     email = email,
-    role = role.name,
-    assignedDepartments = Gson().toJson(assignedDepartments),
+    role = role,
+    assignedDepartments = assignedDepartments,
     isActive = isActive
 )
