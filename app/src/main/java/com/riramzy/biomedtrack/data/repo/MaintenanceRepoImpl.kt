@@ -99,8 +99,8 @@ class MaintenanceRepoImpl @Inject constructor(
     }
 
     override suspend fun getLogsByDateRange(
-        startDate: String,
-        endDate: String,
+        startDate: Long,
+        endDate: Long,
         department: Department?
     ): List<MaintenanceLog> {
         var query = firebaseFirestore
