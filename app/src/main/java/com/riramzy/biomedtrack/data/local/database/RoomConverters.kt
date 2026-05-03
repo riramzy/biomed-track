@@ -5,13 +5,13 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
-import com.riramzy.biomedtrack.domain.model.MaintenanceType
-import com.riramzy.biomedtrack.domain.model.TaskStatus
-import com.riramzy.biomedtrack.domain.model.UserRole
+import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.MaintenanceType
+import com.riramzy.biomedtrack.utils.TaskStatus
+import com.riramzy.biomedtrack.utils.UserRole
 
 @ProvidedTypeConverter
-class RoomConverters {
+class RoomConverters(private val gson: Gson) {
     @TypeConverter
     fun fromEquipmentStatus(status: EquipmentStatus): String {
         return status.name
@@ -24,12 +24,12 @@ class RoomConverters {
 
     @TypeConverter
     fun fromDepartment(department: Department): String {
-        return department.name
+        return gson.toJson(department)
     }
 
     @TypeConverter
-    fun toDepartment(department: String): Department {
-        return Department.valueOf(department)
+    fun toDepartment(departmentString: String): Department {
+        return gson.fromJson(departmentString, Department::class.java)
     }
 
     @TypeConverter
@@ -64,21 +64,31 @@ class RoomConverters {
 
     @TypeConverter
     fun fromChecklistItemsList(itemList: List<ChecklistItem>): String {
-        return Gson().toJson(itemList)
+        return gson.toJson(itemList)
     }
 
     @TypeConverter
     fun toChecklistItemsList(itemListString: String): List<ChecklistItem> {
-        return Gson().fromJson(itemListString, Array<ChecklistItem>::class.java).toList()
+        return gson.fromJson(itemListString, Array<ChecklistItem>::class.java).toList()
     }
 
     @TypeConverter
     fun fromDepartmentsList(departments: List<Department>): String {
-        return Gson().toJson(departments)
+        return gson.toJson(departments)
     }
 
     @TypeConverter
     fun toDepartmentsList(departmentsString: String): List<Department> {
-        return Gson().fromJson(departmentsString, Array<Department>::class.java).toList()
+        return gson.fromJson(departmentsString, Array<Department>::class.java).toList()
+    }
+
+    @TypeConverter
+    fun fromStringList(list: List<String>): String {
+        return gson.toJson(list)
+    }
+
+    @TypeConverter
+    fun toStringList(listString: String): List<String> {
+        return gson.fromJson(listString, Array<String>::class.java).toList()
     }
 }
