@@ -37,7 +37,7 @@ class ChangeEquipmentStatusUseCase @Inject constructor(
             newStatus = newStatus,
             changedBy = currentUser.id,
             changedByName = currentUser.name,
-            timestamp = System.currentTimeMillis().toString(),
+            timestamp = System.currentTimeMillis(),
             notes = notes
         )
 

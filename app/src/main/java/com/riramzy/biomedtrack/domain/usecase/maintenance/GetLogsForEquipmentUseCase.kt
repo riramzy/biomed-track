@@ -2,7 +2,7 @@ package com.riramzy.biomedtrack.domain.usecase.maintenance
 
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
-import com.riramzy.biomedtrack.domain.model.UserRole
+import com.riramzy.biomedtrack.utils.UserRole
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
