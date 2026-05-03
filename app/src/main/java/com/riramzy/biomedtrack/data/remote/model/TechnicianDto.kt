@@ -1,9 +1,9 @@
 package com.riramzy.biomedtrack.data.remote.model
 
 import androidx.annotation.Keep
-import com.riramzy.biomedtrack.domain.model.Department
+import com.google.firebase.firestore.PropertyName
 import com.riramzy.biomedtrack.domain.model.Technician
-import com.riramzy.biomedtrack.domain.model.UserRole
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Keep
 data class TechnicianDto(
@@ -12,8 +12,10 @@ data class TechnicianDto(
     val employeeId: String = "",
     val email: String = "",
     val role: String = "",
-    val assignedDepartments: List<String> = emptyList(),
-    val isActive: Boolean = false
+    val assignedDepartments: List<DepartmentDto> = emptyList(),
+    @get:PropertyName("isActive")
+    @set:PropertyName("isActive")
+    var isActive: Boolean = false
 ) {
     fun toDomain() = Technician(
         id = id,
@@ -22,7 +24,7 @@ data class TechnicianDto(
         email = email,
         role = UserRole.valueOf(role),
         assignedDepartments = assignedDepartments.map {
-            Department.valueOf(it)
+            it.toDomain()
         },
         isActive = isActive
     )
@@ -35,7 +37,7 @@ fun Technician.toDto() = TechnicianDto(
     email = email,
     role = role.name,
     assignedDepartments = assignedDepartments.map {
-        it.name
+        it.toDto()
     },
     isActive = isActive
 )
