@@ -4,7 +4,7 @@ import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
 import jakarta.inject.Inject
-import com.riramzy.biomedtrack.domain.Result
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.permission.Permission
 
 class CreateUserUseCase @Inject constructor(
