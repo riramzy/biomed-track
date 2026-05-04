@@ -104,6 +104,31 @@ class EquipmentRepoImpl @Inject constructor(
         }
     }
 
+    override suspend fun batchInsertEquipment(equipmentList: List<Equipment>): Result<Unit> {
+        return try {
+            val finalEquipmentList = mutableListOf<Equipment>()
+            val chunks = equipmentList.chunked(500)
+
+            for (chunk in chunks) {
+                firebaseFirestore.runBatch { batch ->
+                    chunk.forEach { equipment ->
+                        val docRef = firebaseFirestore
+                            .collection(FirestoreCollections.EQUIPMENT)
+                            .document()
+                        val finalEquipment = equipment.copy(id = docRef.id)
+                        finalEquipmentList.add(finalEquipment)
+                        batch.set(docRef, finalEquipment.toDto())
+                    }
+                }.await()
+            }
+
+            equipmentDao.insertAllEquipment(finalEquipmentList.map { it.toEntity() })
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to add equipment", e)
+        }
+    }
+
     override suspend fun updateEquipment(equipment: Equipment): Result<Unit> {
         return try {
             firebaseFirestore
