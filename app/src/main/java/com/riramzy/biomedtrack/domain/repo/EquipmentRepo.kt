@@ -13,6 +13,7 @@ interface EquipmentRepo {
     suspend fun getEquipmentById(id: String): Equipment?
     suspend fun getEquipmentCount(): Triple<Int, Int, Int>
     suspend fun addEquipment(equipment: Equipment): Result<Unit>
+    suspend fun batchInsertEquipment(equipmentList: List<Equipment>): Result<Unit>
     suspend fun updateEquipment(equipment: Equipment): Result<Unit>
     suspend fun deleteEquipment(id: String): Result<Unit>
 }
