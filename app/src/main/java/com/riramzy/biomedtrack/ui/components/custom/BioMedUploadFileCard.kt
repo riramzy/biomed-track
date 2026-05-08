@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
@@ -30,14 +33,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedUploadFileCard(
     modifier: Modifier = Modifier,
-    onBrowseClick: () -> Unit = {}
+    onBrowseClick: () -> Unit = {},
+    isUploaded: Boolean = false
 ) {
-    val borderColor = if (isSystemInDarkTheme()) {
-        MaterialTheme.colorScheme.primary
+    val borderColor = if (isUploaded) {
+        MaterialTheme.indicatorColors.green.copy(0.6f)
     } else {
         MaterialTheme.colorScheme.primary
     }
@@ -46,8 +51,8 @@ fun BioMedUploadFileCard(
 
     Box(
         modifier = modifier
-            .width(380.dp)
-            .height(200.dp)
+            .fillMaxWidth()
+            .wrapContentHeight()
             .drawBehind {
                 drawRoundRect(
                     color = borderColor,
@@ -60,52 +65,89 @@ fun BioMedUploadFileCard(
             }
             .clip(RoundedCornerShape(25.dp))
             .background(
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+                if (isUploaded) {
+                    MaterialTheme.indicatorColors.green.copy(0.15f)
                 } else {
                     MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
                 }
             ),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.excel),
-                contentDescription = null,
-                modifier = Modifier.size(45.dp)
-            )
+        if (isUploaded) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(vertical = 20.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.activity_online),
+                    contentDescription = null,
+                    modifier = Modifier.size(45.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.indicatorColors.green)
+                )
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                text = "Select your excel file",
-                style = MaterialTheme.typography.titleMedium,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = if (isSystemInDarkTheme()) Color.White else Color.Black
-            )
+                Text(
+                    text = "Your file has been uploaded successfully",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                )
 
-            Text(
-                text = "Supports .xlsx and .xls formats",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal
-            )
+                Spacer(modifier = Modifier.height(15.dp))
 
-            Spacer(modifier = Modifier.height(15.dp))
+                BioMedButton(
+                    text = "Reupload",
+                    modifier = Modifier.width(136.dp),
+                    customColor = MaterialTheme.indicatorColors.green,
+                    customTextColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
+                    customTextSize = 11,
+                    onClick = onBrowseClick
+                )
+            }
+        } else {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(vertical = 20.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.excel),
+                    contentDescription = null,
+                    modifier = Modifier.size(45.dp)
+                )
 
-            BioMedButton(
-                text = "Browse Files",
-                modifier = Modifier.width(136.dp),
-                customColor = MaterialTheme.colorScheme.primary,
-                customTextColor = MaterialTheme.colorScheme.onPrimary,
-                customTextSize = 11,
-                onClick = onBrowseClick
-            )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Select your excel file",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                )
+
+                Text(
+                    text = "Supports .xlsx and .xls formats",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
+                )
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                BioMedButton(
+                    text = "Browse Files",
+                    modifier = Modifier.width(136.dp),
+                    customColor = MaterialTheme.colorScheme.primary,
+                    customTextColor = MaterialTheme.colorScheme.onPrimary,
+                    customTextSize = 11,
+                    onClick = onBrowseClick
+                )
+            }
         }
     }
 }
