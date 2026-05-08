@@ -28,7 +28,7 @@ data class RawEquipment(
 class ExcelParserUseCase @Inject constructor() {
     private val formatter = DataFormatter()
 
-    suspend operator fun invoke(
+    suspend operator fun invoke (
         inputStream: InputStream,
         existingEquipmentIds: Set<String>
     ): Triple<List<DataPreviewRow>, List<RawEquipment>, Set<String>> = withContext(Dispatchers.IO) {
