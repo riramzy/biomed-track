@@ -1,6 +1,9 @@
 package com.riramzy.biomedtrack.ui.screens.importing
 
 import android.content.res.Configuration
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,26 +15,93 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNoteCard
 import com.riramzy.biomedtrack.ui.components.custom.BioMedProgressIndicator
+import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedUploadFileCard
 import com.riramzy.biomedtrack.ui.components.importing.BioMedGeneratedFileCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
-fun ImportEquipmentSelectFileScreen(navController: NavHostController) {
+fun ImportEquipmentSelectFileScreen(
+    navController: NavHostController,
+    importingEquipmentVm: ImportingEquipmentVm = hiltViewModel()
+) {
+    val state by importingEquipmentVm.uiState.collectAsStateWithLifecycle()
+    val uploadHistory by importingEquipmentVm.uploadHistory.collectAsStateWithLifecycle()
+    val selectedFile by importingEquipmentVm.selectedFile.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state) {
+        if (state is ImportingUiState.PreviewReady) {
+            navController.navigate(Screen.ImportEquipmentPreview.route)
+        }
+    }
+
+    ImportEquipmentSelectFileScreenContent(
+        navController = navController,
+        state = state,
+        uploadHistory = uploadHistory,
+        selectedFile = selectedFile,
+        snackbarEvent = importingEquipmentVm.snackbarEvent,
+        downloadTemplate = importingEquipmentVm::downloadTemplate,
+        selectFileForPreview = importingEquipmentVm::selectFileForPreview,
+    )
+}
+
+@Composable
+fun ImportEquipmentSelectFileScreenContent(
+    navController: NavHostController,
+    state: ImportingUiState = ImportingUiState.Idle,
+    uploadHistory: List<UploadedFile> = emptyList(),
+    selectedFile: UploadedFile? = null,
+    snackbarEvent: SharedFlow<String> = MutableSharedFlow(),
+    downloadTemplate: () -> Unit = {},
+    selectFileForPreview: (Uri) -> Unit = { _ -> },
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val excelPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            selectFileForPreview(uri)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        snackbarEvent.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                withDismissAction = true,
+                actionLabel = "Dismiss",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             BioMedTopAppBar(
@@ -46,10 +116,22 @@ fun ImportEquipmentSelectFileScreen(navController: NavHostController) {
                 withActionButton = true,
                 isActionButtonText = true,
                 actionButtonText = "Preview",
+                onActionButtonClick = {
+                    if (state !is ImportingUiState.PreviewReady) return@BioMedNavBar
+                    navController.navigate(Screen.ImportEquipmentPreview.route)
+                },
                 modifier = Modifier.padding(horizontal = 15.dp)
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                BioMedSnackbar(
+                    snackbarData = data,
+                    isError = state is ImportingUiState.Error,
+                )
+            }
+        },
         modifier = Modifier.statusBarsPadding()
     ) { innerPadding ->
         LazyColumn(
@@ -119,10 +201,16 @@ fun ImportEquipmentSelectFileScreen(navController: NavHostController) {
                             .fillMaxWidth()
                     )
 
-                    BioMedUploadFileCard()
+                    BioMedUploadFileCard(
+                        onBrowseClick = {
+                            excelPickerLauncher.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                        },
+                        isUploaded = selectedFile != null
+                    )
 
                     BioMedNoteCard(
-                        note = "Excel format must match the exact format of the template for easy and successful data extraction"
+                        note = "Excel format must match the exact format of the template for easy and successful data extraction",
+                        onNoteButtonClick = { downloadTemplate() }
                     )
                 }
             }
@@ -139,7 +227,7 @@ fun ImportEquipmentSelectFileScreen(navController: NavHostController) {
                         )
                 ) {
                     Text(
-                        text = "Uploaded File",
+                        text = "Uploaded Files",
                         style = MaterialTheme.typography.titleMedium,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -147,9 +235,13 @@ fun ImportEquipmentSelectFileScreen(navController: NavHostController) {
                             .fillMaxWidth()
                     )
 
-                    BioMedGeneratedFileCard(
-                        isUploaded = true
-                    )
+                    uploadHistory.forEach { file ->
+                        BioMedGeneratedFileCard(
+                            isUploaded = true,
+                            fileName = file.fileName,
+                            fileSize = "${file.fileSize / 1024} KB"
+                        )
+                    }
                 }
             }
         }
@@ -160,7 +252,17 @@ fun ImportEquipmentSelectFileScreen(navController: NavHostController) {
 @Composable
 fun ImportEquipmentSelectFileScreenPreview() {
     BioMedTheme {
-        ImportEquipmentSelectFileScreen(navController = rememberNavController())
+        ImportEquipmentSelectFileScreenContent(
+            navController = rememberNavController(),
+            state = ImportingUiState.Idle,
+            uploadHistory = listOf(
+                UploadedFile(
+                    uri = Uri.EMPTY,
+                    fileName = "Sample File.xlsx",
+                    fileSize = 1024
+                )
+            )
+        )
     }
 }
 
@@ -170,6 +272,16 @@ fun ImportEquipmentSelectFileScreenPreview() {
 @Composable
 fun ImportEquipmentSelectFileScreenDarkPreview() {
     BioMedTheme {
-        ImportEquipmentSelectFileScreen(navController = rememberNavController())
+        ImportEquipmentSelectFileScreenContent(
+            navController = rememberNavController(),
+            state = ImportingUiState.Idle,
+            uploadHistory = listOf(
+                UploadedFile(
+                    uri = Uri.EMPTY,
+                    fileName = "Sample File.xlsx",
+                    fileSize = 1024
+                )
+            )
+        )
     }
 }
