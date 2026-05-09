@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
@@ -30,10 +30,11 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedSnackbar(
     modifier: Modifier = Modifier,
     snackbarData: SnackbarData? = null,
-    isError: Boolean = true
+    isError: Boolean = false
 ) {
     Card(
         modifier = modifier
+            .padding(15.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
@@ -53,8 +54,6 @@ fun BioMedSnackbar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier
-                    .wrapContentSize(),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
