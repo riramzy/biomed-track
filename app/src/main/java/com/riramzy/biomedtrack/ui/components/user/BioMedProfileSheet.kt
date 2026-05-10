@@ -15,7 +15,13 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedProfileSheet(
-    role: String = "Supervisor"
+    role: String = "Supervisor",
+    onMyProfileClick: () -> Unit = {},
+    onNotificationsPreferencesClick: () -> Unit = {},
+    onChangePasswordClick: () -> Unit = {},
+    onManageUsersClick: () -> Unit = {},
+    onImportEquipmentClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -33,33 +39,47 @@ fun BioMedProfileSheet(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            BioMedProfileSelection(selectionText = "My Profile", selectionIcon = R.drawable.profile)
             BioMedProfileSelection(
-                selectionText = "Notifications Preferences",
-                selectionIcon = R.drawable.profile_notifications
-            )
-            BioMedProfileSelection(
-                selectionText = "Change Password",
-                selectionIcon = R.drawable.profile_password
+                selectionText = "My Profile",
+                selectionIcon = R.drawable.profile,
+                onClick = onMyProfileClick
             )
 
-            if (role == "Supervisor" || role == "Admin") {
+            BioMedProfileSelection(
+                selectionText = "Notifications Preferences",
+                selectionIcon = R.drawable.profile_notifications,
+                onClick = onNotificationsPreferencesClick
+            )
+
+            BioMedProfileSelection(
+                selectionText = "Change Password",
+                selectionIcon = R.drawable.profile_password,
+                onClick = onChangePasswordClick
+            )
+
+            if (role == "SUPERVISOR" || role == "ADMIN") {
                 BioMedProfileSelection(
                     selectionText = "Manage Users",
-                    selectionIcon = R.drawable.profile_manage
+                    selectionIcon = R.drawable.profile_manage,
+                    onClick = onManageUsersClick
                 )
 
             }
 
-            if (role == "Admin") {
+            if (role == "ADMIN") {
                 BioMedProfileSelection(
                     selectionText = "Import Equipment",
-                    selectionIcon = R.drawable.profile_import
+                    selectionIcon = R.drawable.profile_import,
+                    onClick = onImportEquipmentClick
                 )
             }
         }
 
-        BioMedProfileSelection(selectionText = "Logout", selectionIcon = R.drawable.logout)
+        BioMedProfileSelection(
+            selectionText = "Logout",
+            selectionIcon = R.drawable.logout,
+            onClick = onLogoutClick
+        )
     }
 }
 
