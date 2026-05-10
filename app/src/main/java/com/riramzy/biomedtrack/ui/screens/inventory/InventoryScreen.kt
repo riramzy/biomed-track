@@ -49,6 +49,7 @@ import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentOverviewCa
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Screen
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 
 @Composable
 fun InventoryScreen(
@@ -254,7 +255,6 @@ fun InventoryScreenContent(
                             ) {
                                 BioMedSearchBar(
                                     modifier = Modifier
-                                        .height(35.dp)
                                         .weight(3f),
                                     value = state.searchQuery,
                                     onValueChange = { onSearchQueryChange(it) }
@@ -325,7 +325,7 @@ fun InventoryScreenContent(
                             serialNumber = equipment.serialNumber,
                             category = equipment.category,
                             department = equipment.department,
-                            nextServiceDate = equipment.nextMaintenanceDate,
+                            nextServiceDate = equipment.nextMaintenanceDate?.toDateString(),
                             onCardClick = {
                                 navController.navigate(Screen.EquipmentDetail.createRoute(equipment.id))
                             },
