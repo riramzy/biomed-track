@@ -5,10 +5,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,12 +27,16 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedImportedDataPreviewCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    totalRows: Int = 42,
+    validRows: Int = 42,
+    errorRows: Int = 3,
+    warningRows: Int = 0
 ) {
     Card(
         modifier = modifier
-            .width(386.dp)
-            .height(110.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -41,14 +44,14 @@ fun BioMedImportedDataPreviewCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(15.dp)
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .padding(15.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column() {
+            Column {
                 Text(
-                    text = "42",
+                    text = totalRows.toString(),
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Black,
@@ -72,20 +75,20 @@ fun BioMedImportedDataPreviewCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BioMedStatusIndicator(
-                    status = "42 Valid",
+                    status = "$validRows Valid",
                     color = MaterialTheme.indicatorColors.green,
                     changeable = false
                 )
 
                 BioMedStatusIndicator(
-                    status = "3 Errors",
-                    color = MaterialTheme.indicatorColors.red,
+                    status = "$warningRows Warnings",
+                    color = MaterialTheme.indicatorColors.yellow,
                     changeable = false
                 )
 
                 BioMedStatusIndicator(
-                    status = "0 Warnings",
-                    color = MaterialTheme.indicatorColors.yellow,
+                    status = "$errorRows Errors",
+                    color = MaterialTheme.indicatorColors.red,
                     changeable = false
                 )
             }

@@ -38,7 +38,8 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedProfileSelection(
     modifier: Modifier = Modifier,
     selectionText: String = "Logout",
-    selectionIcon: Int = R.drawable.logout
+    selectionIcon: Int = R.drawable.logout,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -51,7 +52,8 @@ fun BioMedProfileSelection(
             } else {
                 MaterialTheme.colorScheme.primaryContainer
             }
-        )
+        ),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
