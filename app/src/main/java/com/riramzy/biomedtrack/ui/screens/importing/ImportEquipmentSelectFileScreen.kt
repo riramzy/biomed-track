@@ -54,12 +54,6 @@ fun ImportEquipmentSelectFileScreen(
     val uploadHistory by importingEquipmentVm.uploadHistory.collectAsStateWithLifecycle()
     val selectedFile by importingEquipmentVm.selectedFile.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state) {
-        if (state is ImportingUiState.PreviewReady) {
-            navController.navigate(Screen.ImportEquipmentPreview.route)
-        }
-    }
-
     ImportEquipmentSelectFileScreenContent(
         navController = navController,
         state = state,
@@ -117,8 +111,9 @@ fun ImportEquipmentSelectFileScreenContent(
                 isActionButtonText = true,
                 actionButtonText = "Preview",
                 onActionButtonClick = {
-                    if (state !is ImportingUiState.PreviewReady) return@BioMedNavBar
-                    navController.navigate(Screen.ImportEquipmentPreview.route)
+                    if (state is ImportingUiState.PreviewReady) {
+                        navController.navigate(Screen.ImportEquipmentPreview.route)
+                    }
                 },
                 modifier = Modifier.padding(horizontal = 15.dp)
             )
