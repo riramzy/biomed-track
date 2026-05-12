@@ -39,10 +39,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
+import com.riramzy.biomedtrack.ui.components.custom.BioMedRadioButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+import java.util.UUID
 
 data class DataPreviewRow(
+    val id: String = UUID.randomUUID().toString(),
+    val isSelected: Boolean = false,
     val name: String,
     val model: String,
     val serialNumber: String,
@@ -62,196 +67,213 @@ enum class ValidationStatus {
 fun BioMedDataPreviewTable(
     modifier: Modifier = Modifier,
     rows: List<DataPreviewRow>,
-    onRowClick: (DataPreviewRow) -> Unit = {}
+    onRowToggle: (String) -> Unit = {},
+    onToggleSelectAll: (Boolean) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
-    Card(
+    Column(
         modifier = modifier
-            .width(386.dp)
-            .height(388.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            MaterialTheme.colorScheme.primary
-        )
     ) {
-        Column(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .height(388.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                MaterialTheme.colorScheme.primary
+            )
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(25.dp))
-                    .padding(vertical = 12.dp, horizontal = 15.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(10.dp)
             ) {
-                RadioButton(
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = MaterialTheme.colorScheme.onPrimary,
-                        unselectedColor = MaterialTheme.colorScheme.primary,
-                        disabledSelectedColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledUnselectedColor = MaterialTheme.colorScheme.primary
-                    ),
-                    modifier = Modifier
-                        .size(24.dp)
-                )
-
-                // Space for the leading status icon in rows
-                Spacer(modifier = Modifier.width(16.dp))
-
                 Row(
                     modifier = Modifier
-                        .horizontalScroll(scrollState)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(30.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(25.dp))
+                        .padding(vertical = 12.dp, horizontal = 15.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val headers = listOf("Name", "Model", "Serial Number", "Department", "Category", "Status", "Logs")
-                    headers.forEach { header ->
-                        Card(
-                            modifier = Modifier
-                                .width(110.dp)
-                                .height(30.dp),
-                            shape = RoundedCornerShape(25.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                text = header,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
+                    val allValidSelected = rows.filter { it.validationStatus == ValidationStatus.VALID }.let { validRows ->
+                        validRows.isNotEmpty() && validRows.all { it.isSelected }
+                    }
+
+                    RadioButton(
+                        selected = allValidSelected,
+                        onClick = { onToggleSelectAll(!allValidSelected) },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.primary,
+                            disabledSelectedColor = MaterialTheme.colorScheme.primary,
+                            disabledUnselectedColor = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(scrollState)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(30.dp)
+                    ) {
+                        val headers = listOf("Name", "Model", "Serial Number", "Department", "Category", "Status", "Logs")
+                        headers.forEach { header ->
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp),
-                            )
+                                    .width(110.dp)
+                                    .height(30.dp),
+                                shape = RoundedCornerShape(25.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text(
+                                    text = header,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp),
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                // Data Rows
-                rows.forEach { row ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onRowClick(row)
-                            }
-                    ) {
-                        Row(
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    rows.forEach { row ->
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 12.dp, horizontal = 15.dp),
-                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Leading Status Icon
-                            val (icon, iconColor) = when (row.validationStatus) {
-                                ValidationStatus.VALID -> R.drawable.activity_online to MaterialTheme.colorScheme.primary
-                                ValidationStatus.ERROR -> R.drawable.error to MaterialTheme.indicatorColors.red
-                                ValidationStatus.WARNING -> R.drawable.warning to MaterialTheme.indicatorColors.yellow
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .size(24.dp)
-                                    .background(iconColor),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(icon),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(15.dp))
-
-                            // Scrollable Columns
-                            Row(
-                                modifier = Modifier
-                                    .horizontalScroll(scrollState)
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(30.dp)
-                            ) {
-                                val textColor = when (row.validationStatus) {
-                                    ValidationStatus.VALID -> if (isSystemInDarkTheme()) Color.White else Color.Black
-                                    ValidationStatus.ERROR -> MaterialTheme.indicatorColors.red
-                                    ValidationStatus.WARNING -> MaterialTheme.indicatorColors.yellow
-                                }
-
-                                val dataPoints = listOf(row.name, row.model, row.serialNumber, row.department, row.category, row.status, row.logs)
-                                dataPoints.forEach { text ->
-                                    Text(
-                                        text = text,
-                                        color = textColor,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.width(110.dp)
-                                    )
-                                }
-                            }
-                        }
-
-                        // Error/Warning Note below the row
-                        if (row.message != null) {
-                            val messageColor = if (row.validationStatus == ValidationStatus.ERROR)
-                                MaterialTheme.indicatorColors.red else MaterialTheme.indicatorColors.yellow
-
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 15.dp, bottom = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    .padding(vertical = 12.dp, horizontal = 15.dp)
+                                    .clickable { onRowToggle(row.id) },
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(18.dp)
-                                        .background(messageColor),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = if (row.validationStatus == ValidationStatus.ERROR)
-                                            painterResource(R.drawable.error) else painterResource(R.drawable.warning),
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(12.dp)
-                                    )
+                                val (icon, iconColor) = when (row.validationStatus) {
+                                    ValidationStatus.VALID -> R.drawable.activity_online to MaterialTheme.colorScheme.primary
+                                    ValidationStatus.ERROR -> R.drawable.activity_online to MaterialTheme.indicatorColors.red
+                                    ValidationStatus.WARNING -> R.drawable.activity_online to MaterialTheme.indicatorColors.yellow
                                 }
 
-                                Text(
-                                    text = row.message,
-                                    color = messageColor,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
+                                BioMedRadioButton(
+                                    isSelected = row.isSelected,
+                                    icon = icon,
+                                    iconColor = iconColor,
+                                    onClick = { if (row.validationStatus == ValidationStatus.VALID) onRowToggle(row.id) },
                                 )
+
+                                Spacer(modifier = Modifier.width(15.dp))
+
+                                Row(
+                                    modifier = Modifier
+                                        .horizontalScroll(scrollState)
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(30.dp)
+                                ) {
+                                    val textColor = when (row.validationStatus) {
+                                        ValidationStatus.VALID -> if (isSystemInDarkTheme()) Color.White else Color.Black
+                                        ValidationStatus.ERROR -> MaterialTheme.indicatorColors.red
+                                        ValidationStatus.WARNING -> MaterialTheme.indicatorColors.yellow
+                                    }
+
+                                    val dataPoints = listOf(row.name, row.model, row.serialNumber, row.department, row.category, row.status, row.logs)
+                                    dataPoints.forEach { text ->
+                                        Text(
+                                            text = text,
+                                            color = textColor,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.width(110.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (row.message != null) {
+                                val messageColor = if (row.validationStatus == ValidationStatus.ERROR)
+                                    MaterialTheme.indicatorColors.red else MaterialTheme.indicatorColors.yellow
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp, bottom = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .size(18.dp)
+                                            .background(messageColor),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = if (row.validationStatus == ValidationStatus.ERROR)
+                                                painterResource(R.drawable.error) else painterResource(R.drawable.warning),
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(11.dp)
+                                        )
+                                    }
+
+                                    Text(
+                                        text = row.message,
+                                        color = messageColor,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            BioMedButton(
+                modifier = Modifier
+                    .weight(1f),
+                text = "Select All",
+                customColor = MaterialTheme.colorScheme.primary,
+                customTextColor = MaterialTheme.colorScheme.onPrimary,
+                onClick = { onToggleSelectAll(true) }
+            )
+
+            BioMedButton(
+                modifier = Modifier
+                    .weight(1f),
+                text = "Deselect All",
+                onClick = { onToggleSelectAll(false) }
+            )
+        }
     }
+
 }
 
 @Preview(showBackground = true, device = "id:pixel_9")
@@ -259,15 +281,15 @@ fun BioMedDataPreviewTable(
 fun BioMedDataPreviewTablePreview() {
     BioMedTheme {
         val sampleRows = listOf(
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", ValidationStatus.VALID),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Service", "Logs", ValidationStatus.WARNING, "Warning: Serial number format is unusual"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", ValidationStatus.VALID),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Service", "Logs", ValidationStatus.WARNING, "Warning: Serial number format is unusual"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
         )
         BioMedDataPreviewTable(rows = sampleRows, modifier = Modifier.padding(10.dp))
     }
@@ -281,15 +303,15 @@ fun BioMedDataPreviewTablePreview() {
 fun BioMedDataPreviewTableDarkPreview() {
     BioMedTheme {
         val sampleRows = listOf(
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", ValidationStatus.VALID),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Service", "Logs", ValidationStatus.WARNING, "Warning: Serial number format is unusual"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", ValidationStatus.VALID),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Service", "Logs", ValidationStatus.WARNING, "Warning: Serial number format is unusual"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
         )
         BioMedDataPreviewTable(rows = sampleRows, modifier = Modifier.padding(10.dp))
     }
