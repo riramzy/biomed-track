@@ -14,12 +14,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedProgressIndicator
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
@@ -28,9 +34,52 @@ import com.riramzy.biomedtrack.ui.components.importing.BioMedImportedDataPreview
 import com.riramzy.biomedtrack.ui.components.importing.DataPreviewRow
 import com.riramzy.biomedtrack.ui.components.importing.ValidationStatus
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
 
 @Composable
-fun ImportEquipmentDataPreviewScreen() {
+fun ImportEquipmentDataPreviewScreen(
+    navController: NavHostController,
+) {
+    val parentEntry = remember(navController.currentBackStackEntry) {
+        navController.getBackStackEntry(Screen.ImportEquipmentSelectFile.route)
+    }
+
+    val importingEquipmentVm: ImportingEquipmentVm = hiltViewModel(parentEntry)
+
+    val state by importingEquipmentVm.uiState.collectAsStateWithLifecycle()
+
+    val previewState = state as? ImportingUiState.PreviewReady
+    val previewRows = previewState?.previewRows ?: emptyList()
+    val totalValidRows = previewState?.totalValidRows ?: 0
+    val selectedRowsCount = previewState?.selectedCount ?: 0
+
+    ImportEquipmentDataPreviewScreenContent(
+        previewRows = previewRows,
+        totalPreviewRows = totalValidRows,
+        selectedRowsCount = selectedRowsCount,
+        onImportClick = {
+            importingEquipmentVm.startImporting()
+            navController.navigate(Screen.ImportEquipmentProcessing.route)
+        },
+        onReturnClick = {
+            importingEquipmentVm.resetState()
+            navController.popBackStack()
+        },
+        onToggleSelectAll = importingEquipmentVm::toggleAllRowsSelection,
+        onRowToggle = importingEquipmentVm::toggleRowSelection
+    )
+}
+
+@Composable
+fun ImportEquipmentDataPreviewScreenContent(
+    previewRows: List<DataPreviewRow> = emptyList(),
+    totalPreviewRows: Int = 0,
+    selectedRowsCount: Int = 0,
+    onImportClick: () -> Unit = {},
+    onReturnClick: () -> Unit = {},
+    onToggleSelectAll: (Boolean) -> Unit = {},
+    onRowToggle: (String) -> Unit = {}
+) {
     Scaffold(
         topBar = {
             BioMedTopAppBar(
@@ -42,9 +91,7 @@ fun ImportEquipmentDataPreviewScreen() {
         floatingActionButton = {
             BioMedNavBar(
                 selectedPage = "None",
-                withActionButton = true,
-                isActionButtonText = true,
-                actionButtonText = "Import",
+                withActionButton = false,
                 modifier = Modifier.padding(horizontal = 15.dp)
             )
         },
@@ -118,7 +165,12 @@ fun ImportEquipmentDataPreviewScreen() {
                             .fillMaxWidth()
                     )
 
-                    BioMedImportedDataPreviewCard()
+                    BioMedImportedDataPreviewCard(
+                        totalRows = totalPreviewRows,
+                        validRows = previewRows.count { it.validationStatus == ValidationStatus.VALID },
+                        errorRows = previewRows.count { it.validationStatus == ValidationStatus.ERROR },
+                        warningRows = previewRows.count { it.validationStatus == ValidationStatus.WARNING }
+                    )
                 }
             }
 
@@ -143,16 +195,32 @@ fun ImportEquipmentDataPreviewScreen() {
                     )
 
                     BioMedDataPreviewTable(
-                        rows = listOf(
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs"),
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs"),
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", validationStatus = ValidationStatus.ERROR, message = "Error: Overriding an already existing equipment"),
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs"),
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs"),
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", validationStatus = ValidationStatus.WARNING, message = "Error: Overriding an already existing equipment"),
-                            DataPreviewRow("Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs"),
-                            ),
+                        rows = previewRows,
+                        onRowToggle = { onRowToggle(it) },
+                        onToggleSelectAll = onToggleSelectAll
                     )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BioMedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Return to File Selection",
+                            customTextSize = 14,
+                            onClick = { onReturnClick() }
+                        )
+
+                        BioMedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Import $selectedRowsCount Selected Rows",
+                            customTextSize = 14,
+                            customColor = MaterialTheme.colorScheme.primary,
+                            customTextColor = MaterialTheme.colorScheme.onPrimary,
+                            onClick = onImportClick,
+                            isEnabled = selectedRowsCount > 0
+                        )
+                    }
                 }
             }
         }
@@ -163,7 +231,7 @@ fun ImportEquipmentDataPreviewScreen() {
 @Composable
 fun ImportEquipmentDataPreviewScreenPreview() {
     BioMedTheme {
-        ImportEquipmentDataPreviewScreen()
+        ImportEquipmentDataPreviewScreenContent()
     }
 }
 
@@ -173,6 +241,6 @@ fun ImportEquipmentDataPreviewScreenPreview() {
 @Composable
 fun ImportEquipmentDataPreviewScreenDarkPreview() {
     BioMedTheme {
-        ImportEquipmentDataPreviewScreen()
+        ImportEquipmentDataPreviewScreenContent()
     }
 }
