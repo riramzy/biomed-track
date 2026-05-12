@@ -39,6 +39,8 @@ class ExcelParserUseCase @Inject constructor() {
         WorkbookFactory.create(inputStream).use { workbook ->
             val sheet = workbook.getSheetAt(0)
 
+            val seenSerialNumber = mutableSetOf<String>()
+
             for (row in 2..sheet.lastRowNum) {
                 val rowData = sheet.getRow(row) ?: continue
 
@@ -49,12 +51,31 @@ class ExcelParserUseCase @Inject constructor() {
                 if (serialNumber.isBlank() && name.isBlank()) continue
                 if (department.isNotBlank()) uniqueDepartments.add(department)
 
-                val isDuplicate = existingEquipmentIds.contains(serialNumber)
-                val status = if (serialNumber.isBlank() || isDuplicate) ValidationStatus.ERROR else ValidationStatus.VALID
-                val message = if (isDuplicate) "Serial Number already exists" else null
+                val isDuplicateInDb = existingEquipmentIds.contains(serialNumber)
+                val isDuplicateInFile = seenSerialNumber.contains(serialNumber)
+
+                val status = if (serialNumber.isBlank() || isDuplicateInDb) {
+                    ValidationStatus.ERROR
+                }
+                else if (isDuplicateInFile) {
+                    ValidationStatus.WARNING
+                } else {
+                    ValidationStatus.VALID
+                }
+
+                val message = when {
+                    serialNumber.isBlank() -> "Serial Number is blank"
+                    isDuplicateInDb -> "Serial Number already exists"
+                    isDuplicateInFile -> "Serial Number already exists in the file"
+                    else -> null
+                }
+
+                seenSerialNumber.add(serialNumber)
 
                 previewRows.add(
                     DataPreviewRow(
+                        id = serialNumber,
+                        isSelected = false,
                         name = name,
                         model = formatter.formatCellValue(rowData.getCell(1)),
                         serialNumber = serialNumber,
