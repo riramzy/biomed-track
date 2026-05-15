@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,19 +51,22 @@ import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.components.user.BioMedUserCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Screen
+import com.riramzy.biomedtrack.utils.Timestamps.toRelativeTime
+import com.riramzy.biomedtrack.utils.UserRole
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     navController: NavHostController,
-    dashboardVm: DashboardVm = hiltViewModel()
+    dashboardVm: DashboardVm = hiltViewModel(),
 ) {
-    val uiState by dashboardVm.uiState.collectAsStateWithLifecycle()
+    val state by dashboardVm.uiState.collectAsStateWithLifecycle()
 
     DashboardScreenContent(
         navController = navController,
-        uiState = uiState,
+        state = state,
         onRetryClick = { dashboardVm.refresh() }
     )
 }
@@ -71,10 +75,10 @@ fun DashboardScreen(
 @Composable
 fun DashboardScreenContent(
     navController: NavHostController,
-    uiState: DashboardUiState = DashboardUiState.Loading,
+    state: DashboardUiState = DashboardUiState.Loading,
     onRetryClick: () -> Unit = {}
 ) {
-    when(uiState) {
+    when(state) {
         is DashboardUiState.Error -> {
             Scaffold(
                 topBar = {
@@ -121,7 +125,7 @@ fun DashboardScreenContent(
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = uiState.message,
+                                text = state.message,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.ExtraBold,
@@ -183,7 +187,10 @@ fun DashboardScreenContent(
                         Color.White
                     }
                 ) {
-                    BioMedProfileSheet(role = uiState.currentUser.role.name)
+                    BioMedProfileSheet(
+                        role = state.currentUser.role.name,
+                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) }
+                    )
                 }
             }
 
@@ -220,8 +227,8 @@ fun DashboardScreenContent(
                 ) {
                     item {
                         BioMedUserCard(
-                            username = uiState.currentUser.name,
-                            role = uiState.currentUser.role.name,
+                            username = state.currentUser.name,
+                            role = state.currentUser.role.name,
                             modifier = Modifier.padding(
                                 bottom = 15.dp,
                                 top = 20.dp
@@ -243,12 +250,12 @@ fun DashboardScreenContent(
                                 modifier = Modifier.padding(bottom = 10.dp)
                             ) {
                                 BioMedInsightCard(
-                                    value = uiState.stats.total.toString(),
+                                    value = state.stats.total.toString(),
                                     status = ""
                                 )
 
                                 BioMedInsightCard(
-                                    value = uiState.stats.online.toString(),
+                                    value = state.stats.online.toString(),
                                     status = "Online"
                                 )
                             }
@@ -258,12 +265,12 @@ fun DashboardScreenContent(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 BioMedInsightCard(
-                                    value = uiState.stats.dueService.toString(),
+                                    value = state.stats.dueService.toString(),
                                     status = "Service"
                                 )
 
                                 BioMedInsightCard(
-                                    value = uiState.stats.down.toString(),
+                                    value = state.stats.down.toString(),
                                     status = "Down"
                                 )
                             }
@@ -304,16 +311,22 @@ fun DashboardScreenContent(
                                 )
                             }
 
-                            uiState.recentActivities.forEach { log ->
-                                BioMedActivityCard(
-                                    status = log.newStatus.name,
-                                    name = log.equipmentName,
-                                    serialNumber = log.equipmentSerial,
-                                    model = log.equipmentModel,
-                                    department = log.department.name,
-                                    changedBy = log.changedBy,
-                                    modifier = Modifier.padding(bottom = 10.dp)
-                                )
+                            state.recentActivities.forEach { activity ->
+                                key(activity.id) {
+                                    BioMedActivityCard(
+                                        type = activity.type,
+                                        status = activity.equipmentStatus ?: EquipmentStatus.SERVICE,
+                                        title = activity.title,
+                                        name = activity.equipmentName,
+                                        model = activity.equipmentModel,
+                                        serialNumber = activity.equipmentSerial,
+                                        department = activity.departmentName,
+                                        changedBy = activity.technicianName,
+                                        relativeTime = activity.timestamp.toRelativeTime(),
+                                        dateString = activity.dueDate ?: "",
+                                        modifier = Modifier.padding(bottom = 10.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -352,9 +365,9 @@ fun DashboardScreenContent(
                                 )
                             }
 
-                            uiState.upcomingMaintenance.forEach { upcomingMaintenance ->
+                            state.upcomingMaintenance.forEach { upcomingMaintenance ->
                                 BioMedEquipmentStatusCard(
-                                    status = upcomingMaintenance.status.name,
+                                    equipmentStatus = upcomingMaintenance.status,
                                     modifier = Modifier.padding(bottom = 10.dp)
                                 )
                             }
@@ -395,10 +408,21 @@ fun DashboardScreenContent(
                                 )
                             }
 
-                            uiState.currentUser.assignedDepartments.forEach { department ->
+                            val departmentsToShow = if (
+                                state.currentUser.role == UserRole.ADMIN ||
+                                state.currentUser.role == UserRole.SUPERVISOR
+                            ) {
+                                state.allDepartments
+                            } else {
+                                state.currentUser.assignedDepartments
+                            }
+
+                            departmentsToShow.forEach { department ->
                                 BioMedDepartmentInsightCard(
                                     department = department.name,
                                     departmentTotalEquipment = department.totalEquipment.toString(),
+                                    departmentDueService = department.dueServiceEquipment.toString(),
+                                    departmentDown = department.downEquipment.toString(),
                                     modifier = Modifier.padding(bottom = 10.dp)
                                 )
                             }
