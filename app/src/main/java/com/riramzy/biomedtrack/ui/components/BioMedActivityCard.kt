@@ -5,12 +5,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,29 +27,35 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.ui.components.custom.BioMedStatusIndicator
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+import com.riramzy.biomedtrack.utils.ActivityType
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 
 @Composable
 fun BioMedActivityCard(
     modifier: Modifier = Modifier,
-    status: String = "Online"
+    type: ActivityType = ActivityType.STATUS_CHANGE,
+    status: EquipmentStatus = EquipmentStatus.SERVICE,
+    title: String = "Status Changed to Online",
+    name: String = "Fresenius",
+    model: String = "4008S",
+    serialNumber: String = "4545885N70",
+    department: String = "Dialysis Unit",
+    changedBy: String = "Ramsey Ibrahim",
+    relativeTime: String = "12m ago",
+    dateString: String = "13/3/2026"
 ) {
     Card(
         modifier = modifier
-            .width(386.dp)
-            .height(155.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondary
-            } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
         )
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -73,24 +76,27 @@ fun BioMedActivityCard(
                     modifier = Modifier
                         .size(34.dp),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = when(status) {
-                            "Online" -> MaterialTheme.indicatorColors.green
-                            "Down" -> MaterialTheme.indicatorColors.red
-                            "Service" -> MaterialTheme.indicatorColors.yellow
-                            else -> if (isSystemInDarkTheme()) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.primary
+                        containerColor = when(type) {
+                            ActivityType.MAINTENANCE_LOG -> if (isSystemInDarkTheme()) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.secondary
+                            ActivityType.TASK_ASSIGNED -> if (isSystemInDarkTheme()) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.tertiary
+                            ActivityType.STATUS_CHANGE -> when (status) {
+                                EquipmentStatus.SERVICE -> MaterialTheme.indicatorColors.yellow
+                                EquipmentStatus.ONLINE -> MaterialTheme.indicatorColors.green
+                                EquipmentStatus.DOWN -> MaterialTheme.indicatorColors.red
                             }
                         }
                     )
                 ) {
                     Icon(
-                        painter = when(status) {
-                            "Online" -> painterResource(id = R.drawable.activity_online)
-                            "Down" -> painterResource(R.drawable.activity_down)
-                            "Service" -> painterResource(R.drawable.activity_service)
-                            else -> painterResource(R.drawable.activity_log)
+                        painter = when(type) {
+                            ActivityType.MAINTENANCE_LOG -> painterResource(R.drawable.activity_log)
+                            ActivityType.TASK_ASSIGNED -> painterResource(R.drawable.add)
+                            ActivityType.STATUS_CHANGE -> when (status) {
+                                EquipmentStatus.ONLINE -> painterResource(id = R.drawable.activity_online)
+                                EquipmentStatus.DOWN -> painterResource(R.drawable.activity_down)
+                                EquipmentStatus.SERVICE -> painterResource(R.drawable.activity_service)
+                            }
+
                         },
                         contentDescription = null,
                         tint = Color.White,
@@ -106,7 +112,7 @@ fun BioMedActivityCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Status Changed to Online",
+                        text = title,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelSmall,
@@ -118,7 +124,7 @@ fun BioMedActivityCard(
                     )
 
                     Text(
-                        text = "Fresenius 4008S - 4545885N70",
+                        text = "$name $model - $serialNumber",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelSmall,
@@ -131,7 +137,11 @@ fun BioMedActivityCard(
 
                     BioMedStatusIndicator(
                         modifier = Modifier.padding(top = 5.dp),
-                        status = status
+                        status = when(type) {
+                            ActivityType.MAINTENANCE_LOG -> "LOG"
+                            ActivityType.TASK_ASSIGNED -> "ASSIGNED"
+                            ActivityType.STATUS_CHANGE -> status.name
+                        }
                     )
 
                     Column(
@@ -148,7 +158,7 @@ fun BioMedActivityCard(
                         )
 
                         Text(
-                            text = "Dialysis Unit",
+                            text = department,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.labelSmall,
@@ -174,7 +184,7 @@ fun BioMedActivityCard(
                         )
 
                         Text(
-                            text = "Ramsey Ibrahim",
+                            text = changedBy,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             style = MaterialTheme.typography.labelSmall,
@@ -192,7 +202,7 @@ fun BioMedActivityCard(
                     verticalArrangement = Arrangement.Top
                 ) {
                     Text(
-                        text = "12m ago",
+                        text = relativeTime,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelSmall,
@@ -201,7 +211,7 @@ fun BioMedActivityCard(
                     )
 
                     Text(
-                        text = "13/3/2026",
+                        text = dateString,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall,
@@ -214,24 +224,29 @@ fun BioMedActivityCard(
     }
 }
 
-@Preview(device = "spec:width=411dp,height=891dp", showBackground = true)
+@Preview(device = "spec:width=411dp,height=891dp", showBackground = true,
+    backgroundColor = 0xFFFFFFFF
+)
 @Composable
 fun BioMedActivityCardPreview() {
     BioMedTheme {
         BioMedActivityCard(
-            status = "Log"
+            type = ActivityType.TASK_ASSIGNED,
+            status = EquipmentStatus.SERVICE
         )
     }
 }
 
 @Preview(device = "spec:width=411dp,height=891dp", showBackground = true, showSystemUi = false,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    backgroundColor = 0xFF000000
 )
 @Composable
 fun BioMedActivityCardDarkPreview() {
     BioMedTheme {
         BioMedActivityCard(
-            status = "Log"
+            type = ActivityType.TASK_ASSIGNED,
+            status = EquipmentStatus.SERVICE
         )
     }
 }
