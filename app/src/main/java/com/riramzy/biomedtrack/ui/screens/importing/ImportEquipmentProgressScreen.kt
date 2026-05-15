@@ -14,12 +14,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedProgressIndicator
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
@@ -27,9 +33,45 @@ import com.riramzy.biomedtrack.ui.components.importing.BioMedImportingProgressCa
 import com.riramzy.biomedtrack.ui.components.importing.ImportLog
 import com.riramzy.biomedtrack.ui.components.importing.LogType
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
 
 @Composable
-fun ImportEquipmentProgressScreen() {
+fun ImportEquipmentProgressScreen(
+    navController: NavHostController
+) {
+    val parentEntry = remember(navController.currentBackStackEntry) {
+        navController.getBackStackEntry(Screen.ImportEquipmentSelectFile.route)
+    }
+
+    val importingEquipmentVm: ImportingEquipmentVm = hiltViewModel(parentEntry)
+    val state by importingEquipmentVm.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state) {
+        if (state is ImportingUiState.Success) {
+            navController.navigate(Screen.ImportEquipmentSuccess.route) {
+                popUpTo(Screen.ImportEquipmentSelectFile.route) {
+                    inclusive = false
+                }
+            }
+        }
+    }
+
+    val importingState = state as? ImportingUiState.Importing
+    val progress = importingState?.progress ?: 0f
+    val liveLogs = importingState?.liveLogs ?: emptyList()
+
+
+    ImportEquipmentProgressScreenContent(
+        progress = progress,
+        liveLogs = liveLogs
+    )
+}
+
+@Composable
+fun ImportEquipmentProgressScreenContent(
+    progress: Float = 0f,
+    liveLogs: List<ImportLog> = emptyList()
+) {
     Scaffold(
         topBar = {
             BioMedTopAppBar(
@@ -41,9 +83,7 @@ fun ImportEquipmentProgressScreen() {
         floatingActionButton = {
             BioMedNavBar(
                 selectedPage = "None",
-                withActionButton = true,
-                isActionButtonText = true,
-                actionButtonText = "Confirm",
+                withActionButton = false,
                 modifier = Modifier.padding(horizontal = 15.dp)
             )
         },
@@ -121,12 +161,9 @@ fun ImportEquipmentProgressScreen() {
 
             item {
                 BioMedImportingProgressCard(
-                    progress = 0.2f,
-                    logs = listOf(
-                        ImportLog("Imported Fresenius 4008S - 4545885N70", LogType.SUCCESS),
-                        ImportLog("4 rows skipped successfully", LogType.WARNING),
-                        ImportLog("Failed to import 2 rows", LogType.ERROR)
-                    )
+                    progress = progress,
+                    logs = liveLogs,
+                    modifier = Modifier.padding(horizontal = 15.dp)
                 )
             }
         }
@@ -137,7 +174,13 @@ fun ImportEquipmentProgressScreen() {
 @Composable
 fun ImportEquipmentProgressScreenPreview() {
     BioMedTheme {
-        ImportEquipmentProgressScreen()
+        ImportEquipmentProgressScreenContent(
+            liveLogs = listOf(
+                ImportLog("Imported Fresenius 4008S - 4545885N70", LogType.SUCCESS),
+                ImportLog("4 rows skipped successfully", LogType.WARNING),
+                ImportLog("Failed to import 2 rows", LogType.ERROR)
+            )
+        )
     }
 }
 
@@ -147,6 +190,12 @@ fun ImportEquipmentProgressScreenPreview() {
 @Composable
 fun ImportEquipmentProgressScreenDarkPreview() {
     BioMedTheme {
-        ImportEquipmentProgressScreen()
+        ImportEquipmentProgressScreenContent(
+            liveLogs = listOf(
+                ImportLog("Imported Fresenius 4008S - 4545885N70", LogType.SUCCESS),
+                ImportLog("4 rows skipped successfully", LogType.WARNING),
+                ImportLog("Failed to import 2 rows", LogType.ERROR)
+            )
+        )
     }
 }
