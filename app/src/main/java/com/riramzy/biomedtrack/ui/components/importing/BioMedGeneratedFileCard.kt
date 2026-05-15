@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -52,7 +50,7 @@ fun BioMedGeneratedFileCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(70.dp),
+            .wrapContentHeight(),
         shape = RoundedCornerShape(50.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -66,12 +64,13 @@ fun BioMedGeneratedFileCard(
         Row(
             modifier = Modifier
                 .padding(10.dp)
-                .fillMaxSize(),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(2f)
             ) {
                 Image(
                     painter = if (fileFormat == "Excel") {
@@ -86,8 +85,7 @@ fun BioMedGeneratedFileCard(
 
                 Column(
                     modifier = Modifier
-                        .padding(start = 10.dp)
-                        .fillMaxHeight(),
+                        .padding(start = 10.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
@@ -157,6 +155,7 @@ fun BioMedGeneratedFileCard(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier
                     .padding(end = 10.dp)
+                    .weight(1f)
             ) {
                 if (isUploaded) {
                     IconButton(
