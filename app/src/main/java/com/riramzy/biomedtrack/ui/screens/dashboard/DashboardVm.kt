@@ -3,12 +3,17 @@ package com.riramzy.biomedtrack.ui.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
+import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
-import com.riramzy.biomedtrack.domain.model.EquipmentStatus
-import com.riramzy.biomedtrack.domain.model.StatusChangeLog
 import com.riramzy.biomedtrack.domain.model.Technician
+import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
+import com.riramzy.biomedtrack.domain.usecase.department.GetAllDepartmentsUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetAllEquipmentUseCase
 import com.riramzy.biomedtrack.domain.usecase.statuschange.GetRecentStatusChangesUseCase
+import com.riramzy.biomedtrack.utils.ActivityItem
+import com.riramzy.biomedtrack.utils.ActivityType
+import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +29,9 @@ sealed class DashboardUiState {
     data class Success(
         val currentUser: Technician,
         val stats: DashboardStats,
-        val recentActivities: List<StatusChangeLog>,
-        val upcomingMaintenance: List<Equipment>
+        val recentActivities: List<ActivityItem>,
+        val upcomingMaintenance: List<Equipment>,
+        val allDepartments: List<Department>
     ): DashboardUiState()
     data class Error(val message: String): DashboardUiState()
 }
@@ -41,6 +47,8 @@ data class DashboardStats(
 class DashboardVm @Inject constructor(
     private val getAllEquipmentsUseCase: GetAllEquipmentUseCase,
     private val getRecentStatusChangesUseCase: GetRecentStatusChangesUseCase,
+    private val getAllDepartmentsUseCase: GetAllDepartmentsUseCase,
+    private val maintenanceRepo: MaintenanceRepo,
     private val sessionManager: SessionManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Loading)
@@ -61,10 +69,12 @@ class DashboardVm @Inject constructor(
         _uiState.value = DashboardUiState.Loading
         fetchJob = viewModelScope.launch {
             combine(
-                getAllEquipmentsUseCase(),
-                getRecentStatusChangesUseCase(20),
-                sessionManager.currentUser
-            ) { equipmentList, statusLogs, user ->
+                flow = getAllEquipmentsUseCase(),
+                flow2 = getRecentStatusChangesUseCase(20),
+                flow3 = maintenanceRepo.getAllMaintenanceLogs(),
+                flow4 = getAllDepartmentsUseCase(),
+                flow5 = sessionManager.currentUser
+            ) { equipmentList, statusLogs, maintenanceLogs, departmentsList, user ->
                 val total = equipmentList.count()
 
                 val online = equipmentList.count {
@@ -72,7 +82,7 @@ class DashboardVm @Inject constructor(
                 }
 
                 val dueService = equipmentList.count {
-                    it.status == EquipmentStatus.DUE_SERVICE
+                    it.status == EquipmentStatus.SERVICE
                 }
 
                 val down = equipmentList.count {
@@ -86,6 +96,44 @@ class DashboardVm @Inject constructor(
 
                 val currentUser = user ?: return@combine DashboardUiState.Error("Session Expired")
 
+                val changesList = statusLogs.map { statusLog ->
+                    ActivityItem(
+                        id = statusLog.id,
+                        type = ActivityType.STATUS_CHANGE,
+                        title = "Status Changed to ${statusLog.newStatus}",
+                        equipmentId = statusLog.equipmentId,
+                        equipmentName = statusLog.equipmentName,
+                        equipmentModel = statusLog.equipmentModel,
+                        equipmentSerial = statusLog.equipmentSerial,
+                        departmentName = statusLog.department.name,
+                        technicianName = statusLog.changedBy,
+                        timestamp = statusLog.timestamp,
+                        equipmentStatus = statusLog.newStatus,
+                        dueDate = statusLog.timestamp.toDateString()
+                    )
+                }
+
+                val logsList = maintenanceLogs.map { maintenanceLog ->
+                    ActivityItem(
+                        id = maintenanceLog.id,
+                        type = ActivityType.MAINTENANCE_LOG,
+                        title = "Maintenance Logged",
+                        equipmentId = maintenanceLog.equipmentId,
+                        equipmentName = maintenanceLog.equipmentName,
+                        equipmentModel = maintenanceLog.equipmentModel,
+                        equipmentSerial = maintenanceLog.equipmentSerial,
+                        departmentName = maintenanceLog.department.name,
+                        technicianName = maintenanceLog.technicianName,
+                        timestamp = maintenanceLog.date,
+                        equipmentStatus = maintenanceLog.currentStatus,
+                        dueDate = maintenanceLog.date.toDateString()
+                    )
+                }
+
+                val recentUnifiedActivities = (changesList + logsList)
+                    .sortedByDescending { it.timestamp }
+                    .take(5)
+
                 DashboardUiState.Success(
                     currentUser = currentUser,
                     stats = DashboardStats(
@@ -94,8 +142,9 @@ class DashboardVm @Inject constructor(
                         dueService = dueService,
                         down = down
                     ),
-                    recentActivities = statusLogs,
-                    upcomingMaintenance = upcomingMaintenance
+                    recentActivities = recentUnifiedActivities,
+                    upcomingMaintenance = upcomingMaintenance,
+                    allDepartments = departmentsList
                 )
             }.catch {
                 _uiState.value = DashboardUiState.Error(it.message ?: "Failed to connect to database")
