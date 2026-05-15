@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -52,7 +51,7 @@ fun BioMedImportingProgressCard(
 ) {
     Card(
         modifier = modifier
-            .width(386.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy()
@@ -64,14 +63,12 @@ fun BioMedImportingProgressCard(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // --- Circular Progress Section ---
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(top = 15.dp)
                     .size(115.dp)
             ) {
-                // Background Track (White)
                 CircularProgressIndicator(
                     progress = { 1f },
                     modifier = Modifier.fillMaxSize(),
@@ -80,7 +77,7 @@ fun BioMedImportingProgressCard(
                     strokeWidth = 12.dp,
                     strokeCap = StrokeCap.Round,
                 )
-                // Progress Arc (Primary Blue)
+
                 CircularProgressIndicator(
                     progress = { progress },
                     modifier = Modifier.fillMaxSize(),
@@ -89,7 +86,7 @@ fun BioMedImportingProgressCard(
                     strokeWidth = 12.dp,
                     strokeCap = StrokeCap.Round,
                 )
-                // Percentage Text
+
                 Text(
                     text = "${(progress * 100).toInt()}%",
                     style = MaterialTheme.typography.headlineLarge,
@@ -105,7 +102,6 @@ fun BioMedImportingProgressCard(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- Title & Subtitle ---
             Text(
                 text = "Importing Equipment",
                 style = MaterialTheme.typography.headlineSmall,
@@ -131,7 +127,6 @@ fun BioMedImportingProgressCard(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- Live Log Section ---
             Column(
                 modifier = Modifier
                     .padding(horizontal = 15.dp)
@@ -150,7 +145,6 @@ fun BioMedImportingProgressCard(
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
 
-                // List of logs
                 logs.forEach { log ->
                     ImportLogItem(log)
                     Spacer(modifier = Modifier.height(10.dp))
