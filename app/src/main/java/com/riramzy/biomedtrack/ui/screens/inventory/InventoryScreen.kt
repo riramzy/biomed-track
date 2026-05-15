@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.inventory
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,12 +16,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +69,8 @@ fun InventoryScreen(
         state = state,
         onSearchQueryChange = { inventoryVm.searchInventory(it) },
         onDepartmentSelected = { inventoryVm.filterByDepartment(it) },
+        onCategorySelected = { inventoryVm.filterByCategory(it) },
+        onStatusSelected = { inventoryVm.filterByStatus(it) },
         onRetryClick = {  },
         onStatusChangeConfirm = { equipment, status, note ->
             inventoryVm.changeStatus(equipment, status, note)
@@ -70,12 +78,15 @@ fun InventoryScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryScreenContent(
     navController: NavHostController,
     state: InventoryUiState = InventoryUiState.Loading,
     onSearchQueryChange: (String) -> Unit = {},
     onDepartmentSelected: (Department?) -> Unit = {},
+    onCategorySelected: (String?) -> Unit = {},
+    onStatusSelected: (EquipmentStatus?) -> Unit = {},
     onRetryClick: () -> Unit = {},
     onStatusChangeConfirm: (Equipment, EquipmentStatus, String) -> Unit = { _, _, _ -> }
 ) {
@@ -175,6 +186,99 @@ fun InventoryScreenContent(
         is InventoryUiState.Success -> {
             var selectedEquipment by remember { mutableStateOf<Equipment?>(null) }
 
+            var showFilterSheet by remember { mutableStateOf(false) }
+            val filterSheetState = rememberModalBottomSheetState()
+
+            if (showFilterSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showFilterSheet = false },
+                    sheetState = filterSheetState,
+                    dragHandle = { BottomSheetDefaults.DragHandle() },
+
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(15.dp)
+                    ) {
+                        Text(
+                            text = "Advanced Filters",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+
+                        Text(
+                            text = "Filter by status",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+
+                        BioMedHorizontalSelector(
+                            items = listOf("All") + EquipmentStatus.entries.map { it.name },
+                            selectedItem = state.selectedStatus?.name ?: "All",
+                            onItemSelected = { selected ->
+                                if (selected == "All") {
+                                    onStatusSelected(null)
+                                } else {
+                                    onStatusSelected(EquipmentStatus.valueOf(selected))
+                                }
+                            }
+                        )
+
+                        Text(
+                            text = "Filter by category",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+
+                        BioMedHorizontalSelector(
+                            items = listOf("All") + state.categories,
+                            selectedItem = state.selectedCategory ?: "All",
+                            onItemSelected = { selected ->
+                                if (selected == "All") {
+                                    onCategorySelected(null)
+                                } else {
+                                    onCategorySelected(selected)
+                                }
+                            }
+                        )
+
+                        BioMedButton(
+                            text = "Apply",
+                            onClick = {
+                                showFilterSheet = false
+                                onStatusSelected(state.selectedStatus)
+                                onCategorySelected(state.selectedCategory)
+                                      },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.End),
+                            customColor = MaterialTheme.colorScheme.primary,
+                            customTextColor = MaterialTheme.colorScheme.onPrimary,
+                            customTextSize = 14
+                        )
+
+                        BioMedButton(
+                            text = "Clear All Filters",
+                            onClick = {
+                                showFilterSheet = false
+                                onStatusSelected(null)
+                                onCategorySelected(null)
+                                      },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.End),
+                            customTextSize = 14
+                        )
+                    }
+                }
+            }
+
             Scaffold(
                 topBar = {
                     BioMedTopAppBar(
@@ -263,7 +367,9 @@ fun InventoryScreenContent(
                                 BioMedButton(
                                     withIcon = true,
                                     icon = R.drawable.filter,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { showFilterSheet = true },
+                                    text = "Filter"
                                 )
                             }
 
@@ -274,7 +380,7 @@ fun InventoryScreenContent(
                                     val department = if (selectedDepartment == "All") {
                                         null
                                     } else {
-                                        state.departments.find { it.name == selectedDepartment }
+                                        state.departments.find { it.name.equals(selectedDepartment, ignoreCase = true) }
                                     }
                                     onDepartmentSelected(department)
                                 }
@@ -358,10 +464,35 @@ fun InventoryScreenPreview() {
         InventoryScreenContent(
             navController = NavHostController(LocalContext.current),
             state = InventoryUiState.Success(
-                equipment = emptyList(),
+                equipment = listOf(
+                    Equipment(
+                        id = "1",
+                        name = "Fresenius",
+                        model = "4008S",
+                        serialNumber = "4545885N70",
+                        category = "Dialysis Machine",
+                        department = Department(
+                            id = "1",
+                            name = "Dialysis Unit",
+                            totalEquipment = 10,
+                        ),
+                        status = EquipmentStatus.SERVICE,
+                        nextMaintenanceDate = null,
+                        serviceIntervalDays = 180,
+                        lastMaintenanceDate = null,
+                        manufacturer = "EGMED",
+                        agent = "",
+                        location = "",
+                        installDate = 0L,
+                        createdBy = ""
+                    )
+                ),
                 departments = emptyList(),
+                categories = emptyList(),
                 selectedDepartment = null,
                 searchQuery = "",
+                selectedCategory = null,
+                selectedStatus = null,
                 canAddEquipment = false,
                 canDeleteEquipment = false
             )
@@ -378,10 +509,35 @@ fun InventoryScreenDarkPreview() {
         InventoryScreenContent(
             navController = NavHostController(LocalContext.current),
             state = InventoryUiState.Success(
-                equipment = emptyList(),
+                equipment = listOf(
+                    Equipment(
+                        id = "1",
+                        name = "Fresenius",
+                        model = "4008S",
+                        serialNumber = "4545885N70",
+                        category = "Dialysis Machine",
+                        department = Department(
+                            id = "1",
+                            name = "Dialysis Unit",
+                            totalEquipment = 10,
+                        ),
+                        status = EquipmentStatus.SERVICE,
+                        nextMaintenanceDate = null,
+                        serviceIntervalDays = 180,
+                        lastMaintenanceDate = null,
+                        manufacturer = "EGMED",
+                        agent = "",
+                        location = "",
+                        installDate = 0L,
+                        createdBy = ""
+                    )
+                ),
                 departments = emptyList(),
+                categories = emptyList(),
                 selectedDepartment = null,
                 searchQuery = "",
+                selectedCategory = null,
+                selectedStatus = null,
                 canAddEquipment = false,
                 canDeleteEquipment = false
             )
