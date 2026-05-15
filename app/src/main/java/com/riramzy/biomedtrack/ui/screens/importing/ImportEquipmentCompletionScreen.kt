@@ -14,20 +14,70 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedProgressIndicator
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.importing.BioMedProcessCompletedCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
 
 @Composable
-fun ImportEquipmentCompletionScreen() {
+fun ImportEquipmentCompletionScreen(
+    navController: NavHostController
+) {
+    val parentEntry = remember(navController.currentBackStackEntry) {
+        navController.getBackStackEntry(Screen.ImportEquipmentSelectFile.route)
+    }
+
+    val importingEquipmentVm: ImportingEquipmentVm = hiltViewModel(parentEntry)
+    val state by importingEquipmentVm.uiState.collectAsStateWithLifecycle()
+
+    val successState = state as? ImportingUiState.Success
+    val importedCount = successState?.importedCount ?: 0
+    val failedCount = successState?.failedCount ?: 0
+    val skippedCount = successState?.skippedCount ?: 0
+
+    ImportEquipmentCompletionScreenContent(
+        importedCount = importedCount,
+        skippedCount = skippedCount,
+        failedCount = failedCount,
+        onImportAnotherClick = {
+            navController.navigate(Screen.ImportEquipmentSelectFile.route) {
+                popUpTo(Screen.ImportEquipmentSelectFile.route) {
+                    inclusive = true
+                }
+            }
+        },
+        onGoBackToInventoryClick = {
+            navController.navigate(Screen.Inventory.route) {
+                popUpTo(Screen.Inventory.route) {
+                    inclusive = true
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun ImportEquipmentCompletionScreenContent(
+    importedCount: Int? = null,
+    skippedCount: Int? = null,
+    failedCount: Int? = null,
+    onImportAnotherClick: () -> Unit = {},
+    onGoBackToInventoryClick: () -> Unit = {}
+) {
     Scaffold(
         topBar = {
             BioMedTopAppBar(
@@ -105,8 +155,36 @@ fun ImportEquipmentCompletionScreen() {
                         )
                 ) {
                     BioMedProcessCompletedCard(
-                        modifier = Modifier.padding(top = 15.dp)
+                        modifier = Modifier.padding(top = 15.dp),
+                        successCount = importedCount ?: 0,
+                        warningCount = skippedCount ?: 0,
+                        errorCount = failedCount ?: 0
                     )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BioMedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Import Another File",
+                            customTextSize = 14,
+                            onClick = {
+                                onImportAnotherClick()
+                            }
+                        )
+
+                        BioMedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Go to Inventory",
+                            customTextSize = 14,
+                            customColor = MaterialTheme.colorScheme.primary,
+                            customTextColor = MaterialTheme.colorScheme.onPrimary,
+                            onClick = {
+                                onGoBackToInventoryClick()
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -117,7 +195,7 @@ fun ImportEquipmentCompletionScreen() {
 @Composable
 fun ImportEquipmentCompletionScreenPreview() {
     BioMedTheme {
-        ImportEquipmentCompletionScreen()
+        ImportEquipmentCompletionScreenContent()
     }
 }
 
@@ -127,6 +205,6 @@ fun ImportEquipmentCompletionScreenPreview() {
 @Composable
 fun ImportEquipmentCompletionScreenDarkPreview() {
     BioMedTheme {
-        ImportEquipmentCompletionScreen()
+        ImportEquipmentCompletionScreenContent()
     }
 }
