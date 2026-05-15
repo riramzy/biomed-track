@@ -24,13 +24,23 @@ sealed class InventoryUiState {
     data class Success(
         val equipment: List<Equipment>,
         val departments: List<Department>,
+        val categories: List<String>,
         val selectedDepartment: Department?,
         val searchQuery: String,
+        val selectedCategory: String?,
+        val selectedStatus: EquipmentStatus?,
         val canAddEquipment: Boolean,
         val canDeleteEquipment: Boolean,
     ): InventoryUiState()
     data class Error(val message: String): InventoryUiState()
 }
+
+data class InventoryFilters(
+    val department: Department? = null,
+    val category: String? = null,
+    val status: EquipmentStatus? = null,
+    val query: String = ""
+)
 
 @HiltViewModel
 class InventoryVm @Inject constructor(
@@ -41,39 +51,57 @@ class InventoryVm @Inject constructor(
 ): ViewModel() {
     private val _uiState = MutableStateFlow<InventoryUiState>(InventoryUiState.Loading)
     val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
-    private val _searchQuery = MutableStateFlow("")
-    private val _selectedDepartment = MutableStateFlow<Department?>(null)
+    private val _filters = MutableStateFlow(InventoryFilters())
 
     init {
         _uiState .value = InventoryUiState.Loading
         viewModelScope.launch {
             combine(
                 getAllEquipmentsUseCase(),
-                _searchQuery,
-                _selectedDepartment,
+                _filters,
                 departmentRepo.getAllDepartments()
-            ) { equipment, query, selectedDepartment, departments ->
-                val filteredByDepartment = if (selectedDepartment != null) {
-                    equipment.filter { it.department == selectedDepartment }
+            ) { equipment, filters, departments ->
+                val allCategories = equipment.map { it.category }
+                    .filter { it.isNotBlank() }
+                    .distinct()
+                    .sorted()
+
+                val filteredByDepartment = if (filters.department != null) {
+                    equipment.filter { it.department.id == filters.department.id }
                 } else {
                     equipment
                 }
 
-                val filteredByQuery = if (query.isEmpty()) {
-                    filteredByDepartment
+                val filteredByStatus = if (filters.status != null) {
+                    filteredByDepartment.filter { it.status == filters.status }
                 } else {
-                    filteredByDepartment.filter {
-                        it.name.contains(query, ignoreCase = true) ||
-                                it.model.contains(query, ignoreCase = true) ||
-                                it.serialNumber.contains(query, ignoreCase = true)
+                    filteredByDepartment
+                }
+
+                val filteredByCategory = if (filters.category != null) {
+                    filteredByStatus.filter { it.category == filters.category }
+                } else {
+                    filteredByStatus
+                }
+
+                val finalFiltered = if (filters.query.isEmpty()) {
+                    filteredByCategory
+                } else {
+                    filteredByCategory.filter {
+                        it.name.contains(filters.query, ignoreCase = true) ||
+                                it.model.contains(filters.query, ignoreCase = true) ||
+                                it.serialNumber.contains(filters.query, ignoreCase = true)
                     }
                 }
 
                 InventoryUiState.Success(
-                    equipment = filteredByQuery,
+                    equipment = finalFiltered,
                     departments = departments,
-                    selectedDepartment = selectedDepartment,
-                    searchQuery = query,
+                    categories = allCategories,
+                    selectedDepartment = filters.department,
+                    searchQuery = filters.query,
+                    selectedCategory = filters.category,
+                    selectedStatus = filters.status,
                     canAddEquipment = sessionManager.hasPermission(Permission.ADD_EQUIPMENT),
                     canDeleteEquipment = sessionManager.hasPermission(Permission.DELETE_EQUIPMENT)
                 )
@@ -86,11 +114,19 @@ class InventoryVm @Inject constructor(
     }
 
     fun searchInventory(query: String) {
-        _searchQuery.value = query
+        _filters.value = _filters.value.copy(query = query)
     }
 
     fun filterByDepartment(department: Department?) {
-        _selectedDepartment.value = department
+        _filters.value = _filters.value.copy(department = department)
+    }
+
+    fun filterByCategory(category: String?) {
+        _filters.value = _filters.value.copy(category = category)
+    }
+
+    fun filterByStatus(status: EquipmentStatus?) {
+        _filters.value = _filters.value.copy(status = status)
     }
 
     fun changeStatus(equipment: Equipment, newStatus: EquipmentStatus, notes: String) {
