@@ -2,9 +2,11 @@ package com.riramzy.biomedtrack.domain.usecase.maintenance
 
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
+import com.riramzy.biomedtrack.domain.model.StatusChangeLog
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
+import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
 import com.riramzy.biomedtrack.utils.Result
 import java.time.LocalDate
 import javax.inject.Inject
@@ -12,6 +14,7 @@ import javax.inject.Inject
 class AddMaintenanceLogUseCase @Inject constructor(
     private val maintenanceRepository: MaintenanceRepo,
     private val equipmentRepository: EquipmentRepo,
+    private val statusChangeRepo: StatusChangeRepo,
     private val sessionManager: SessionManager
 ) {
     suspend operator fun invoke(log: MaintenanceLog): Result<Unit> {
@@ -38,11 +41,31 @@ class AddMaintenanceLogUseCase @Inject constructor(
         val updatedEquipmentResult = equipmentRepository.updateEquipment(
             equipment.copy(
                 lastMaintenanceDate = log.date,
-                nextMaintenanceDate = nextMaintenanceDate.toEpochDay()
+                nextMaintenanceDate = nextMaintenanceDate.toEpochDay(),
+                status = log.currentStatus
             )
         )
         if (updatedEquipmentResult is Result.Error) {
             return Result.Error("Failed to update equipment")
+        }
+
+        if (equipment.status != log.currentStatus) {
+            val newStatusLogEntry = StatusChangeLog(
+                id = log.id,
+                equipmentId = equipment.id,
+                equipmentName = equipment.name,
+                equipmentModel = equipment.model,
+                equipmentSerial = equipment.serialNumber,
+                department = equipment.department,
+                previousStatus = equipment.status,
+                newStatus = log.currentStatus,
+                changedBy = sessionManager.currentUser.value!!.id,
+                changedByName = sessionManager.currentUser.value!!.name,
+                timestamp = System.currentTimeMillis(),
+                notes = "Updated equipment status via maintenance log"
+            )
+
+            statusChangeRepo.logStatusChange(newStatusLogEntry)
         }
 
         val logMaintenanceResult = maintenanceRepository.addLog(log)
