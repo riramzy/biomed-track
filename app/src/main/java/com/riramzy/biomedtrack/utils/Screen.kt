@@ -9,7 +9,10 @@ sealed class Screen(val route: String) {
     object Notifications: Screen("notifications")
     object Login: Screen("login")
     object UserManagement: Screen("user_management")
-    object ImportEquipment: Screen("import_equipment")
+    object ImportEquipmentSelectFile: Screen("import_equipment_select_file")
+    object ImportEquipmentPreview: Screen("import_equipment_preview")
+    object ImportEquipmentProcessing: Screen("import_equipment_processing")
+    object ImportEquipmentSuccess: Screen("import_equipment_success")
 
     object EquipmentDetail: Screen("equipment_detail/{equipmentId}") {
         fun createRoute(equipmentId: String) = "equipment_detail/$equipmentId"
