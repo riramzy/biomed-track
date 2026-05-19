@@ -77,19 +77,22 @@ fun BioMedImportedDataPreviewCard(
                 BioMedStatusIndicator(
                     status = "$validRows Valid",
                     color = MaterialTheme.indicatorColors.green,
-                    changeable = false
+                    changeable = false,
+                    onStatusClicked = {}
                 )
 
                 BioMedStatusIndicator(
                     status = "$warningRows Warnings",
                     color = MaterialTheme.indicatorColors.yellow,
-                    changeable = false
+                    changeable = false,
+                    onStatusClicked = {}
                 )
 
                 BioMedStatusIndicator(
                     status = "$errorRows Errors",
                     color = MaterialTheme.indicatorColors.red,
-                    changeable = false
+                    changeable = false,
+                    onStatusClicked = {}
                 )
             }
         }
