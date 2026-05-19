@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -36,6 +38,7 @@ import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 
 @Composable
 fun BioMedEquipmentStatusCard(
@@ -50,13 +53,13 @@ fun BioMedEquipmentStatusCard(
         totalEquipment = 20
     ),
     equipmentStatus: EquipmentStatus = EquipmentStatus.SERVICE,
-    equipmentLastServiceDate: String = "2022-01-01",
-    isAbbreviated: Boolean = false
+    equipmentLastServiceDate: Long = 1/1/2026,
+    isAbbreviated: Boolean = true,
+    notes: String? = null
 ) {
     Card(
         modifier = modifier
-            .width(380.dp)
-            .height(if (isAbbreviated) (50.dp) else (90.dp)),
+            .wrapContentSize(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -67,8 +70,7 @@ fun BioMedEquipmentStatusCard(
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -88,9 +90,7 @@ fun BioMedEquipmentStatusCard(
 
             Column(
                 modifier = Modifier
-                    .weight(if (isAbbreviated) (1f) else (2f))
-                    .fillMaxHeight()
-                    .padding(if (isAbbreviated) (10.dp) else (0.dp)),
+                    .weight(if (isAbbreviated) (1f) else (2f)),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -118,6 +118,20 @@ fun BioMedEquipmentStatusCard(
                     }
                 )
 
+                if (notes != null && isAbbreviated) {
+                    Text(
+                        text = notes,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    )
+                }
+
                 if (!isAbbreviated) {
                     Text(
                         text = equipmentDepartment.name,
@@ -137,7 +151,7 @@ fun BioMedEquipmentStatusCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = equipmentLastServiceDate,
+                        text = equipmentLastServiceDate.toDateString(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall,
@@ -212,7 +226,7 @@ fun LogMaintenancePill(
 fun BioMedEquipmentStatusCardPreview() {
     BioMedTheme {
         BioMedEquipmentStatusCard(
-
+            notes = "Replaced faulty parts with new ones"
         )
     }
 }
@@ -224,7 +238,7 @@ fun BioMedEquipmentStatusCardPreview() {
 fun BioMedEquipmentStatusCardDarkPreview() {
     BioMedTheme {
         BioMedEquipmentStatusCard(
-
+            notes = "Replaced faulty parts with new ones"
         )
     }
 }
