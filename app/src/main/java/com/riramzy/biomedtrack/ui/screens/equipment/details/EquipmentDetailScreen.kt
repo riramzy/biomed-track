@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.details
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,16 +14,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,18 +48,22 @@ import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import com.riramzy.biomedtrack.domain.model.StatusChangeLog
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
+import com.riramzy.biomedtrack.ui.components.equipment.BioMedChangeStatusDialog
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentDetailsCard
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
 import com.riramzy.biomedtrack.ui.components.maintenance.BioMedMaintenanceCard
+import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.MaintenanceType
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Composable
 fun EquipmentDetailScreen(
@@ -68,9 +76,10 @@ fun EquipmentDetailScreen(
     EquipmentDetailsScreenContent(
         navController = navController,
         state = state,
-        onDeleteClicked = { equipmentDetailsVm.deleteEquipment() },
-        resetDeleteResult = { equipmentDetailsVm.resetDeleteResult() },
-        deleteResult = deleteResult
+        onDeleteClicked = equipmentDetailsVm::deleteEquipment,
+        resetDeleteResult = equipmentDetailsVm::resetDeleteResult,
+        deleteResult = deleteResult,
+        changeStatus = equipmentDetailsVm::changeEquipmentStatus
     )
 }
 
@@ -82,7 +91,8 @@ fun EquipmentDetailsScreenContent(
     onRetryClick: () -> Unit = {},
     onDeleteClicked: () -> Unit = {},
     resetDeleteResult: () -> Unit = {},
-    deleteResult: Result<Unit>? = null
+    deleteResult: Result<Unit>? = null,
+    changeStatus: (Equipment, EquipmentStatus, String?) -> Unit = { _, _, _ -> }
 ) {
     when(state) {
         is EquipmentDetailsUiState.Error -> {
@@ -179,6 +189,38 @@ fun EquipmentDetailsScreenContent(
         }
         is EquipmentDetailsUiState.Success -> {
             var showDeleteDialog by remember { mutableStateOf(false) }
+            var showChangeStatusDialog by remember { mutableStateOf(false) }
+            val sheetState = rememberModalBottomSheetState()
+            var showBottomSheet by remember { mutableStateOf(false) }
+
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = sheetState,
+                    dragHandle = { BottomSheetDefaults.DragHandle() },
+                    containerColor = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.onSecondary
+                    } else {
+                        Color.White
+                    }
+                ) {
+                    BioMedProfileSheet(
+                        role = state.currentUser.role.name,
+                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) }
+                    )
+                }
+            }
+
+            if (showChangeStatusDialog) {
+                BioMedChangeStatusDialog(
+                    equipmentName = "${state.equipment.name} ${state.equipment.model}",
+                    onConfirm = { status, note ->
+                        changeStatus(state.equipment, status, note.ifBlank { null })
+                        showChangeStatusDialog = false
+                    },
+                    onDismiss = { showChangeStatusDialog = false }
+                )
+            }
 
             if (showDeleteDialog) {
                 AlertDialog(
@@ -234,17 +276,22 @@ fun EquipmentDetailsScreenContent(
                     BioMedTopAppBar(
                         modifier = Modifier.padding(
                             top = 10.dp
-                        )
+                        ),
+                        onProfileClick = { showBottomSheet = true }
                     )
                 },
                 floatingActionButton = {
                     BioMedNavBar(
                         selectedPage = "Inventory",
-                        withActionButton = false,
+                        withActionButton = true,
+                        isActionButtonText = true,
+                        actionButtonText = "Log",
+                        onActionButtonClick = { navController.navigate(Screen.LogMaintenance.createRoute(state.equipment.id)) },
                         onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
                         onSchedulerClick = { navController.navigate(Screen.Scheduler.route) },
                         onInventoryClick = { navController.navigate(Screen.Inventory.route) },
-                        onReportsClick = { navController.navigate(Screen.Reports.route) }
+                        onReportsClick = { navController.navigate(Screen.Reports.route) },
+                        modifier = Modifier.padding(horizontal = 15.dp)
                     )
                                        },
                 floatingActionButtonPosition = FabPosition.Center,
@@ -274,6 +321,10 @@ fun EquipmentDetailsScreenContent(
                             onEditClick = { navController.navigate(Screen.EditEquipment.createRoute(state.equipment.id)) },
                             onDeleteClick = {
                                 showDeleteDialog = true
+                            },
+                            canChangeStatus = state.canChangeStatus,
+                            onStatusClick = {
+                                showChangeStatusDialog = true
                             }
                         )
                     }
@@ -329,7 +380,7 @@ fun EquipmentDetailsScreenContent(
 
                             state.statusChangesLogs.forEach { log ->
                                 BioMedEquipmentStatusCard(
-                                    modifier = Modifier.padding(bottom = 10.dp),
+                                    modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 10.dp),
                                     equipmentStatus = log.newStatus,
                                     equipmentName = log.equipmentName,
                                     equipmentModel = log.equipmentModel,
@@ -337,7 +388,8 @@ fun EquipmentDetailsScreenContent(
                                     equipmentCategory = log.department.name,
                                     equipmentDepartment = log.department,
                                     equipmentLastServiceDate = log.timestamp,
-                                    isAbbreviated = true
+                                    isAbbreviated = true,
+                                    notes = log.notes
                                 )
                             }
                         }
@@ -368,11 +420,11 @@ fun EquipmentDetailsScreenPreview() {
                         totalEquipment = 20
                     ),
                     status = EquipmentStatus.SERVICE,
-                    nextMaintenanceDate = "2023-01-01",
-                    lastMaintenanceDate = "2022-01-01",
+                    nextMaintenanceDate = 1/1/2026,
+                    lastMaintenanceDate = 1/1/2026,
                     manufacturer = "Manufacturer 1",
                     agent = "Agent 1",
-                    installDate = "2021-01-01",
+                    installDate = 1/1/2016,
                     location = "Dialysis Unit",
                     serviceIntervalDays = 90,
                     createdBy = "Ramzy Habel"
@@ -382,6 +434,7 @@ fun EquipmentDetailsScreenPreview() {
                         id = "1",
                         equipmentId = "1",
                         equipmentName = "Equipment 1",
+                        equipmentModel = "Model",
                         equipmentSerial = "123456789",
                         department = Department(
                             id = "1",
@@ -391,7 +444,7 @@ fun EquipmentDetailsScreenPreview() {
                         type = MaintenanceType.REPAIR,
                         technicianId = "1",
                         technicianName = "Technician 1",
-                        date = "14/4/2026",
+                        date = 14/4/2026,
                         currentStatus = EquipmentStatus.SERVICE,
                         checklist = emptyList(),
                         notes = "Replaced faulty parts with new ones",
@@ -412,15 +465,25 @@ fun EquipmentDetailsScreenPreview() {
                         ),
                         previousStatus = EquipmentStatus.ONLINE,
                         newStatus = EquipmentStatus.SERVICE,
-                        timestamp = "14/4/2026",
+                        timestamp = 14/4/2026,
                         notes = "Replaced faulty parts with new ones",
                         changedBy = "Supervisor",
-                        changedByName = "Ramzy Habel"
+                        changedByName = "Ramzy Habel",
                     )
                 ),
                 canEditEquipment = true,
                 canDeleteEquipment = true,
-            ),
+                canChangeStatus = true,
+                currentUser = Technician(
+                    id = "1",
+                    name = "Ramzy Habel",
+                    role = UserRole.SUPERVISOR,
+                    email = "",
+                    employeeId = "",
+                    assignedDepartments = emptyList(),
+                    isActive = true,
+                )
+            )
         )
     }
 }
@@ -433,7 +496,6 @@ fun EquipmentDetailsScreenDarkPreview() {
     BioMedTheme {
         EquipmentDetailsScreenContent(
             navController = NavHostController(LocalContext.current),
-
             state = EquipmentDetailsUiState.Success(
                 equipment = Equipment(
                     id = "1",
@@ -447,11 +509,11 @@ fun EquipmentDetailsScreenDarkPreview() {
                         totalEquipment = 20
                     ),
                     status = EquipmentStatus.SERVICE,
-                    nextMaintenanceDate = "2023-01-01",
-                    lastMaintenanceDate = "2022-01-01",
+                    nextMaintenanceDate = 1/1/2026,
+                    lastMaintenanceDate = 1/1/2026,
                     manufacturer = "Manufacturer 1",
                     agent = "Agent 1",
-                    installDate = "2021-01-01",
+                    installDate = 1/1/2016,
                     location = "Dialysis Unit",
                     serviceIntervalDays = 90,
                     createdBy = "Ramzy Habel"
@@ -461,6 +523,7 @@ fun EquipmentDetailsScreenDarkPreview() {
                         id = "1",
                         equipmentId = "1",
                         equipmentName = "Equipment 1",
+                        equipmentModel = "Model",
                         equipmentSerial = "123456789",
                         department = Department(
                             id = "1",
@@ -470,7 +533,7 @@ fun EquipmentDetailsScreenDarkPreview() {
                         type = MaintenanceType.REPAIR,
                         technicianId = "1",
                         technicianName = "Technician 1",
-                        date = "14/4/2026",
+                        date = 14/4/2026,
                         currentStatus = EquipmentStatus.SERVICE,
                         checklist = emptyList(),
                         notes = "Replaced faulty parts with new ones",
@@ -491,7 +554,7 @@ fun EquipmentDetailsScreenDarkPreview() {
                         ),
                         previousStatus = EquipmentStatus.ONLINE,
                         newStatus = EquipmentStatus.SERVICE,
-                        timestamp = "14/4/2026",
+                        timestamp = 14/4/2026,
                         notes = "Replaced faulty parts with new ones",
                         changedBy = "Supervisor",
                         changedByName = "Ramzy Habel"
@@ -499,6 +562,16 @@ fun EquipmentDetailsScreenDarkPreview() {
                 ),
                 canEditEquipment = true,
                 canDeleteEquipment = true,
+                canChangeStatus = true,
+                currentUser = Technician(
+                    id = "1",
+                    name = "Ramzy Habel",
+                    role = UserRole.SUPERVISOR,
+                    email = "",
+                    employeeId = "",
+                    assignedDepartments = emptyList(),
+                    isActive = true,
+                )
             ),
         )
     }
