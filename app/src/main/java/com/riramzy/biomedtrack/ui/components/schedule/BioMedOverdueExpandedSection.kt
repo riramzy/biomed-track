@@ -4,10 +4,9 @@ import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,19 +20,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedOverdueEquipmentCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+import com.riramzy.biomedtrack.utils.TaskStatus
 
 @Composable
 fun BioMedOverdueExpandedSection(
     modifier: Modifier = Modifier,
-    overdueEquipment: Int = 3
+    overdueTasks: List<Task>,
+    onTaskClick: (Task) -> Unit
 ) {
     Card(
         modifier = modifier
-            .width(356.dp)
-            .height(327.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -45,7 +48,6 @@ fun BioMedOverdueExpandedSection(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(15.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -56,7 +58,7 @@ fun BioMedOverdueExpandedSection(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = "Overdue Maintenance ($overdueEquipment)",
+                    text = "Overdue Maintenance (${overdueTasks.size})",
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -68,9 +70,10 @@ fun BioMedOverdueExpandedSection(
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
 
-                for (overdueEquipment in 1..overdueEquipment) {
+                overdueTasks.forEach { task ->
                     BioMedOverdueEquipmentCard(
-                        modifier = Modifier.padding(bottom = 10.dp)
+                        task = task,
+                        onCardClick = { onTaskClick(task) }
                     )
                 }
             }
@@ -82,7 +85,27 @@ fun BioMedOverdueExpandedSection(
 @Composable
 fun BioMedOverdueExpandedSectionPreview() {
     BioMedTheme {
-        BioMedOverdueExpandedSection()
+        BioMedOverdueExpandedSection(
+            overdueTasks = listOf(
+                Task(
+                    id = "1",
+                    equipmentId = "eq1",
+                    equipmentName = "Fresenius",
+                    equipmentModel = "4008S",
+                    equipmentSerial = "SN12345678",
+                    department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+                    assignedTo = "tech1",
+                    assignedToName = "John Doe",
+                    assignedBy = "sup1",
+                    dueDate = System.currentTimeMillis(),
+                    status = TaskStatus.IN_PROGRESS,
+                    notes = "Check pressure sensors and replace faulty filters",
+                    scheduledChecklist = emptyList(),
+                    readBy = emptyList()
+                )
+            ),
+            onTaskClick = {}
+        )
     }
 }
 
@@ -93,6 +116,26 @@ fun BioMedOverdueExpandedSectionPreview() {
 @Composable
 fun BioMedOverdueExpandedSectionDarkPreview() {
     BioMedTheme {
-        BioMedOverdueExpandedSection()
+        BioMedOverdueExpandedSection(
+            overdueTasks = listOf(
+                Task(
+                    id = "1",
+                    equipmentId = "eq1",
+                    equipmentName = "Fresenius",
+                    equipmentModel = "4008S",
+                    equipmentSerial = "SN12345678",
+                    department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+                    assignedTo = "tech1",
+                    assignedToName = "John Doe",
+                    assignedBy = "sup1",
+                    dueDate = System.currentTimeMillis(),
+                    status = TaskStatus.IN_PROGRESS,
+                    notes = "Check pressure sensors and replace faulty filters",
+                    scheduledChecklist = emptyList(),
+                    readBy = emptyList()
+                )
+            ),
+            onTaskClick = {}
+        )
     }
 }
