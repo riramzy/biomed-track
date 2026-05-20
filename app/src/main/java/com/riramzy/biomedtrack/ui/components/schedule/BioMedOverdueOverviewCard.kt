@@ -7,12 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -37,13 +38,14 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 
 @Composable
 fun BioMedOverdueOverviewCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    overdueCount: Int,
+    onViewAllClick: () -> Unit
 ) {
     Card(
-        onClick = { /*TODO*/ },
         modifier = modifier
-            .height(108.dp)
-            .width(356.dp),
+            .wrapContentHeight()
+            .fillMaxWidth(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -56,12 +58,11 @@ fun BioMedOverdueOverviewCard(
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
         ) {
             Row(
                 modifier = Modifier
-                    .padding(15.dp)
-                    .fillMaxSize(),
+                    .padding(15.dp),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -91,13 +92,12 @@ fun BioMedOverdueOverviewCard(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 10.dp)
-                        .fillMaxHeight(),
+                        .padding(start = 10.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "3 equipment are overdue for maintenance",
+                        text = "$overdueCount equipment ${if (overdueCount == 1) "is" else "are"} overdue for maintenance",
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -107,6 +107,8 @@ fun BioMedOverdueOverviewCard(
                             Color(0xFF980000)
                         }
                     )
+
+                    Spacer(Modifier.height(10.dp))
 
                     Text(
                         text = "Please schedule maintenance as soon as possible",
@@ -136,7 +138,8 @@ fun BioMedOverdueOverviewCard(
                     } else {
                         Color.White
                     },
-                    text = "View All"
+                    text = "View All",
+                    onClick = onViewAllClick
                 )
             }
         }
@@ -147,7 +150,10 @@ fun BioMedOverdueOverviewCard(
 @Composable
 fun BioMedOverdueOverviewCardPreview() {
     BioMedTheme {
-        BioMedOverdueOverviewCard()
+        BioMedOverdueOverviewCard(
+            overdueCount = 3,
+            onViewAllClick = {}
+        )
     }
 }
 
@@ -158,6 +164,9 @@ fun BioMedOverdueOverviewCardPreview() {
 @Composable
 fun BioMedOverdueOverviewCardDarkPreview() {
     BioMedTheme {
-        BioMedOverdueOverviewCard()
+        BioMedOverdueOverviewCard(
+            overdueCount = 1,
+            onViewAllClick = {}
+        )
     }
 }
