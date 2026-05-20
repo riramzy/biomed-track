@@ -73,7 +73,8 @@ fun BioMedOverdueExpandedSection(
                 overdueTasks.forEach { task ->
                     BioMedOverdueEquipmentCard(
                         task = task,
-                        onCardClick = { onTaskClick(task) }
+                        onCardClick = { onTaskClick(task) },
+                        modifier = Modifier.padding(bottom = 10.dp)
                     )
                 }
             }
