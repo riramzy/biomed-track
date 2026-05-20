@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -25,57 +23,66 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+import com.riramzy.biomedtrack.utils.TaskStatus
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 
 @Composable
 fun BioMedOverdueEquipmentCard(
     modifier: Modifier = Modifier,
-    status: String = "Down",
+    task: Task,
+    onCardClick: () -> Unit
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
     Card(
         modifier = modifier
-            .width(328.dp)
-            .height(78.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(0.3f)
-        )
+            containerColor = if (isDarkTheme) {
+                Color.Black.copy(0.2f)
+            } else {
+                Color.White.copy(0.2f)
+            }
+        ),
+        onClick = onCardClick
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .padding(15.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
-                    .padding(15.dp)
+                    .padding(end = 10.dp)
                     .size(34.dp)
                     .clip(CircleShape)
                     .background(
-                        when(status) {
-                            "Online" -> MaterialTheme.indicatorColors.green
-                            "Down" -> MaterialTheme.indicatorColors.red
-                            "Service" -> MaterialTheme.indicatorColors.yellow
-                            else -> MaterialTheme.colorScheme.primary
+                        when(task.status) {
+                            TaskStatus.PENDING -> MaterialTheme.indicatorColors.yellow
+                            TaskStatus.IN_PROGRESS -> MaterialTheme.indicatorColors.red
+                            TaskStatus.DONE -> MaterialTheme.indicatorColors.green
                         }
                     ),
             ) {
                 Icon(
-                    painter = when(status) {
-                        "Online" -> painterResource(id = R.drawable.activity_online)
-                        "Down" -> painterResource(id = R.drawable.activity_down)
-                        "Service" -> painterResource(id = R.drawable.activity_service)
-                        else -> {}
-                    } as Painter,
+                    painter = when(task.status) {
+                        TaskStatus.PENDING -> painterResource(R.drawable.activity_service)
+                        TaskStatus.IN_PROGRESS -> painterResource(R.drawable.activity_down)
+                        TaskStatus.DONE -> painterResource(R.drawable.activity_online)
+                    },
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier
@@ -87,29 +94,28 @@ fun BioMedOverdueEquipmentCard(
             Column(
                 modifier = Modifier
                     .weight(2f)
-                    .fillMaxHeight()
                     .padding(0.dp),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Fresenius 4008S",
+                    text = "${task.equipmentName} ${task.equipmentModel}",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSystemInDarkTheme()) {
+                    color = if (isDarkTheme) {
                         Color.White
                     } else {
                         Color.Black
                     }
-
                 )
+
                 Text(
-                    text = "4545885N70",
+                    text = task.equipmentSerial,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSystemInDarkTheme()) {
+                    color = if (isDarkTheme) {
                         Color.White
                     } else {
                         Color.Black
@@ -117,11 +123,11 @@ fun BioMedOverdueEquipmentCard(
                 )
 
                 Text(
-                    text = "Dialysis Unit",
+                    text = task.department.name,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSystemInDarkTheme()) {
+                    color = if (isDarkTheme) {
                         Color.White
                     } else {
                         Color.Black
@@ -136,23 +142,23 @@ fun BioMedOverdueEquipmentCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "20/3/2026",
+                    text = task.dueDate.toDateString(),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSystemInDarkTheme()) {
-                        Color.White
-                    } else {
-                        Color(0xFF980000)
+                    color = when(task.status) {
+                        TaskStatus.PENDING -> MaterialTheme.indicatorColors.yellow
+                        TaskStatus.IN_PROGRESS -> MaterialTheme.indicatorColors.red
+                        TaskStatus.DONE -> MaterialTheme.indicatorColors.green
                     }
                 )
 
                 Text(
-                    text = "Hemodialysis",
+                    text = task.assignedToName,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSystemInDarkTheme()) {
+                    color = if (isDarkTheme) {
                         Color.White
                     } else {
                         Color.Black
@@ -167,7 +173,25 @@ fun BioMedOverdueEquipmentCard(
 @Composable
 fun BioMedOverdueEquipmentCardPreview() {
     BioMedTheme {
-        BioMedOverdueEquipmentCard()
+        BioMedOverdueEquipmentCard(
+            task = Task(
+                id = "1",
+                equipmentId = "eq1",
+                equipmentName = "Fresenius",
+                equipmentModel = "4008S",
+                equipmentSerial = "SN12345678",
+                department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+                assignedTo = "tech1",
+                assignedToName = "John Doe",
+                assignedBy = "sup1",
+                dueDate = System.currentTimeMillis(),
+                status = TaskStatus.IN_PROGRESS,
+                notes = "Check pressure sensors and replace faulty filters",
+                scheduledChecklist = emptyList(),
+                readBy = emptyList()
+            ),
+            onCardClick = {}
+        )
     }
 }
 
@@ -178,6 +202,24 @@ fun BioMedOverdueEquipmentCardPreview() {
 @Composable
 fun BioMedOverdueEquipmentCardDarkPreview() {
     BioMedTheme {
-        BioMedOverdueEquipmentCard()
+        BioMedOverdueEquipmentCard(
+            task = Task(
+                id = "1",
+                equipmentId = "eq1",
+                equipmentName = "Fresenius",
+                equipmentModel = "4008S",
+                equipmentSerial = "SN12345678",
+                department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+                assignedTo = "tech1",
+                assignedToName = "John Doe",
+                assignedBy = "sup1",
+                dueDate = System.currentTimeMillis(),
+                status = TaskStatus.PENDING,
+                notes = "Check pressure sensors and replace faulty filters",
+                scheduledChecklist = emptyList(),
+                readBy = emptyList()
+            ),
+            onCardClick = {}
+        )
     }
 }
