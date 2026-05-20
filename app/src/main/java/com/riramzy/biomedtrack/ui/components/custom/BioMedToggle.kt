@@ -26,7 +26,8 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedToggle(
     modifier: Modifier = Modifier,
     text: String = "Toggle",
-    isChecked: Boolean = true
+    isChecked: Boolean = true,
+    onCheckedChange: (Boolean) -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -69,7 +70,9 @@ fun BioMedToggle(
 
             Switch(
                 checked = isChecked,
-                onCheckedChange = {},
+                onCheckedChange = {
+                    onCheckedChange(it)
+                },
                 modifier = Modifier
                     .padding(vertical = 6.dp, horizontal = 2.dp),
                 colors = SwitchDefaults.colors(
