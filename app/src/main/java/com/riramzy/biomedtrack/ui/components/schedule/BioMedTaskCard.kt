@@ -1,0 +1,296 @@
+package com.riramzy.biomedtrack.ui.components.schedule
+
+import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.domain.model.ChecklistItem
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Task
+import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.TaskStatus
+
+@Composable
+fun BioMedTaskCard(
+    task: Task,
+    modifier: Modifier = Modifier,
+    onCardClick: () -> Unit = {}
+) {
+    val isDark = isSystemInDarkTheme()
+    
+    val (statusText, statusBg, statusTextCol) = when(task.status) {
+        TaskStatus.PENDING -> Triple(
+            "Pending",
+            if (isDark) Color(0xFFF57F17).copy(alpha = 0.15f) else Color(0xFFFFF3E0),
+            if (isDark) Color(0xFFFFB300) else Color(0xFFE65100)
+        )
+        TaskStatus.IN_PROGRESS -> Triple(
+            "In Progress",
+            if (isDark) MaterialTheme.colorScheme.primaryContainer.copy(0.3f) else MaterialTheme.colorScheme.surface.copy(0.7f),
+            if (isDark) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
+        )
+        TaskStatus.DONE -> Triple(
+            "Done",
+            if (isDark) Color(0xFF2E7D32).copy(alpha = 0.15f) else Color(0xFFE8F5E9),
+            if (isDark) Color(0xFF81C784) else Color(0xFF2E7D32)
+        )
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDark) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                MaterialTheme.colorScheme.primaryContainer
+            }
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        onClick = onCardClick
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "${task.equipmentName} ${task.equipmentModel}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (isDark) Color.White else Color.Black
+                    )
+                    
+                    Spacer(modifier = Modifier.height(2.dp))
+                    
+                    Text(
+                        text = "SN: ${task.equipmentSerial}",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isDark) MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    )
+                }
+                
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(statusBg)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = statusText,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = statusTextCol
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(25.dp))
+                            .background(
+                                if (isDark) {
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                } else {
+                                    MaterialTheme.colorScheme.surface.copy(0.5f)
+                                }
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = task.department.name,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isDark) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.avatar),
+                            contentDescription = "Technician Avatar",
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clip(CircleShape)
+                        )
+                        
+                        Text(
+                            text = task.assignedToName,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = if (isDark) MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f) else Color.DarkGray
+                        )
+                    }
+                }
+
+                val totalSteps = task.scheduledChecklist.size
+                val checkedSteps = task.scheduledChecklist.count { it.isChecked }
+                if (totalSteps > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(
+                                id = if (checkedSteps == totalSteps) R.drawable.checked else R.drawable.task
+                            ),
+                            contentDescription = "Checklist Progress Icon",
+                            modifier = Modifier.size(12.dp)
+                        )
+                        
+                        Text(
+                            text = "$checkedSteps/$totalSteps steps",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (checkedSteps == totalSteps) {
+                                if (isDark) Color(0xFF81C784) else Color(0xFF2E7D32)
+                            } else {
+                                if (isDark) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(device = "id:pixel_9", showBackground = true)
+@Composable
+fun BioMedTaskCardPendingPreview() {
+    val mockTask = Task(
+        id = "1",
+        equipmentId = "eq1",
+        equipmentName = "Fresenius",
+        equipmentModel = "4008S",
+        equipmentSerial = "SN12345678",
+        department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+        assignedTo = "tech1",
+        assignedToName = "John Doe",
+        assignedBy = "sup1",
+        dueDate = System.currentTimeMillis(),
+        status = TaskStatus.IN_PROGRESS,
+        notes = "Check pressure sensors and replace faulty filters",
+        scheduledChecklist = listOf(
+            ChecklistItem("1", "Clean filters", false),
+            ChecklistItem("2", "Calibrate sensors", false),
+            ChecklistItem("3", "Leak test", false)
+        )
+    )
+    BioMedTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            BioMedTaskCard(task = mockTask)
+        }
+    }
+}
+
+@Preview(device = "id:pixel_9", showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+fun BioMedTaskCardInProgressDarkPreview() {
+    val mockTask = Task(
+        id = "2",
+        equipmentId = "eq2",
+        equipmentName = "Philips",
+        equipmentModel = "IntelliVue MX450",
+        equipmentSerial = "SN87654321",
+        department = Department(id = "2", name = "ICU", totalEquipment = 15),
+        assignedTo = "tech2",
+        assignedToName = "Sarah Connor",
+        assignedBy = "sup1",
+        dueDate = System.currentTimeMillis(),
+        status = TaskStatus.IN_PROGRESS,
+        notes = "Calibrate blood pressure modules and check battery backup",
+        scheduledChecklist = listOf(
+            ChecklistItem("1", "Clean modules", true),
+            ChecklistItem("2", "Calibrate NIBP", false),
+            ChecklistItem("3", "Battery load test", true)
+        )
+    )
+    BioMedTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            BioMedTaskCard(task = mockTask)
+        }
+    }
+}
+
+@Preview(device = "id:pixel_9", showBackground = true)
+@Composable
+fun BioMedTaskCardDonePreview() {
+    val mockTask = Task(
+        id = "3",
+        equipmentId = "eq3",
+        equipmentName = "Dräger",
+        equipmentModel = "Evita V500",
+        equipmentSerial = "SN99887766",
+        department = Department(id = "3", name = "OR", totalEquipment = 8),
+        assignedTo = "tech3",
+        assignedToName = "Alex Mercer",
+        assignedBy = "sup1",
+        dueDate = System.currentTimeMillis(),
+        status = TaskStatus.DONE,
+        notes = "Routine yearly PM certification and testing",
+        scheduledChecklist = listOf(
+            ChecklistItem("1", "O2 sensor check", true),
+            ChecklistItem("2", "Alarm testing", true)
+        )
+    )
+    BioMedTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            BioMedTaskCard(task = mockTask)
+        }
+    }
+}
