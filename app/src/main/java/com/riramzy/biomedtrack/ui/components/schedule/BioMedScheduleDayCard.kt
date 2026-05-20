@@ -4,11 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,19 +22,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
+import com.riramzy.biomedtrack.domain.model.Task
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.ChecklistItem
+import com.riramzy.biomedtrack.utils.TaskStatus
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedScheduleDayCard(
     modifier: Modifier = Modifier,
-    containsSchedules: Boolean = true
+    dayName: String,
+    dateDisplay: String,
+    tasks: List<Task>,
+    onTaskClick: (Task) -> Unit = {}
 ) {
     Card(
-        onClick = { /*TODO*/ },
         modifier = modifier
-            .height(170.dp)
-            .width(356.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -46,7 +51,6 @@ fun BioMedScheduleDayCard(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(15.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -56,7 +60,7 @@ fun BioMedScheduleDayCard(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "SAT",
+                    text = dayName,
                     style = MaterialTheme.typography.titleLarge,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,
@@ -68,7 +72,7 @@ fun BioMedScheduleDayCard(
                 )
 
                 Text(
-                    text = "28 Mar",
+                    text = dateDisplay,
                     style = MaterialTheme.typography.titleLarge,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Black,
@@ -80,9 +84,9 @@ fun BioMedScheduleDayCard(
                 )
             }
 
-            if (containsSchedules) {
-                BioMedEquipmentStatusCard(isAbbreviated = true)
-            } else {
+            Spacer(Modifier.height(15.dp))
+
+            tasks.ifEmpty {
                 Text(
                     text = "No maintenance",
                     style = MaterialTheme.typography.labelSmall,
@@ -98,6 +102,14 @@ fun BioMedScheduleDayCard(
                         .padding(bottom = 8.dp)
                 )
             }
+
+            tasks.forEach { task ->
+                BioMedTaskCard(
+                    task = task,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    onCardClick = { onTaskClick(task) }
+                )
+            }
         }
     }
 }
@@ -105,8 +117,33 @@ fun BioMedScheduleDayCard(
 @Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
 @Composable
 fun BioMedScheduleDayCardPreview() {
+    val mockTasks = listOf(
+        Task(
+            id = "1",
+            equipmentId = "eq1",
+            equipmentName = "Fresenius",
+            equipmentModel = "4008S",
+            equipmentSerial = "SN12345678",
+            department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+            assignedTo = "tech1",
+            assignedToName = "John Doe",
+            assignedBy = "sup1",
+            dueDate = System.currentTimeMillis(),
+            status = TaskStatus.IN_PROGRESS,
+            notes = "Check pressure sensors and replace faulty filters",
+            scheduledChecklist = listOf(
+                ChecklistItem("1", "Clean filters", true),
+                ChecklistItem("2", "Calibrate sensors", false),
+                ChecklistItem("3", "Leak test", false)
+            )
+        )
+    )
     BioMedTheme {
-        BioMedScheduleDayCard()
+        BioMedScheduleDayCard(
+            dayName = "SAT",
+            dateDisplay = "28 Mar",
+            tasks = mockTasks
+        )
     }
 }
 
@@ -115,7 +152,32 @@ fun BioMedScheduleDayCardPreview() {
 )
 @Composable
 fun BioMedScheduleDayCardDarkPreview() {
+    val mockTasks = listOf(
+        Task(
+            id = "1",
+            equipmentId = "eq1",
+            equipmentName = "Fresenius",
+            equipmentModel = "4008S",
+            equipmentSerial = "SN12345678",
+            department = Department(id = "1", name = "Dialysis Unit", totalEquipment = 20),
+            assignedTo = "tech1",
+            assignedToName = "John Doe",
+            assignedBy = "sup1",
+            dueDate = System.currentTimeMillis(),
+            status = TaskStatus.PENDING,
+            notes = "Check pressure sensors and replace faulty filters",
+            scheduledChecklist = listOf(
+                ChecklistItem("1", "Clean filters", false),
+                ChecklistItem("2", "Calibrate sensors", false),
+                ChecklistItem("3", "Leak test", false)
+            )
+        )
+    )
     BioMedTheme {
-        BioMedScheduleDayCard()
+        BioMedScheduleDayCard(
+            dayName = "SAT",
+            dateDisplay = "28 Mar",
+            tasks = mockTasks
+        )
     }
 }
