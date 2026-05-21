@@ -7,19 +7,70 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.riramzy.biomedtrack.R
-import com.riramzy.biomedtrack.ui.components.BioMedNavBar
-import com.riramzy.biomedtrack.ui.components.BioMedScheduleMaintenanceCard
-import com.riramzy.biomedtrack.ui.components.BioMedTopAppBar
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
+import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
+import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
+import com.riramzy.biomedtrack.ui.components.schedule.BioMedScheduleMaintenanceCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
 
 @Composable
-fun ScheduleMaintenanceScreen() {
+fun ScheduleMaintenanceScreen(
+    navController: NavHostController,
+    scheduleMaintenanceVm: ScheduleMaintenanceVm = hiltViewModel()
+) {
+    val state by scheduleMaintenanceVm.uiState.collectAsStateWithLifecycle()
+
+    ScheduleMaintenanceScreenContent(
+        navController = navController,
+        state = state,
+        onAction = scheduleMaintenanceVm::onAction
+    )
+}
+
+@Composable
+fun ScheduleMaintenanceScreenContent(
+    navController: NavHostController,
+    state: ScheduleMaintenanceUiState = ScheduleMaintenanceUiState(),
+    onAction: (ScheduleMaintenanceAction) -> Unit = {}
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            navController.navigate(Screen.Scheduler.route) {
+                popUpTo(Screen.Scheduler.route) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(state.isError) {
+        state.isError?.let { message ->
+            snackbarHostState.showSnackbar(
+                message,
+                actionLabel = "Dismiss",
+                withDismissAction = true
+            )
+            onAction(ScheduleMaintenanceAction.ResetError)
+        }
+    }
+
     Scaffold(
         topBar = {
             BioMedTopAppBar(
@@ -33,10 +84,22 @@ fun ScheduleMaintenanceScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(18.dp),
-                withActionButton = true,
-                actionButtonIcon = R.drawable.activity_online,
-                selectedPage = "Scheduler"
+                withActionButton = false,
+                selectedPage = "Scheduler",
+                onInventoryClick = { navController.navigate(Screen.Inventory.route) },
+                onReportsClick = { navController.navigate(Screen.Reports.route) },
+                onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
+                onSchedulerClick = { navController.navigate(Screen.Scheduler.route) }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) {
+                BioMedSnackbar(
+                    snackbarData = it,
+                    isError = state.isError != null,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
         },
         modifier = Modifier.statusBarsPadding()
     ) { innerPadding ->
@@ -47,7 +110,21 @@ fun ScheduleMaintenanceScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BioMedScheduleMaintenanceCard(
-                modifier = Modifier.padding(top = 20.dp)
+                modifier = Modifier.padding(top = 20.dp),
+                equipmentList = state.equipmentList,
+                selectedEquipment = state.selectedEquipment,
+                onEquipmentSelected = { onAction(ScheduleMaintenanceAction.SelectEquipment(it)) },
+                dueDate = state.selectedDate,
+                onDateSelected = { onAction(ScheduleMaintenanceAction.SelectDate(it)) },
+                techniciansList = state.techniciansList.map { it.name },
+                selectedTechnicianName = state.selectedTechnician?.name ?: "",
+                onTechnicianSelected = { onAction(ScheduleMaintenanceAction.SelectTechnician(it)) },
+                notes = state.notes,
+                onNotesChanged = { onAction(ScheduleMaintenanceAction.UpdateNotes(it)) },
+                checklist = state.checklist,
+                onToggleChecklist = { onAction(ScheduleMaintenanceAction.ToggleChecklistItem(it)) },
+                onScheduleClick = { onAction(ScheduleMaintenanceAction.ScheduleTask) },
+                onCancelClick = { navController.navigate(Screen.Scheduler.route) }
             )
         }
     }
@@ -57,7 +134,9 @@ fun ScheduleMaintenanceScreen() {
 @Composable
 fun ScheduleMaintenanceScreenPreview() {
     BioMedTheme {
-        ScheduleMaintenanceScreen()
+        ScheduleMaintenanceScreenContent(
+            navController = NavHostController(LocalContext.current)
+        )
     }
 }
 
@@ -67,6 +146,8 @@ fun ScheduleMaintenanceScreenPreview() {
 @Composable
 fun ScheduleMaintenanceScreenDarkPreview() {
     BioMedTheme {
-        ScheduleMaintenanceScreen()
+        ScheduleMaintenanceScreenContent(
+            navController = NavHostController(LocalContext.current)
+        )
     }
 }
