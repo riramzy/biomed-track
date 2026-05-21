@@ -5,7 +5,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object Timestamps {
     fun Long.toRelativeTime(): String {
@@ -25,12 +26,10 @@ object Timestamps {
             else -> this.toDateString()
         }
     }
-
     fun Long.toDateString(): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return sdf.format(Date(this))
     }
-
     fun Long.getGroupHeader(): String {
         return try {
             val date = Instant.ofEpochMilli(this)
@@ -46,5 +45,52 @@ object Timestamps {
         } catch(_: Exception) {
             "Earlier"
         }
+    }
+    fun parseDateToLong(dateString: String, nullable: Boolean = false): Long {
+        if (dateString.isBlank() || dateString.equals("none", ignoreCase = true)) {
+            return if (nullable) 0L else System.currentTimeMillis()
+        }
+
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+        return try {
+            dateFormat.parse(dateString)?.time ?: System.currentTimeMillis()
+        } catch (e: Exception) {
+            if (nullable) 0L else System.currentTimeMillis()
+        }
+    }
+
+    fun getStartOfWeek(offsetWeeks: Int = 0): Long {
+        val now = LocalDate.now().plusWeeks(offsetWeeks.toLong())
+        val monday = now.with(java.time.DayOfWeek.MONDAY)
+        return monday.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    fun getEndOfWeek(offsetWeeks: Int = 0): Long {
+        val now = LocalDate.now().plusWeeks(offsetWeeks.toLong())
+        val sunday = now.with(java.time.DayOfWeek.SUNDAY)
+        return sunday.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    fun Long.toDayName(): String {
+        val date = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+        return date.dayOfWeek.name.take(3)
+    }
+
+    fun Long.toDayMonthString(): String {
+        val date = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+        return date.format(DateTimeFormatter.ofPattern("dd MMM"))
+    }
+
+    fun Long.isSameDay(other: Long): Boolean {
+        val d1 = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+        val d2 = Instant.ofEpochMilli(other).atZone(ZoneId.systemDefault()).toLocalDate()
+        return d1 == d2
+    }
+
+    fun Long.isOverdue(): Boolean {
+        val dueDate = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+        val today = LocalDate.now()
+        return dueDate.isBefore(today)
     }
 }
