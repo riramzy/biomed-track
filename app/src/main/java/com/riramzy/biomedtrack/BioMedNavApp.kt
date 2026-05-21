@@ -11,13 +11,17 @@ import com.riramzy.biomedtrack.ui.screens.auth.LoginScreen
 import com.riramzy.biomedtrack.ui.screens.auth.SplashScreen
 import com.riramzy.biomedtrack.ui.screens.dashboard.DashboardScreen
 import com.riramzy.biomedtrack.ui.screens.equipment.add.AddEquipmentScreen
-import com.riramzy.biomedtrack.ui.screens.equipment.edit.EditEquipmentScreen
 import com.riramzy.biomedtrack.ui.screens.equipment.details.EquipmentDetailScreen
+import com.riramzy.biomedtrack.ui.screens.equipment.edit.EditEquipmentScreen
+import com.riramzy.biomedtrack.ui.screens.importing.ImportEquipmentCompletionScreen
+import com.riramzy.biomedtrack.ui.screens.importing.ImportEquipmentDataPreviewScreen
+import com.riramzy.biomedtrack.ui.screens.importing.ImportEquipmentProgressScreen
 import com.riramzy.biomedtrack.ui.screens.importing.ImportEquipmentSelectFileScreen
 import com.riramzy.biomedtrack.ui.screens.inventory.InventoryScreen
 import com.riramzy.biomedtrack.ui.screens.maintenance.LogMaintenanceScreen
 import com.riramzy.biomedtrack.ui.screens.notifications.NotificationsScreen
 import com.riramzy.biomedtrack.ui.screens.reports.ReportsScreen
+import com.riramzy.biomedtrack.ui.screens.scheduler.ScheduleMaintenanceScreen
 import com.riramzy.biomedtrack.ui.screens.scheduler.SchedulerScreen
 import com.riramzy.biomedtrack.utils.Screen
 
@@ -32,29 +36,54 @@ fun BioMedApp(
         composable(Screen.Splash.route) {
             SplashScreen(navController)
         }
+
         composable(Screen.Dashboard.route) {
             DashboardScreen(navController)
         }
+
         composable(Screen.Inventory.route) {
             InventoryScreen(navController)
         }
+
         composable(Screen.Scheduler.route) {
             SchedulerScreen(navController)
         }
+
+        composable(Screen.ScheduleMaintenance.route) {
+            ScheduleMaintenanceScreen(navController)
+        }
+
         composable(Screen.Reports.route) {
             ReportsScreen(navController)
         }
+
         composable(Screen.Notifications.route) {
             NotificationsScreen(navController)
         }
+
+
         composable(Screen.Login.route) {
             LoginScreen(navController)
         }
+
         composable(Screen.UserManagement.route) {
             UserManagementScreen(navController)
         }
-        composable(Screen.ImportEquipment.route) {
+
+        composable(Screen.ImportEquipmentSelectFile.route) {
             ImportEquipmentSelectFileScreen(navController)
+        }
+
+        composable(Screen.ImportEquipmentPreview.route) {
+            ImportEquipmentDataPreviewScreen(navController)
+        }
+
+        composable(Screen.ImportEquipmentProcessing.route) {
+            ImportEquipmentProgressScreen(navController)
+        }
+
+        composable(Screen.ImportEquipmentSuccess.route) {
+            ImportEquipmentCompletionScreen(navController)
         }
 
         composable(
