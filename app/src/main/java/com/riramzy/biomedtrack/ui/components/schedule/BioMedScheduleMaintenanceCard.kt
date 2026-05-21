@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.domain.model.ChecklistItem
+import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDateSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedMultipleItemsSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedSelector
@@ -31,11 +34,27 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedScheduleMaintenanceCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    equipmentList: List<Equipment>,
+    selectedEquipment: Equipment?,
+    onEquipmentSelected: (Equipment) -> Unit,
+    dueDate: Long,
+    onDateSelected: (Long) -> Unit,
+    techniciansList: List<String>,
+    selectedTechnicianName: String,
+    onTechnicianSelected: (String) -> Unit,
+    notes: String,
+    onNotesChanged: (String) -> Unit,
+    checklist: List<ChecklistItem>,
+    onToggleChecklist: (ChecklistItem) -> Unit,
+    onScheduleClick: () -> Unit,
+    onCancelClick: () -> Unit
 ) {
+    val scrollState = rememberScrollState()
+
     Card(
         modifier = modifier
-            .width(380.dp)
+            .fillMaxWidth()
             .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
@@ -96,57 +115,85 @@ fun BioMedScheduleMaintenanceCard(
                 }
             }
 
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 15.dp),
+                    .padding(bottom = 15.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                item {
-                    BioMedSelector(
-                        title = "Equipment",
-                        placeholder = "Select Equipment",
-                        items = listOf(
-                            "Dental",
-                            "OR",
-                            "ICU",
-                            "PICU",
-                            "Dialysis Unit"
-                        )
-                    )
-                }
+                BioMedSelector(
+                    title = "Equipment",
+                    placeholder = "Select Equipment",
+                    items = equipmentList.map { "${it.name} ${it.model} - ${it.serialNumber}" },
+                    selectedItem = selectedEquipment?.let { "${it.name} ${it.model} - ${it.serialNumber}" } ?: "",
+                    onItemSelected = { eq ->
+                        val selectedEquipment = equipmentList.find { equipment ->
+                            "${equipment.name} ${equipment.model} - ${equipment.serialNumber}" == eq
+                        }
 
-                item {
-                    BioMedDateSelector(
-                        title = "Date"
-                    )
-                }
+                        selectedEquipment?.let { onEquipmentSelected(it) }
+                    },
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
 
-                item {
-                    BioMedTextField(
-                        value = "By",
-                        isNoteCard = false,
-                        modifier = Modifier.padding(
+                BioMedDateSelector(
+                    title = "Date",
+                    selectedDate = dueDate,
+                    onDateSelected = onDateSelected,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+
+                BioMedSelector(
+                    title = "Assign To",
+                    placeholder = "Select Technician",
+                    items = techniciansList,
+                    selectedItem = selectedTechnicianName,
+                    onItemSelected = onTechnicianSelected,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+
+                BioMedTextField(
+                    label = "Additional Notes",
+                    value = notes,
+                    onValueChange = onNotesChanged,
+                    placeholder = "Enter notes here",
+                    isNoteCard = true,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+
+                BioMedMultipleItemsSelector(
+                    title = "Tasks Required",
+                    items = checklist,
+                    onToggle = onToggleChecklist,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
                             start = 20.dp,
                             end = 20.dp,
-                            bottom = 15.dp
-                        )
+                            top = 20.dp
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    BioMedButton(
+                        text = "Schedule",
+                        customColor = MaterialTheme.colorScheme.primary,
+                        customTextColor = MaterialTheme.colorScheme.onPrimary,
+                        onClick = onScheduleClick,
+                        modifier = Modifier.weight(1f)
                     )
-                }
 
-                item {
-                    BioMedTextField(
-                        value = "Additional Notes",
-                        isNoteCard = true,
-                        modifier = Modifier.padding(
-                            start = 20.dp,
-                            end = 20.dp,
-                            bottom = 15.dp
-                        )
+                    BioMedButton(
+                        text = "Cancel",
+                        customColor = MaterialTheme.colorScheme.primaryContainer,
+                        customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        onClick = onCancelClick,
+                        modifier = Modifier.weight(1f),
                     )
-                }
-
-                item {
-                    BioMedMultipleItemsSelector()
                 }
             }
         }
@@ -157,7 +204,22 @@ fun BioMedScheduleMaintenanceCard(
 @Composable
 fun BioMedScheduleMaintenanceCardPreview() {
     BioMedTheme {
-        BioMedScheduleMaintenanceCard()
+        BioMedScheduleMaintenanceCard(
+            equipmentList = emptyList(),
+            selectedEquipment = null,
+            onEquipmentSelected = {},
+            dueDate = System.currentTimeMillis(),
+            onDateSelected = {},
+            techniciansList = emptyList(),
+            selectedTechnicianName = "",
+            onTechnicianSelected = {},
+            notes = "",
+            onNotesChanged = {},
+            checklist = emptyList(),
+            onToggleChecklist = {},
+            onScheduleClick = {},
+            onCancelClick = {}
+        )
     }
 }
 
@@ -167,6 +229,21 @@ fun BioMedScheduleMaintenanceCardPreview() {
 @Composable
 fun BioMedScheduleMaintenanceCardDarkPreview() {
     BioMedTheme {
-        BioMedScheduleMaintenanceCard()
+        BioMedScheduleMaintenanceCard(
+            equipmentList = emptyList(),
+            selectedEquipment = null,
+            onEquipmentSelected = {},
+            dueDate = System.currentTimeMillis(),
+            onDateSelected = {},
+            techniciansList = emptyList(),
+            selectedTechnicianName = "",
+            onTechnicianSelected = {},
+            notes = "",
+            onNotesChanged = {},
+            checklist = emptyList(),
+            onToggleChecklist = {},
+            onScheduleClick = {},
+            onCancelClick = {}
+        )
     }
 }
