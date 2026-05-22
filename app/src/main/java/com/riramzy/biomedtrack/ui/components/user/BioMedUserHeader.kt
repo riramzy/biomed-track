@@ -32,7 +32,8 @@ fun BioMedUserHeader(
     modifier: Modifier = Modifier,
     username: String = "Bruce Wayne",
     role: String = "Technician",
-    withMoreButton: Boolean = true
+    withMoreButton: Boolean = true,
+    onMoreClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -101,7 +102,7 @@ fun BioMedUserHeader(
 
         if (withMoreButton) {
             IconButton(
-                onClick = {},
+                onClick = { onMoreClick() },
                 modifier = Modifier
                     .size(24.dp)
             ) {
