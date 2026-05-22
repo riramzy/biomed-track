@@ -5,11 +5,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,14 +32,17 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedUserInfoCard(
     modifier: Modifier = Modifier,
     username: String = "Bruce Wayne",
-    role: String = "Technician",
+    role: String = "Supervisor",
     departments: List<String>? = listOf("ICU", "OPD", "PCU", "Dialysis Unit"),
-    onManageDepartmentsClick: () -> Unit = {}
+    onManageDepartmentsClick: () -> Unit = {},
+    isUserActive: Boolean = true,
+    onActiveToggle: (Boolean) -> Unit = {},
+    onMoreClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
-            .width(386.dp)
-            .height(200.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -50,15 +54,18 @@ fun BioMedUserInfoCard(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(15.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BioMedUserHeader(
                 username = username,
-                role = role
+                role = role,
+                withMoreButton = true,
+                onMoreClick = onMoreClick
             )
+
+            Spacer(Modifier.height(10.dp))
 
             if (role == "Technician") {
                 Row(
@@ -74,6 +81,8 @@ fun BioMedUserInfoCard(
                         )
                     }
                 }
+
+                Spacer(Modifier.height(10.dp))
             }
 
             if (role == "Supervisor") {
@@ -92,6 +101,8 @@ fun BioMedUserInfoCard(
                         .padding(start = 15.dp),
                     textAlign = TextAlign.Start
                 )
+
+                Spacer(Modifier.height(10.dp))
             }
 
             if (role == "Admin") {
@@ -110,6 +121,8 @@ fun BioMedUserInfoCard(
                         .padding(start = 15.dp),
                     textAlign = TextAlign.Start
                 )
+
+                Spacer(Modifier.height(10.dp))
             }
 
             Row(
@@ -149,7 +162,9 @@ fun BioMedUserInfoCard(
                     )
                 ) {
                     BioMedToggle(
-                        text = "Active"
+                        text = "Active",
+                        isChecked = isUserActive,
+                        onCheckedChange = onActiveToggle
                     )
                 }
             }
