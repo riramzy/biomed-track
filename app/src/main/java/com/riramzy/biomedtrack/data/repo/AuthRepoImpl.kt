@@ -1,6 +1,9 @@
 package com.riramzy.biomedtrack.data.repo
 
+import android.content.Context
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+
 import com.google.firebase.firestore.FirebaseFirestore
 import com.riramzy.biomedtrack.data.local.dao.TechnicianDao
 import com.riramzy.biomedtrack.data.local.entity.toEntity
@@ -12,6 +15,7 @@ import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.UserRole
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -20,35 +24,69 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 
 class AuthRepoImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseFirestore: FirebaseFirestore,
     private val technicianDao: TechnicianDao,
+    @param:ApplicationContext private val context: Context
 ): AuthRepo {
     override suspend fun createUser(technician: Technician, password: String): Result<Technician> {
-        return try {
-            firebaseAuth
-                .createUserWithEmailAndPassword(technician.email, password)
-                .await()
+        return withContext(Dispatchers.IO) {
+            try {
+                // Use the Firebase Auth REST API to create the account without affecting
+                // the current admin session. The SDK's createUserWithEmailAndPassword always
+                // auto-signs-in the new user and corrupts the active session — the REST API
+                // bypasses this entirely by operating as a pure server-side call.
+                val apiKey = FirebaseApp.getInstance().options.apiKey
+                val url = URL("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey")
 
-            val userId = firebaseAuth.currentUser?.uid ?: return Result.Error("Failed to create user")
+                val requestBody = JSONObject().apply {
+                    put("email", technician.email)
+                    put("password", password)
+                    put("returnSecureToken", false)
+                }.toString()
 
-            val updatedTechnician = technician.copy(id = userId)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doOutput = true
+                connection.outputStream.use { it.write(requestBody.toByteArray()) }
 
-            firebaseFirestore
-                .collection(FirestoreCollections.TECHNICIANS)
-                .document(userId)
-                .set(updatedTechnician.toDto())
-                .await()
+                val responseCode = connection.responseCode
+                val responseBody = if (responseCode == 200) {
+                    connection.inputStream.bufferedReader().readText()
+                } else {
+                    connection.errorStream.bufferedReader().readText()
+                }
+                connection.disconnect()
 
-            technicianDao.insertTechnician(updatedTechnician.toEntity())
+                if (responseCode != 200) {
+                    val errorMessage = JSONObject(responseBody)
+                        .optJSONObject("error")
+                        ?.optString("message") ?: "Failed to create user"
+                    return@withContext Result.Error(errorMessage)
+                }
 
+                val userId = JSONObject(responseBody).getString("localId")
+                val updatedTechnician = technician.copy(id = userId)
 
-            Result.Success(updatedTechnician)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to create user", e)
+                firebaseFirestore
+                    .collection(FirestoreCollections.TECHNICIANS)
+                    .document(userId)
+                    .set(updatedTechnician.toDto())
+                    .await()
+
+                technicianDao.insertTechnician(updatedTechnician.toEntity())
+
+                Result.Success(updatedTechnician)
+            } catch (e: Exception) {
+                Result.Error(e.message ?: "Failed to create user", e)
+            }
         }
     }
 
