@@ -143,7 +143,7 @@ fun BioMedNavBar(
         if (withActionButton) {
             if (isActionButtonText) {
                 TextButton (
-                    onClick = {},
+                    onClick = { onActionButtonClick() },
                     modifier = Modifier
                         .height(54.dp)
                         .padding(start = 8.dp),
