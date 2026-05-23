@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,13 +24,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedToggle
 import com.riramzy.biomedtrack.ui.components.user.BioMedUserHeader
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Composable
-fun BioMedManageDepartmentsSheet() {
+fun BioMedManageDepartmentsSheet(
+    user: Technician,
+    departments: List<Department> = emptyList(),
+    onSave: (List<Department>) -> Unit = {},
+    onCancel: () -> Unit = {}
+) {
+    var selectedDepartments by remember { mutableStateOf(user.assignedDepartments.toSet()) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -35,7 +49,11 @@ fun BioMedManageDepartmentsSheet() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BioMedUserHeader(
-            withMoreButton = false
+            withMoreButton = false,
+            username = user.name,
+            role = user.role.name,
+            email = user.email,
+            employeeId = user.employeeId
         )
 
         Text(
@@ -57,53 +75,25 @@ fun BioMedManageDepartmentsSheet() {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.height(327.dp)
         ) {
-            item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp),
-                        isChecked = false
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                    BioMedToggle(
-                        text = "Intensive Care Unit (A)",
-                        modifier = Modifier.width(356.dp)
-                    )
-                }
+            items(departments) { dept ->
+                BioMedToggle(
+                    text = dept.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 15.dp,
+                            end = 15.dp,
+                            bottom = 10.dp
+                        ),
+                    isChecked = selectedDepartments.contains(dept),
+                    onCheckedChange = { checked ->
+                        selectedDepartments = if (checked) {
+                            selectedDepartments + dept
+                        } else {
+                            selectedDepartments - dept
+                        }
+                    }
+                )
             }
         }
 
@@ -125,7 +115,8 @@ fun BioMedManageDepartmentsSheet() {
                 } else {
                     MaterialTheme.colorScheme.onPrimary
                 },
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier.padding(end = 10.dp),
+                onClick = { onSave(selectedDepartments.toList()) }
             )
 
             BioMedButton(
@@ -139,7 +130,8 @@ fun BioMedManageDepartmentsSheet() {
                     MaterialTheme.colorScheme.onSecondaryContainer
                 } else {
                     MaterialTheme.colorScheme.onPrimaryContainer
-                }
+                },
+                onClick = onCancel
             )
         }
     }
@@ -149,7 +141,17 @@ fun BioMedManageDepartmentsSheet() {
 @Composable
 fun BioMedManageDepartmentsSheetPreview() {
     BioMedTheme {
-        BioMedManageDepartmentsSheet()
+        BioMedManageDepartmentsSheet(
+            user = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "john.quincy.adams@examplepetstore.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true
+            )
+        )
     }
 }
 
@@ -160,6 +162,16 @@ fun BioMedManageDepartmentsSheetPreview() {
 @Composable
 fun BioMedManageDepartmentsSheetDarkPreview() {
     BioMedTheme {
-        BioMedManageDepartmentsSheet()
+        BioMedManageDepartmentsSheet(
+            user = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "john.quincy.adams@examplepetstore.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true
+            )
+        )
     }
 }
