@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,19 +21,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Composable
-fun BioMedChangeRoleSheet() {
+fun BioMedChangeRoleSheet(
+    modifier: Modifier = Modifier,
+    user: Technician,
+    onSave: (UserRole) -> Unit = { _ -> },
+    onCancel: () -> Unit = {}
+) {
+    var selectedRole by remember { mutableStateOf(user.role) }
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(15.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BioMedUserHeader(
+            username = user.name,
+            role = user.role.name,
+            email = user.email,
+            employeeId = user.employeeId,
             withMoreButton = false
         )
 
@@ -53,17 +70,20 @@ fun BioMedChangeRoleSheet() {
         ) {
             BioMedUserRoleSelectionCard(
                 role = "Supervisor",
-                isSelected = false
+                isSelected = selectedRole == UserRole.SUPERVISOR,
+                onRoleClick = { selectedRole = UserRole.SUPERVISOR }
             )
 
             BioMedUserRoleSelectionCard(
                 role = "Admin",
-                isSelected = false
+                isSelected = selectedRole == UserRole.ADMIN,
+                onRoleClick = { selectedRole = UserRole.ADMIN }
             )
 
             BioMedUserRoleSelectionCard(
                 role = "Technician",
-                isSelected = true
+                isSelected = selectedRole == UserRole.TECHNICIAN,
+                onRoleClick = { selectedRole = UserRole.TECHNICIAN }
             )
         }
 
@@ -85,7 +105,8 @@ fun BioMedChangeRoleSheet() {
                 } else {
                     MaterialTheme.colorScheme.onPrimary
                 },
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier.padding(end = 10.dp),
+                onClick = { onSave(selectedRole) }
             )
 
             BioMedButton(
@@ -99,7 +120,8 @@ fun BioMedChangeRoleSheet() {
                     MaterialTheme.colorScheme.onSecondaryContainer
                 } else {
                     MaterialTheme.colorScheme.onPrimaryContainer
-                }
+                },
+                onClick = onCancel
             )
         }
     }
@@ -109,7 +131,17 @@ fun BioMedChangeRoleSheet() {
 @Composable
 fun BioMedChangeRoleSheetPreview() {
     BioMedTheme {
-        BioMedChangeRoleSheet()
+        BioMedChangeRoleSheet(
+            user = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "james.moore.wayne@example-pet-store.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true,
+            )
+        )
     }
 }
 
@@ -120,6 +152,16 @@ fun BioMedChangeRoleSheetPreview() {
 @Composable
 fun BioMedChangeRoleSheetDarkPreview() {
     BioMedTheme {
-        BioMedChangeRoleSheet()
+        BioMedChangeRoleSheet(
+            user = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "john.quincy.adams@examplepetstore.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true
+            )
+        )
     }
 }

@@ -32,6 +32,8 @@ fun BioMedUserHeader(
     modifier: Modifier = Modifier,
     username: String = "Bruce Wayne",
     role: String = "Technician",
+    email: String = "william.a.wheeler@example-pet-store.com",
+    employeeId: String = "SPV-001",
     withMoreButton: Boolean = true,
     onMoreClick: () -> Unit = {}
 ) {
@@ -71,7 +73,7 @@ fun BioMedUserHeader(
                 )
 
                 Text(
-                    text = "SPV-001",
+                    text = employeeId,
                     style = MaterialTheme.typography.labelLarge,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
@@ -83,7 +85,7 @@ fun BioMedUserHeader(
                 )
 
                 Text(
-                    text = "fadwazayed@hospital.com",
+                    text = email,
                     style = MaterialTheme.typography.labelLarge,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,

@@ -28,7 +28,8 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedUserRoleSelectionCard(
     modifier: Modifier = Modifier,
     role: String = "Supervisor",
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+    onRoleClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -48,7 +49,8 @@ fun BioMedUserRoleSelectionCard(
                     MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
                 }
             }
-        )
+        ),
+        onClick = onRoleClick
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -58,7 +60,7 @@ fun BioMedUserRoleSelectionCard(
         ) {
             RadioButton(
                 selected = isSelected,
-                onClick = { /*TODO*/ },
+                onClick = { onRoleClick() },
                 colors = RadioButtonDefaults.colors(
                     selectedColor = MaterialTheme.colorScheme.onPrimary,
                     unselectedColor = MaterialTheme.colorScheme.primary,
