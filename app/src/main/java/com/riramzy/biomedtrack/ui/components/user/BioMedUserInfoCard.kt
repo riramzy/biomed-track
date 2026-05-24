@@ -24,16 +24,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedToggle
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Composable
 fun BioMedUserInfoCard(
     modifier: Modifier = Modifier,
-    username: String = "Bruce Wayne",
-    role: String = "Supervisor",
-    departments: List<String>? = listOf("ICU", "OPD", "PCU", "Dialysis Unit"),
+    user: Technician,
     onManageDepartmentsClick: () -> Unit = {},
     isUserActive: Boolean = true,
     onActiveToggle: (Boolean) -> Unit = {},
@@ -59,15 +59,17 @@ fun BioMedUserInfoCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BioMedUserHeader(
-                username = username,
-                role = role,
+                username = user.name,
+                role = user.role.name,
+                email = user.email,
+                employeeId = user.employeeId,
                 withMoreButton = true,
                 onMoreClick = onMoreClick
             )
 
             Spacer(Modifier.height(10.dp))
 
-            if (role == "Technician") {
+            if (user.role == UserRole.TECHNICIAN) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,9 +77,9 @@ fun BioMedUserInfoCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    departments?.forEach {
+                    user.assignedDepartments.forEach {
                         BioMedDepartmentPill(
-                            departmentName = it
+                            departmentName = it.name
                         )
                     }
                 }
@@ -85,7 +87,7 @@ fun BioMedUserInfoCard(
                 Spacer(Modifier.height(10.dp))
             }
 
-            if (role == "Supervisor") {
+            if (user.role == UserRole.SUPERVISOR) {
                 Text(
                     text = "Access to all departments",
                     style = MaterialTheme.typography.labelSmall,
@@ -105,7 +107,7 @@ fun BioMedUserInfoCard(
                 Spacer(Modifier.height(10.dp))
             }
 
-            if (role == "Admin") {
+            if (user.role == UserRole.ADMIN) {
                 Text(
                     text = "Full system access",
                     style = MaterialTheme.typography.labelSmall,
@@ -129,9 +131,9 @@ fun BioMedUserInfoCard(
                 modifier = Modifier
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = if (role == "Admin") Arrangement.End else Arrangement.SpaceBetween
+                horizontalArrangement = if (user.role == UserRole.ADMIN) Arrangement.End else Arrangement.SpaceBetween
             ) {
-                if (role == "Supervisor" || role == "Technician") {
+                if (user.role == UserRole.SUPERVISOR || user.role == UserRole.TECHNICIAN) {
                     BioMedButton(
                         modifier = Modifier
                             .width(235.dp)
@@ -203,7 +205,17 @@ fun BioMedDepartmentPill(
 @Composable
 fun BioMedUserInfoCardPreview() {
     BioMedTheme {
-        BioMedUserInfoCard()
+        BioMedUserInfoCard(
+            user = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "william.henry.harrison@example-pet-store.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true,
+            )
+        )
     }
 }
 
@@ -214,6 +226,16 @@ fun BioMedUserInfoCardPreview() {
 @Composable
 fun BioMedUserInfoCardDarkPreview() {
     BioMedTheme {
-        BioMedUserInfoCard()
+        BioMedUserInfoCard(
+            user = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "william.henry.harrison@example-pet-store.com",
+                role = UserRole.TECHNICIAN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true
+            )
+        )
     }
 }

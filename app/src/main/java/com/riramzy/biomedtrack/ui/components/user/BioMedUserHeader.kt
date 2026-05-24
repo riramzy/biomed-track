@@ -31,7 +31,7 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedUserHeader(
     modifier: Modifier = Modifier,
     username: String = "Bruce Wayne",
-    role: String = "Technician",
+    role: String = "Admin",
     email: String = "william.a.wheeler@example-pet-store.com",
     employeeId: String = "SPV-001",
     withMoreButton: Boolean = true,
