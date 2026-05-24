@@ -5,11 +5,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ fun BioMedManageDepartmentsSheet(
     onCancel: () -> Unit = {}
 ) {
     var selectedDepartments by remember { mutableStateOf(user.assignedDepartments.toSet()) }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
@@ -70,21 +72,18 @@ fun BioMedManageDepartmentsSheet(
                 .fillMaxWidth()
         )
 
-        LazyColumn (
+        Column (
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.height(327.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
         ) {
-            items(departments) { dept ->
+            for(dept in departments) {
                 BioMedToggle(
                     text = dept.name,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = 15.dp,
-                            end = 15.dp,
-                            bottom = 10.dp
-                        ),
+                        .fillMaxWidth(),
                     isChecked = selectedDepartments.contains(dept),
                     onCheckedChange = { checked ->
                         selectedDepartments = if (checked) {
@@ -94,6 +93,8 @@ fun BioMedManageDepartmentsSheet(
                         }
                     }
                 )
+
+                Spacer(Modifier.height(10.dp))
             }
         }
 
@@ -147,7 +148,23 @@ fun BioMedManageDepartmentsSheetPreview() {
                 name = "Khaled",
                 email = "john.quincy.adams@examplepetstore.com",
                 role = UserRole.ADMIN,
-                assignedDepartments = emptyList(),
+                assignedDepartments = listOf(
+                    Department(
+                        id = "1",
+                        name = "Department 1",
+                        totalEquipment = 15,
+                    ),
+                    Department(
+                        id = "2",
+                        name = "Department 2",
+                        totalEquipment = 10,
+                    ),
+                    Department(
+                        id = "3",
+                        name = "Department 3",
+                        totalEquipment = 5,
+                    )
+                ),
                 employeeId = "1",
                 isActive = true
             )
@@ -168,7 +185,23 @@ fun BioMedManageDepartmentsSheetDarkPreview() {
                 name = "Khaled",
                 email = "john.quincy.adams@examplepetstore.com",
                 role = UserRole.ADMIN,
-                assignedDepartments = emptyList(),
+                assignedDepartments = listOf(
+                    Department(
+                        id = "1",
+                        name = "Department 1",
+                        totalEquipment = 15,
+                    ),
+                    Department(
+                        id = "2",
+                        name = "Department 2",
+                        totalEquipment = 10,
+                    ),
+                    Department(
+                        id = "3",
+                        name = "Department 3",
+                        totalEquipment = 5,
+                    )
+                ),
                 employeeId = "1",
                 isActive = true
             )
