@@ -41,6 +41,8 @@ class UserManagementVm @Inject constructor(
 ): ViewModel() {
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+    private val isSnackbarMessageAnError = MutableStateFlow(false)
+    val isSnackbarMessageError: StateFlow<Boolean> = isSnackbarMessageAnError.asStateFlow()
     private val _userCreatedEvent = MutableSharedFlow<Unit>()
     val userCreatedEvent = _userCreatedEvent.asSharedFlow()
     private val _searchQuery = MutableStateFlow("")
@@ -111,8 +113,14 @@ class UserManagementVm @Inject constructor(
             }
 
             when (result) {
-                is Result.Success -> _snackbarMessage.value = "User active status updated successfully"
-                is Result.Error -> _snackbarMessage.value = result.message
+                is Result.Success -> {
+                    _snackbarMessage.value = "User active status updated successfully"
+                    isSnackbarMessageAnError.value = false
+                }
+                is Result.Error -> {
+                    _snackbarMessage.value = result.message
+                    isSnackbarMessageAnError.value = true
+                }
                 else -> Unit
             }
         }
@@ -126,8 +134,14 @@ class UserManagementVm @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             when(val result = authRepo.updateUserRole(userId, newRole)) {
-               is Result.Success -> _snackbarMessage.value = "User role updated successfully"
-               is Result.Error -> _snackbarMessage.value = result.message
+               is Result.Success -> {
+                   _snackbarMessage.value = "User role updated successfully"
+                   isSnackbarMessageAnError.value = false
+               }
+               is Result.Error -> {
+                   _snackbarMessage.value = result.message
+                   isSnackbarMessageAnError.value = true
+               }
                 else -> {}
            }
         }
@@ -136,8 +150,14 @@ class UserManagementVm @Inject constructor(
     fun updateUserDepartments(userId: String, departments: List<Department>) {
         viewModelScope.launch(Dispatchers.IO) {
             when(val result = authRepo.updateUserDepartments(userId, departments)) {
-                is Result.Success -> _snackbarMessage.value = "User departments updated successfully"
-                is Result.Error -> _snackbarMessage.value = result.message
+                is Result.Success -> {
+                    _snackbarMessage.value = "User departments updated successfully"
+                    isSnackbarMessageAnError.value = false
+                }
+                is Result.Error -> {
+                    _snackbarMessage.value = result.message
+                    isSnackbarMessageAnError.value = true
+                }
                 else -> {}
             }
         }
@@ -149,8 +169,12 @@ class UserManagementVm @Inject constructor(
                 is Result.Success -> {
                     _snackbarMessage.value = "User created successfully"
                     _userCreatedEvent.emit(Unit)
+                    isSnackbarMessageAnError.value = false
                 }
-                is Result.Error -> _snackbarMessage.value = result.message
+                is Result.Error -> {
+                    _snackbarMessage.value = result.message
+                    isSnackbarMessageAnError.value = true
+                }
                 else -> {}
             }
         }
