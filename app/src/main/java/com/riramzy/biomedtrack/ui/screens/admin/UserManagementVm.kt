@@ -41,8 +41,8 @@ class UserManagementVm @Inject constructor(
 ): ViewModel() {
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
-    private val isSnackbarMessageAnError = MutableStateFlow(false)
-    val isSnackbarMessageError: StateFlow<Boolean> = isSnackbarMessageAnError.asStateFlow()
+    private val _isSnackbarMessageAnError = MutableStateFlow(false)
+    val isSnackbarMessageError: StateFlow<Boolean> = _isSnackbarMessageAnError.asStateFlow()
     private val _userCreatedEvent = MutableSharedFlow<Unit>()
     val userCreatedEvent = _userCreatedEvent.asSharedFlow()
     private val _searchQuery = MutableStateFlow("")
@@ -101,6 +101,7 @@ class UserManagementVm @Inject constructor(
 
     fun toggleUserActiveStatus(user: Technician) {
         if (user.id == sessionManager.currentUser.value?.id) {
+            _isSnackbarMessageAnError.value = true
             _snackbarMessage.value = "You cannot deactivate your own account"
             return
         }
@@ -115,11 +116,11 @@ class UserManagementVm @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     _snackbarMessage.value = "User active status updated successfully"
-                    isSnackbarMessageAnError.value = false
+                    _isSnackbarMessageAnError.value = false
                 }
                 is Result.Error -> {
                     _snackbarMessage.value = result.message
-                    isSnackbarMessageAnError.value = true
+                    _isSnackbarMessageAnError.value = true
                 }
                 else -> Unit
             }
@@ -128,6 +129,7 @@ class UserManagementVm @Inject constructor(
 
     fun changeUserRole(userId: String, newRole: UserRole) {
         if (userId == sessionManager.currentUser.value?.id) {
+            _isSnackbarMessageAnError.value = true
             _snackbarMessage.value = "You cannot change your own role"
             return
         }
@@ -136,11 +138,11 @@ class UserManagementVm @Inject constructor(
             when(val result = authRepo.updateUserRole(userId, newRole)) {
                is Result.Success -> {
                    _snackbarMessage.value = "User role updated successfully"
-                   isSnackbarMessageAnError.value = false
+                   _isSnackbarMessageAnError.value = false
                }
                is Result.Error -> {
                    _snackbarMessage.value = result.message
-                   isSnackbarMessageAnError.value = true
+                   _isSnackbarMessageAnError.value = true
                }
                 else -> {}
            }
@@ -152,11 +154,11 @@ class UserManagementVm @Inject constructor(
             when(val result = authRepo.updateUserDepartments(userId, departments)) {
                 is Result.Success -> {
                     _snackbarMessage.value = "User departments updated successfully"
-                    isSnackbarMessageAnError.value = false
+                    _isSnackbarMessageAnError.value = false
                 }
                 is Result.Error -> {
                     _snackbarMessage.value = result.message
-                    isSnackbarMessageAnError.value = true
+                    _isSnackbarMessageAnError.value = true
                 }
                 else -> {}
             }
@@ -169,11 +171,11 @@ class UserManagementVm @Inject constructor(
                 is Result.Success -> {
                     _snackbarMessage.value = "User created successfully"
                     _userCreatedEvent.emit(Unit)
-                    isSnackbarMessageAnError.value = false
+                    _isSnackbarMessageAnError.value = false
                 }
                 is Result.Error -> {
                     _snackbarMessage.value = result.message
-                    isSnackbarMessageAnError.value = true
+                    _isSnackbarMessageAnError.value = true
                 }
                 else -> {}
             }
