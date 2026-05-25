@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,7 +31,7 @@ fun BioMedToggle(
 ) {
     Card(
         modifier = modifier
-            .height(35.dp),
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSystemInDarkTheme()) {
@@ -50,7 +50,8 @@ fun BioMedToggle(
         )
     ) {
         Row(
-            modifier = modifier,
+            modifier = modifier
+                .padding(end = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -73,8 +74,6 @@ fun BioMedToggle(
                 onCheckedChange = {
                     onCheckedChange(it)
                 },
-                modifier = Modifier
-                    .padding(vertical = 6.dp, horizontal = 2.dp),
                 colors = SwitchDefaults.colors(
                     uncheckedBorderColor = if (isSystemInDarkTheme()) {
                         MaterialTheme.colorScheme.primary
