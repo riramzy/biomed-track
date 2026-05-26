@@ -17,4 +17,5 @@ interface AuthRepo {
     suspend fun deactivateUser(userId: String): Result<Unit>
     suspend fun activateUser(userId: String): Result<Unit>
     suspend fun updateFcmToken(userId: String, token: String): Result<Unit>
+    suspend fun registerFcmToken(userId: String): Result<Unit>
 }

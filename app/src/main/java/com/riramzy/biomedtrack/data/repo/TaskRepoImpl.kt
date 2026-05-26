@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.data.repo
 
+import android.content.Context
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.riramzy.biomedtrack.data.local.dao.TaskDao
@@ -10,6 +11,8 @@ import com.riramzy.biomedtrack.data.remote.model.toDto
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.repo.TaskRepo
+import com.riramzy.biomedtrack.utils.FcmDispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +24,8 @@ import kotlinx.coroutines.tasks.await
 
 class TaskRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
-    private val taskDao: TaskDao
+    private val taskDao: TaskDao,
+    @param:ApplicationContext private val context: Context
 ): TaskRepo {
     override fun getAllTasks(): Flow<List<Task>> = callbackFlow {
         val listener = firebaseFirestore
@@ -79,6 +83,52 @@ class TaskRepoImpl @Inject constructor(
                 .document(task.id)
                 .set(task.toDto())
                 .await()
+
+            try {
+                val dispatcher = FcmDispatcher(context)
+
+                val userDoc = firebaseFirestore
+                    .collection(FirestoreCollections.TECHNICIANS)
+                    .document(task.assignedTo)
+                    .get()
+                    .await()
+
+                val fcmToken = userDoc.getString("fcmToken")
+                if (!fcmToken.isNullOrEmpty()) {
+                    dispatcher.pushNotification(
+                        targetToken = fcmToken,
+                        title = "New Task Assigned to You",
+                        body = "You have been assigned: ${task.equipmentName} in ${task.
+                        department.name}",
+                        equipmentId = task.equipmentId
+                    )
+                }
+
+                val usersSnap = firebaseFirestore
+                    .collection(FirestoreCollections.TECHNICIANS)
+                    .get()
+                    .await()
+
+                for (doc in usersSnap.documents) {
+                    val role = doc.getString("role")
+                    val isSupervisorOrAdmin = role == "ADMIN" || role == "SUPERVISOR"
+                    val token = doc.getString("fcmToken")
+
+                    if (isSupervisorOrAdmin && doc.id != task.assignedTo && !token.
+                        isNullOrEmpty()) {
+                        dispatcher.pushNotification(
+                            targetToken = token,
+                            title = "New Task Scheduled",
+                            body = "${task.assignedToName} has been assigned to ${task.
+                            equipmentName} in ${task.department.name}",
+                            equipmentId = task.equipmentId
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to add task", e)

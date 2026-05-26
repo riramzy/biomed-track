@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.riramzy.biomedtrack.data.local.dao.TechnicianDao
 import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
@@ -239,6 +240,23 @@ class AuthRepoImpl @Inject constructor(
                 return@withContext Result.Success(Unit)
             } catch (e: Exception) {
                return@withContext Result.Error(e.message ?: "Failed to update fcm token", e)
+            }
+        }
+    }
+
+    override suspend fun registerFcmToken(userId: String): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+
+                firebaseFirestore
+                    .collection(FirestoreCollections.TECHNICIANS)
+                    .document(userId)
+                    .update("fcmToken", token)
+                    .await()
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e.message ?: "Failed to register fcm token", e)
             }
         }
     }

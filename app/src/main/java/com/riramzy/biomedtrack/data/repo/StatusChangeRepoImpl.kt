@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.data.repo
 
+import android.content.Context
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -11,6 +12,8 @@ import com.riramzy.biomedtrack.data.remote.model.toDto
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.StatusChangeLog
 import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
+import com.riramzy.biomedtrack.utils.FcmDispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -22,7 +25,8 @@ import javax.inject.Inject
 
 class StatusChangeRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
-    private val statusChangeDao: StatusChangeLogDao
+    private val statusChangeDao: StatusChangeLogDao,
+    @param:ApplicationContext private val context: Context
 ): StatusChangeRepo {
     override fun getRecentStatusChanges(limit: Int): Flow<List<StatusChangeLog>> = callbackFlow {
         val listener = firebaseFirestore
@@ -81,6 +85,40 @@ class StatusChangeRepoImpl @Inject constructor(
                 .document(statusChangeLog.id)
                 .set(statusChangeLog.toDto())
                 .await()
+
+            try {
+                val usersSnap = firebaseFirestore
+                    .collection(FirestoreCollections.TECHNICIANS)
+                    .get()
+                    .await()
+
+                val dispatcher = FcmDispatcher(context)
+
+                for (doc in usersSnap.documents) {
+                    val role = doc.getString("role")
+                    val isSupervisorOrAdmin = role == "ADMIN" || role == "SUPERVISOR"
+
+                    val depts = doc.get("assignedDepartments") as? List<*>
+
+                    val isInDept = isSupervisorOrAdmin || depts?.any { dept ->
+                        (dept as? Map<*, *>)?.get("id") == statusChangeLog.department.id
+                    } == true
+
+                    val token = doc.getString("fcmToken")
+
+                    if (isInDept && !token.isNullOrEmpty()) {
+                        dispatcher.pushNotification(
+                            targetToken = token,
+                            title = "Status changed from ${statusChangeLog.previousStatus} to ${statusChangeLog.newStatus}",
+                            body = "${statusChangeLog.equipmentName} was updated by ${statusChangeLog.changedByName}",
+                            equipmentId = statusChangeLog.equipmentId
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to log status change", e)
