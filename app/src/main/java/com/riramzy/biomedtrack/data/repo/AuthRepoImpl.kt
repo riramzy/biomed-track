@@ -1,7 +1,7 @@
 package com.riramzy.biomedtrack.data.repo
 
-import android.content.Context
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,7 +16,6 @@ import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.UserRole
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -33,16 +32,11 @@ import javax.inject.Inject
 class AuthRepoImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseFirestore: FirebaseFirestore,
-    private val technicianDao: TechnicianDao,
-    @param:ApplicationContext private val context: Context
+    private val technicianDao: TechnicianDao
 ): AuthRepo {
     override suspend fun createUser(technician: Technician, password: String): Result<Technician> {
         return withContext(Dispatchers.IO) {
             try {
-                // Use the Firebase Auth REST API to create the account without affecting
-                // the current admin session. The SDK's createUserWithEmailAndPassword always
-                // auto-signs-in the new user and corrupts the active session — the REST API
-                // bypasses this entirely by operating as a pure server-side call.
                 val apiKey = FirebaseApp.getInstance().options.apiKey
                 val url = URL("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey")
 
@@ -257,6 +251,26 @@ class AuthRepoImpl @Inject constructor(
                 Result.Success(Unit)
             } catch (e: Exception) {
                 Result.Error(e.message ?: "Failed to register fcm token", e)
+            }
+        }
+    }
+
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String
+    ): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val user = firebaseAuth.currentUser ?: return@withContext Result.Error("User not found")
+                val email = user.email ?: return@withContext Result.Error("User email not found")
+                val credentials = EmailAuthProvider.getCredential(email, oldPassword)
+
+                user.reauthenticate(credentials).await()
+                user.updatePassword(newPassword).await()
+
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e.message ?: "Failed to change password", e)
             }
         }
     }
