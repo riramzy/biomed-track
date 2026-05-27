@@ -87,6 +87,7 @@ class ImportingEquipmentVm @Inject constructor(
 
     private val _snackbarEvent = MutableSharedFlow<String>()
     val snackbarEvent: SharedFlow<String> = _snackbarEvent.asSharedFlow()
+    val currentUser = sessionManager.currentUser
 
     fun parseExcelFile(uri: Uri) {
         _uiState.value = ImportingUiState.Parsing
