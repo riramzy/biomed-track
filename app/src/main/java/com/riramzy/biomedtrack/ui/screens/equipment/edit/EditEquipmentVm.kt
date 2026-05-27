@@ -32,9 +32,9 @@ data class EditEquipmentUiState(
     val department: Department? = null,
     val departments: List<Department> = emptyList(),
     val currentStatus: EquipmentStatus? = null,
-    val installDate: String = "",
+    val installDate: Long = 0L,
     val contractInfo: String? = "",
-    val warrantyEndDate: String? = "",
+    val warrantyEndDate: Long? = null,
     val isLoading: Boolean = false,
     val isError: String? = null,
     val isSuccess: Boolean = false
@@ -51,9 +51,9 @@ sealed class EditEquipmentAction {
     data class UpdateLocation(val location: String): EditEquipmentAction()
     data class UpdateDepartment(val department: Department): EditEquipmentAction()
     data class UpdateCurrentStatus(val currentStatus: EquipmentStatus): EditEquipmentAction()
-    data class UpdateInstallDate(val installDate: String): EditEquipmentAction()
+    data class UpdateInstallDate(val installDate: Long): EditEquipmentAction()
     data class UpdateContractInfo(val contractInfo: String): EditEquipmentAction()
-    data class UpdateWarrantyEndDate(val warrantyEndDate: String): EditEquipmentAction()
+    data class UpdateWarrantyEndDate(val warrantyEndDate: Long): EditEquipmentAction()
     data object ResetError: EditEquipmentAction()
     data object Save: EditEquipmentAction()
 }
@@ -69,6 +69,7 @@ class EditEquipmentVm @Inject constructor(
     private val _uiState = MutableStateFlow(EditEquipmentUiState())
     val uiState: StateFlow<EditEquipmentUiState> = _uiState.asStateFlow()
     private val equipmentId: String = stateHandle.get<String>("equipmentId") ?: ""
+    val currentUser = sessionManager.currentUser
 
     init {
         loadEquipmentData()
@@ -107,7 +108,7 @@ class EditEquipmentVm @Inject constructor(
                         department = equipment.department,
                         currentStatus = equipment.status,
                         installDate = equipment.installDate,
-                        warrantyEndDate = equipment.warrantyEndDate ?: "No contract info",
+                        warrantyEndDate = equipment.warrantyEndDate ?: 0L,
                         isLoading = false
                     )
                 }
@@ -184,7 +185,10 @@ class EditEquipmentVm @Inject constructor(
             is EditEquipmentAction.UpdateContractInfo -> { _uiState.update { it.copy(contractInfo = action.contractInfo) } }
             is EditEquipmentAction.UpdateWarrantyEndDate -> { _uiState.update { it.copy(warrantyEndDate = action.warrantyEndDate) } }
             is EditEquipmentAction.ResetError -> { _uiState.update { it.copy(isError = null) } }
-            is EditEquipmentAction.Save -> { updateEquipment() }
+            is EditEquipmentAction.Save -> {
+                updateEquipment()
+
+            }
         }
     }
 }
