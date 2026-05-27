@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.details
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,7 +57,12 @@ import com.riramzy.biomedtrack.ui.components.equipment.BioMedChangeStatusDialog
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentDetailsCard
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
 import com.riramzy.biomedtrack.ui.components.maintenance.BioMedMaintenanceCard
+import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
+import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.EquipmentStatus
@@ -69,9 +75,11 @@ import com.riramzy.biomedtrack.utils.UserRole
 fun EquipmentDetailScreen(
     navController: NavHostController,
     equipmentDetailsVm: EquipmentDetailsVm = hiltViewModel(),
+    authVm: AuthVm = hiltViewModel()
 ) {
     val state by equipmentDetailsVm.uiState.collectAsStateWithLifecycle()
     val deleteResult by equipmentDetailsVm.deleteResult.collectAsStateWithLifecycle()
+    val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
 
     EquipmentDetailsScreenContent(
         navController = navController,
@@ -79,7 +87,10 @@ fun EquipmentDetailScreen(
         onDeleteClicked = equipmentDetailsVm::deleteEquipment,
         resetDeleteResult = equipmentDetailsVm::resetDeleteResult,
         deleteResult = deleteResult,
-        changeStatus = equipmentDetailsVm::changeEquipmentStatus
+        changeStatus = equipmentDetailsVm::changeEquipmentStatus,
+        isPasswordUpdating = isPasswordUpdating,
+        changePassword = authVm::changePassword,
+        logout = authVm::logout
     )
 }
 
@@ -92,7 +103,10 @@ fun EquipmentDetailsScreenContent(
     onDeleteClicked: () -> Unit = {},
     resetDeleteResult: () -> Unit = {},
     deleteResult: Result<Unit>? = null,
-    changeStatus: (Equipment, EquipmentStatus, String?) -> Unit = { _, _, _ -> }
+    changeStatus: (Equipment, EquipmentStatus, String?) -> Unit = { _, _, _ -> },
+    isPasswordUpdating: Boolean = false,
+    changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
+    logout: (() -> Unit) -> Unit = {}
 ) {
     when(state) {
         is EquipmentDetailsUiState.Error -> {
@@ -188,14 +202,20 @@ fun EquipmentDetailsScreenContent(
             }
         }
         is EquipmentDetailsUiState.Success -> {
+            val sheetState = rememberModalBottomSheetState()
+            val context = LocalContext.current
+
             var showDeleteDialog by remember { mutableStateOf(false) }
             var showChangeStatusDialog by remember { mutableStateOf(false) }
-            val sheetState = rememberModalBottomSheetState()
-            var showBottomSheet by remember { mutableStateOf(false) }
+            var showProfileBottomSheet by remember { mutableStateOf(false) }
+            var showMyProfileDialog by remember { mutableStateOf(false) }
+            var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
+            var showChangePasswordDialog by remember { mutableStateOf(false) }
+            var showLogoutConfirmDialog by remember { mutableStateOf(false) }
 
-            if (showBottomSheet) {
+            if (showProfileBottomSheet) {
                 ModalBottomSheet(
-                    onDismissRequest = { showBottomSheet = false },
+                    onDismissRequest = { showProfileBottomSheet = false },
                     sheetState = sheetState,
                     dragHandle = { BottomSheetDefaults.DragHandle() },
                     containerColor = if (isSystemInDarkTheme()) {
@@ -205,10 +225,68 @@ fun EquipmentDetailsScreenContent(
                     }
                 ) {
                     BioMedProfileSheet(
-                        role = state.currentUser.role.name,
-                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) }
+                        user = state.currentUser,
+                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) },
+                        onManageUsersClick = { navController.navigate(Screen.UserManagement.route) },
+                        onMyProfileClick = {
+                            showMyProfileDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onNotificationsPreferencesClick = {
+                            showNotificationsPreferencesDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onChangePasswordClick = {
+                            showChangePasswordDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onLogoutClick = {
+                            showLogoutConfirmDialog = true
+                            showProfileBottomSheet = false
+                        }
                     )
                 }
+            }
+
+            if (showMyProfileDialog) {
+                BioMedMyProfileDialog(
+                    user = state.currentUser,
+                    onDismiss = { showMyProfileDialog = false }
+                )
+            }
+
+            if (showNotificationsPreferencesDialog) {
+                BioMedNotificationPreferencesDialog(
+                    onDismiss = { showNotificationsPreferencesDialog = false }
+                )
+            }
+
+            if (showChangePasswordDialog) {
+                BioMedChangePasswordDialog(
+                    isLoading = isPasswordUpdating,
+                    onConfirm = { current, new ->
+                        changePassword(current, new) { result ->
+                            when (result) {
+                                is Result.Success -> {
+                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    showChangePasswordDialog = false
+                                }
+                                is Result.Error -> {
+                                    Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                                }
+                                else -> {}
+                            }
+                        }
+                    },
+                    onDismiss = { showChangePasswordDialog = false }
+                )
+            }
+
+            if (showLogoutConfirmDialog) {
+                BioMedLogoutDialog(
+                    onDismiss = { showLogoutConfirmDialog = false },
+                    onConfirm = { logout { navController.navigate(Screen.Login.route) } }
+                )
             }
 
             if (showChangeStatusDialog) {
@@ -277,7 +355,8 @@ fun EquipmentDetailsScreenContent(
                         modifier = Modifier.padding(
                             top = 10.dp
                         ),
-                        onProfileClick = { showBottomSheet = true }
+                        onProfileClick = { showProfileBottomSheet = true },
+                        onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
                     )
                 },
                 floatingActionButton = {
