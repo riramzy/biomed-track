@@ -114,7 +114,8 @@ fun BioMedAddEquipmentCard(
                     .wrapContentHeight()
                     .padding(bottom = 15.dp)
                     .verticalScroll(scrollState)
-                    .weight(1f, fill = false)
+                    .weight(1f, fill = false),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 BioMedHeader(
                     title = "Equipment Details",
@@ -136,7 +137,8 @@ fun BioMedAddEquipmentCard(
                     onValueChange = { onAction(AddEquipmentAction.UpdateName(it)) },
                     label = "Name",
                     placeholder = "Enter Name",
-                    isNoteCard = false
+                    isNoteCard = false,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedTextField(
@@ -144,7 +146,8 @@ fun BioMedAddEquipmentCard(
                     onValueChange = { onAction(AddEquipmentAction.UpdateModel(it)) },
                     label = "Model",
                     placeholder = "Enter Model",
-                    isNoteCard = false
+                    isNoteCard = false,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedTextField(
@@ -152,7 +155,8 @@ fun BioMedAddEquipmentCard(
                     onValueChange = { onAction(AddEquipmentAction.UpdateSerialNumber(it)) },
                     label = "Serial Number",
                     placeholder = "Enter Serial Number",
-                    isNoteCard = false
+                    isNoteCard = false,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedTextField(
@@ -160,7 +164,8 @@ fun BioMedAddEquipmentCard(
                     onValueChange = { onAction(AddEquipmentAction.UpdateManufacturer(it)) },
                     label = "Manufacturer",
                     placeholder = "Enter Manufacturer",
-                    isNoteCard = false
+                    isNoteCard = false,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedTextField(
@@ -168,7 +173,8 @@ fun BioMedAddEquipmentCard(
                     onValueChange = { onAction(AddEquipmentAction.UpdateAgent(it)) },
                     label = "Agent",
                     placeholder = "Enter Agent",
-                    isNoteCard = false
+                    isNoteCard = false,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedHeader(
@@ -177,6 +183,7 @@ fun BioMedAddEquipmentCard(
                     textSize = 16,
                     modifier = Modifier
                         .padding(
+                            top = 15.dp,
                             start = 20.dp,
                             end = 20.dp,
                             bottom = 15.dp
@@ -195,7 +202,8 @@ fun BioMedAddEquipmentCard(
                         "Dialysis Machine",
                         "Dialysis Unit",
                         "Dialysis System"
-                    )
+                    ),
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedSelector(
@@ -207,7 +215,8 @@ fun BioMedAddEquipmentCard(
                             onAction(AddEquipmentAction.UpdateDepartment(it))
                         }
                     },
-                    items = state.departments.map { it.name }
+                    items = state.departments.map { it.name },
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedSelector(
@@ -217,7 +226,8 @@ fun BioMedAddEquipmentCard(
                         onAction(AddEquipmentAction.UpdateCurrentStatus(EquipmentStatus.valueOf(it)))
                     },
                     placeholder = "Select Status",
-                    items = EquipmentStatus.entries.map { it.name }
+                    items = EquipmentStatus.entries.map { it.name },
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedHeader(
@@ -226,6 +236,7 @@ fun BioMedAddEquipmentCard(
                     textSize = 16,
                     modifier = Modifier
                         .padding(
+                            top = 15.dp,
                             start = 20.dp,
                             end = 20.dp,
                             bottom = 15.dp
@@ -245,24 +256,28 @@ fun BioMedAddEquipmentCard(
                         "OR",
                         "ICU",
                         "PICU"
-                    )
+                    ),
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedDateSelector(
                     title = "Installation Date",
                     selectedDate = state.installDate,
-                    onDateSelected = { onAction(AddEquipmentAction.UpdateInstallDate(it)) }
+                    onDateSelected = { onAction(AddEquipmentAction.UpdateInstallDate(it)) },
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedDateSelector(
                     title = "Warranty End Date",
-                    selectedDate = state.warrantyEndDate,
-                    onDateSelected = { onAction(AddEquipmentAction.UpdateWarrantyEndDate(it)) }
+                    selectedDate = state.warrantyEndDate ?: 0L,
+                    onDateSelected = { onAction(AddEquipmentAction.UpdateWarrantyEndDate(it)) },
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedPhotoDocumentationCard(
                     title = "Photo Documentation",
-                    description = "Take photos of installation reports or documentations"
+                    description = "Take photos of installation reports or documentations",
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
 

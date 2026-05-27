@@ -61,6 +61,8 @@ class AddEquipmentVm @Inject constructor(
     private val _uiState = MutableStateFlow(AddEquipmentUiState())
     val uiState: StateFlow<AddEquipmentUiState> = _uiState.asStateFlow()
 
+    val currentUser = sessionManager.currentUser
+
     init {
         fetchDepartments()
     }
