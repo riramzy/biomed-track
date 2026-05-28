@@ -3,6 +3,7 @@ package com.riramzy.biomedtrack.ui.screens.reports
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -17,21 +18,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDateRangeSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedHorizontalSelector
@@ -53,39 +62,147 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.importing.BioMedGeneratedFileCard
 import com.riramzy.biomedtrack.ui.components.report.BioMedReportExportFormatCard
 import com.riramzy.biomedtrack.ui.components.report.BioMedReportSummaryCard
+import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
+import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.FileExportHelper
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
+import com.riramzy.biomedtrack.utils.UserRole
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.ZoneId
 
 @Composable
 fun ReportsScreen(
     navController: NavHostController,
-    reportsVm: ReportsVm = hiltViewModel()
+    reportsVm: ReportsVm = hiltViewModel(),
+    authVm: AuthVm = hiltViewModel()
 ) {
     val state by reportsVm.uiState.collectAsStateWithLifecycle()
+    val currentUser by reportsVm.currentUser.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
 
     ReportsScreenContent(
         navController = navController,
         state = state,
+        currentUser = currentUser!!,
         onAction = reportsVm::onAction,
-        context = context
+        context = context,
+        isPasswordUpdating = isPasswordUpdating,
+        changePassword = authVm::changePassword,
+        logout = authVm::logout
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsScreenContent(
     navController: NavHostController,
     state: ReportsUiState = ReportsUiState(),
+    currentUser: Technician,
     onAction: (ReportsAction) -> Unit = {},
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
+    isPasswordUpdating: Boolean = false,
+    changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
+    logout: (() -> Unit) -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    var selectedPeriod by remember { mutableStateOf("This Month") }
+
+    val sheetState = rememberModalBottomSheetState()
+
+    var showProfileBottomSheet by remember { mutableStateOf(false) }
+    var showMyProfileDialog by remember { mutableStateOf(false) }
+    var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+
+    if (showProfileBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showProfileBottomSheet = false },
+            sheetState = sheetState,
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                Color.White
+            }
+        ) {
+            BioMedProfileSheet(
+                user = currentUser,
+                onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) },
+                onManageUsersClick = { navController.navigate(Screen.UserManagement.route) },
+                onMyProfileClick = {
+                    showMyProfileDialog = true
+                    showProfileBottomSheet = false
+                },
+                onNotificationsPreferencesClick = {
+                    showNotificationsPreferencesDialog = true
+                    showProfileBottomSheet = false
+                },
+                onChangePasswordClick = {
+                    showChangePasswordDialog = true
+                    showProfileBottomSheet = false
+                },
+                onLogoutClick = {
+                    showLogoutConfirmDialog = true
+                    showProfileBottomSheet = false
+                }
+            )
+        }
+    }
+
+    if (showMyProfileDialog) {
+        BioMedMyProfileDialog(
+            user = currentUser,
+            onDismiss = { showMyProfileDialog = false }
+        )
+    }
+
+    if (showNotificationsPreferencesDialog) {
+        BioMedNotificationPreferencesDialog(
+            onDismiss = { showNotificationsPreferencesDialog = false }
+        )
+    }
+
+    if (showChangePasswordDialog) {
+        BioMedChangePasswordDialog(
+            isLoading = isPasswordUpdating,
+            onConfirm = { current, new ->
+                changePassword(current, new) { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                            showChangePasswordDialog = false
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                        }
+                        else -> {}
+                    }
+                }
+            },
+            onDismiss = { showChangePasswordDialog = false }
+        )
+    }
+
+    if (showLogoutConfirmDialog) {
+        BioMedLogoutDialog(
+            onDismiss = { showLogoutConfirmDialog = false },
+            onConfirm = { logout { navController.navigate(Screen.Login.route) } }
+        )
+    }
 
     LaunchedEffect(state.generationResult, state.generationError) {
         state.generationResult?.let {
@@ -124,16 +241,19 @@ fun ReportsScreenContent(
             BioMedTopAppBar(
                 modifier = Modifier.padding(
                     top = 10.dp
-                )
+                ),
+                onProfileClick = { showProfileBottomSheet = true },
+                onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
             )
         },
         floatingActionButton = {
             BioMedNavBar(
                 withActionButton = false,
                 selectedPage = "Reports",
-                onDashboardClick = { navController.navigate(Screen.Dashboard) },
-                onInventoryClick = { navController.navigate(Screen.Inventory) },
-                onSchedulerClick = { navController.navigate(Screen.Scheduler) }
+                onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
+                onSchedulerClick = { navController.navigate(Screen.Scheduler.route) },
+                onInventoryClick = { navController.navigate(Screen.Inventory.route) },
+                onReportsClick = { navController.navigate(Screen.Reports.route) }
             )
                                },
         floatingActionButtonPosition = FabPosition.Center,
@@ -198,15 +318,35 @@ fun ReportsScreenContent(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     BioMedHorizontalSelector(
-                        items = listOf("Previous Week", "This Week", "Next Week"),
-                        onItemSelected = {
-                            val now = System.currentTimeMillis()
-                            val onWeek = 7L * 24 * 60 * 60 * 1000
+                        items = listOf("Previous Month", "This Month", "Next Month"),
+                        selectedItem = selectedPeriod,
+                        onItemSelected = { period ->
+                            selectedPeriod = period
 
-                            when(it) {
-                                "Previous Week" -> onAction(ReportsAction.SelectDateRange(now - (2 * onWeek), now - onWeek))
-                                "This Week" -> onAction(ReportsAction.SelectDateRange(now - onWeek, now))
-                                "Next Week" -> onAction(ReportsAction.SelectDateRange(now, now + onWeek))
+                            val now = LocalDate.now()
+                            val zoneId = ZoneId.systemDefault()
+
+                            when(period) {
+                                "Previous Month" -> {
+                                    val prev = now.minusMonths(1)
+                                    val start = prev.withDayOfMonth(1).atStartOfDay(zoneId).toInstant().toEpochMilli()
+                                    val end = prev.withDayOfMonth(prev.lengthOfMonth()).atTime(23, 59, 59).atZone(zoneId).toInstant().toEpochMilli()
+
+                                    onAction(ReportsAction.SelectDateRange(start, end))
+                                }
+                                "This Month" -> {
+                                    val start = now.withDayOfMonth(1).atStartOfDay(zoneId).toInstant().toEpochMilli()
+                                    val end = now.withDayOfMonth(now.lengthOfMonth()).atTime(23, 59, 59).atZone(zoneId).toInstant().toEpochMilli()
+
+                                    onAction(ReportsAction.SelectDateRange(start, end))
+                                }
+                                "Next Month" -> {
+                                    val next = now.plusMonths(1)
+                                    val start = next.withDayOfMonth(1).atStartOfDay(zoneId).toInstant().toEpochMilli()
+                                    val end = next.withDayOfMonth(next.lengthOfMonth()).atTime(23, 59, 59).atZone(zoneId).toInstant().toEpochMilli()
+
+                                    onAction(ReportsAction.SelectDateRange(start, end))
+                                }
                             }
                         }
                     )
@@ -215,7 +355,6 @@ fun ReportsScreenContent(
                         text = "Filter",
                         withIcon = true,
                         icon = R.drawable.filter,
-                        modifier = Modifier,
                         onClick = { onAction(ReportsAction.SetFilterDialogVisibility(true)) }
                     )
                 }
@@ -514,7 +653,18 @@ fun ReportsScreenContent(
 @Composable
 fun ReportsScreenPreview() {
     BioMedTheme {
-        ReportsScreenContent(navController = NavHostController(LocalContext.current))
+        ReportsScreenContent(
+            navController = NavHostController(LocalContext.current),
+            currentUser = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "william.henry.harrison@example-pet-store.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true,
+            ),
+        )
     }
 }
 
@@ -524,6 +674,17 @@ fun ReportsScreenPreview() {
 @Composable
 fun ReportsScreenDarkPreview() {
     BioMedTheme {
-        ReportsScreenContent(navController = NavHostController(LocalContext.current))
+        ReportsScreenContent(
+            navController = NavHostController(LocalContext.current),
+            currentUser = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "william.henry.harrison@example-pet-store.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true,
+            ),
+        )
     }
 }

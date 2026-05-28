@@ -8,6 +8,7 @@ import com.riramzy.biomedtrack.domain.model.ReportData
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
+import com.riramzy.biomedtrack.utils.UserRole
 import jakarta.inject.Inject
 import java.time.LocalDate
 
@@ -24,7 +25,7 @@ class GenerateReportUseCase @Inject constructor(
         includeDown: Boolean,
         includeServiceDue: Boolean
     ): Result<ReportData> {
-        sessionManager.currentUser.value ?: return Result.Error("User not logged in")
+        val currentUser = sessionManager.currentUser.value ?: return Result.Error("User not logged in")
 
         if (!sessionManager.hasPermission(Permission.GENERATE_REPORTS)) {
             return Result.Error("User doesn't have permission to generate reports")
@@ -32,10 +33,24 @@ class GenerateReportUseCase @Inject constructor(
 
         val allEquipment = equipmentRepository.getAllEquipmentOnce()
 
-        val equipmentFilteredByDepartment = if (department == null) {
-            allEquipment
+        val isTechnician = currentUser.role == UserRole.TECHNICIAN
+
+        val assignedDepartmentsNames = currentUser.assignedDepartments.map { it.name }.toSet()
+
+        if (isTechnician && department != null && department.name !in assignedDepartmentsNames) {
+            return Result.Error("Access Denied: You do not have permission to generate reports for this department")
+        }
+
+        val baseEquipment = if (isTechnician) {
+            allEquipment.filter { it.department.name in assignedDepartmentsNames }
         } else {
-            allEquipment.filter { it.department == department }
+            allEquipment
+        }
+
+        val equipmentFilteredByDepartment = if (department == null) {
+            baseEquipment
+        } else {
+            baseEquipment.filter { it.department == department }
         }
 
         val filteredEquipment = equipmentFilteredByDepartment.filter { equipment ->
@@ -44,7 +59,13 @@ class GenerateReportUseCase @Inject constructor(
                     (includeServiceDue && equipment.status == EquipmentStatus.SERVICE)
         }
 
-        val logs = maintenanceRepo.getLogsByDateRange(startDate, endDate, department)
+        val allLogs = maintenanceRepo.getLogsByDateRange(startDate, endDate, department)
+
+        val logs = if (isTechnician) {
+            allLogs.filter { it.department.name in assignedDepartmentsNames }
+        } else {
+            allLogs
+        }
 
         return Result.Success(ReportData(
             equipmentList = filteredEquipment,

@@ -3,6 +3,7 @@ package com.riramzy.biomedtrack.ui.screens.reports
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
@@ -11,6 +12,7 @@ import com.riramzy.biomedtrack.domain.repo.XlsxGeneratorRepo
 import com.riramzy.biomedtrack.domain.usecase.reports.GenerateReportUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Result
+import com.riramzy.biomedtrack.utils.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
+import java.time.LocalDate
 import javax.inject.Inject
 
 data class GeneratedReport(
@@ -32,9 +35,20 @@ data class GeneratedReport(
 
 data class ReportsUiState(
     val generatedReports: List<GeneratedReport> = emptyList(),
-    val startDate: Long = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000,
+    val startDate: Long = LocalDate.now()
+        .withDayOfMonth(1)
+        .atStartOfDay(java.time.ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli(),
+    val endDate: Long = LocalDate.now()
+        .let { now ->
+            now.withDayOfMonth(now.lengthOfMonth())
+                .atTime(23, 59, 59)
+                .atZone(java.time.ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+        },
     val departmentsList: List<Department> = emptyList(),
-    val endDate: Long = System.currentTimeMillis(),
     val selectedDepartment: Department? = null,
     val selectedStatus: EquipmentStatus? = null,
     val includeLogs: Boolean = false,
@@ -70,14 +84,25 @@ class ReportsVm @Inject constructor(
     private val departmentsRepo: DepartmentRepo,
     private val generateReportUseCase: GenerateReportUseCase,
     private val pdfGeneratorRepo: PdfGeneratorRepo,
-    private val xlsxGeneratorRepo: XlsxGeneratorRepo
+    private val xlsxGeneratorRepo: XlsxGeneratorRepo,
+    private val sessionManager: SessionManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow(ReportsUiState(generationLoading = true))
     val uiState: StateFlow<ReportsUiState> = _uiState.asStateFlow()
+    val currentUser = sessionManager.currentUser
 
     init {
         viewModelScope.launch {
-            val departments = departmentsRepo.getAllDepartmentsOnce()
+            val allDepartments = departmentsRepo.getAllDepartmentsOnce()
+
+            val currentUser = sessionManager.currentUser.value
+
+            val departments = if (currentUser?.role == UserRole.TECHNICIAN) {
+                currentUser.assignedDepartments
+            } else {
+                allDepartments
+            }
+
             _uiState.update { it.copy(departmentsList = departments) }
         }
         refreshSummary()
@@ -89,8 +114,17 @@ class ReportsVm @Inject constructor(
 
             val allEquipment = equipmentRepo.getAllEquipmentOnce()
 
-            val filteredEquipment = allEquipment.filter { equipment ->
-                val matchesDepartment = _uiState.value.selectedDepartment == null || equipment.department == _uiState.value.selectedDepartment
+            val currentUser = sessionManager.currentUser.value
+
+            val baseEquipment = if (currentUser?.role == UserRole.TECHNICIAN) {
+                val assignedDepartmentsNames = currentUser.assignedDepartments.map { it.name }.toSet()
+                allEquipment.filter { it.department.name in assignedDepartmentsNames }
+            } else {
+                allEquipment
+            }
+
+            val filteredEquipment = baseEquipment.filter { equipment ->
+                val matchesDepartment = _uiState.value.selectedDepartment == null || equipment.department.name == _uiState.value.selectedDepartment?.name
                 val matchesStatus = _uiState.value.selectedStatus == null || equipment.status == _uiState.value.selectedStatus
                 matchesDepartment && matchesStatus
             }
