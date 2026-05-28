@@ -47,8 +47,7 @@ class NotificationsVm @Inject constructor(
     private val _uiState = MutableStateFlow<NotificationsUiState>(NotificationsUiState.Loading)
     val uiState: StateFlow<NotificationsUiState> = _uiState.asStateFlow()
     private val _selectedCategory = MutableStateFlow("All")
-    val selectedCategory: StateFlow<String> = _selectedCategory.asStateFlow()
-    private val user = sessionManager.currentUser.value
+    val user = sessionManager.currentUser.value
 
     init {
         loadNotifications()
@@ -79,7 +78,7 @@ class NotificationsVm @Inject constructor(
                         technicianName = log.changedByName,
                         type = ActivityType.STATUS_CHANGE,
                         timestamp = log.timestamp,
-                        status = "${log.newStatus}",
+                        equipmentStatus = log.newStatus,
                         isRead = log.readBy.contains(user.id)
                     )
                 }.sortedByDescending { it.timestamp }
@@ -96,7 +95,7 @@ class NotificationsVm @Inject constructor(
                         technicianName = log.technicianName,
                         type = ActivityType.MAINTENANCE_LOG,
                         timestamp = log.date,
-                        status = log.currentStatus.name,
+                        equipmentStatus = log.currentStatus,
                         isRead = log.readBy.contains(user.id)
                     )
                 }.sortedByDescending { it.timestamp }
@@ -104,7 +103,7 @@ class NotificationsVm @Inject constructor(
                 val tasksList = tasks.map { task ->
                     ActivityItem(
                         id = task.id,
-                        title = "Task Assigned to ${task.assignedTo}",
+                        title = "Task Assigned to ${task.assignedToName}",
                         equipmentId = task.equipmentId,
                         equipmentName = task.equipmentName,
                         equipmentModel = task.equipmentModel,
@@ -114,8 +113,8 @@ class NotificationsVm @Inject constructor(
                         type = ActivityType.TASK_ASSIGNED,
                         timestamp = task.dueDate,
                         dueDate = task.dueDate.toDateString(),
-                        status = task.status.name,
-                        isRead = task.readBy.contains(user.id)
+                        taskStatus = task.status,
+                        isRead = task.readBy.contains(user.id),
                     )
                 }
 
@@ -137,7 +136,8 @@ class NotificationsVm @Inject constructor(
 
                 NotificationsUiState.Success(
                     notifications = notificationsList,
-                    unreadCount = notificationsList.values.flatten().count { !it.isRead },
+                    unreadCount = (changesList + logsList + tasksList).count { !it.isRead },
+                    selectedCategory = category,
                     isLoading = false
                 )
             }.catch { e ->
