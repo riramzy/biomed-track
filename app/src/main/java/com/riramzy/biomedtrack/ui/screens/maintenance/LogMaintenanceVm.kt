@@ -64,7 +64,7 @@ class LogMaintenanceVm @Inject constructor(
     private val _uiState = MutableStateFlow(LogMaintenanceUiState())
     val uiState: StateFlow<LogMaintenanceUiState> = _uiState.asStateFlow()
     private val equipmentId = stateHandle.get<String>("equipmentId") ?: ""
-    private val user = sessionManager.currentUser.value
+    val user = sessionManager.currentUser.value
 
     init {
         initializeChecklist()
