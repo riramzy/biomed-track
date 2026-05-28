@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.data.repo
 
+import android.content.Context
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.riramzy.biomedtrack.data.local.dao.MaintenanceLogDao
@@ -11,6 +12,7 @@ import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -23,6 +25,7 @@ import javax.inject.Inject
 class MaintenanceRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val maintenanceDao: MaintenanceLogDao,
+    @param:ApplicationContext private val context: Context
 ): MaintenanceRepo {
     override fun getAllMaintenanceLogs(): Flow<List<MaintenanceLog>> = callbackFlow {
         val listener = firebaseFirestore
@@ -125,6 +128,20 @@ class MaintenanceRepoImpl @Inject constructor(
                 .document(log.id)
                 .set(log.toDto())
                 .await()
+
+            try {
+                val dispatcher = com.riramzy.biomedtrack.utils.FcmDispatcher(context)
+                dispatcher.pushNotification(
+                    targetToken = "/topics/admin_alerts",
+                    title = "Maintenance Completed",
+                    body = "${log.equipmentName} serviced by ${log.technicianName} in ${log.department.
+                    name}",
+                    equipmentId = log.equipmentId
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to add maintenance log", e)
@@ -160,7 +177,7 @@ class MaintenanceRepoImpl @Inject constructor(
     override suspend fun markAsRead(logId: String, userId: String): Result<Unit> {
         return try {
             firebaseFirestore
-                .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
+                .collection(FirestoreCollections.MAINTENANCE_LOGS)
                 .document(logId)
                 .update("readBy", FieldValue.arrayUnion(userId))
                 .await()

@@ -164,7 +164,7 @@ class TaskRepoImpl @Inject constructor(
     override suspend fun markAsRead(logId: String, userId: String): Result<Unit> {
         return try {
             firebaseFirestore
-                .collection(FirestoreCollections.STATUS_CHANGE_LOGS)
+                .collection(FirestoreCollections.TASKS)
                 .document(logId)
                 .update("readBy", FieldValue.arrayUnion(userId))
                 .await()
