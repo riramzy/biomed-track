@@ -106,7 +106,7 @@ class DashboardVm @Inject constructor(
                         equipmentModel = statusLog.equipmentModel,
                         equipmentSerial = statusLog.equipmentSerial,
                         departmentName = statusLog.department.name,
-                        technicianName = statusLog.changedBy,
+                        technicianName = statusLog.changedByName,
                         timestamp = statusLog.timestamp,
                         equipmentStatus = statusLog.newStatus,
                         dueDate = statusLog.timestamp.toDateString()

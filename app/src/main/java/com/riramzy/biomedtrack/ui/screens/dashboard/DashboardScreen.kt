@@ -1,11 +1,13 @@
 package com.riramzy.biomedtrack.ui.screens.dashboard
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,6 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.BioMedActivityCard
 import com.riramzy.biomedtrack.ui.components.BioMedInsightCard
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
@@ -48,10 +53,18 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.department.BioMedDepartmentInsightCard
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
+import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
-import com.riramzy.biomedtrack.ui.components.user.BioMedUserCard
+import com.riramzy.biomedtrack.ui.components.user.BioMedUserOverview
+import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.ActivityItem
+import com.riramzy.biomedtrack.utils.ActivityType
 import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.Timestamps.toRelativeTime
 import com.riramzy.biomedtrack.utils.UserRole
@@ -61,13 +74,18 @@ import com.riramzy.biomedtrack.utils.UserRole
 fun DashboardScreen(
     navController: NavHostController,
     dashboardVm: DashboardVm = hiltViewModel(),
+    authVm: AuthVm = hiltViewModel()
 ) {
     val state by dashboardVm.uiState.collectAsStateWithLifecycle()
+    val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
 
     DashboardScreenContent(
         navController = navController,
         state = state,
-        onRetryClick = { dashboardVm.refresh() }
+        onRetryClick = dashboardVm::refresh,
+        isPasswordUpdating = isPasswordUpdating,
+        changePassword = authVm::changePassword,
+        logout = authVm::logout
     )
 }
 
@@ -76,7 +94,10 @@ fun DashboardScreen(
 fun DashboardScreenContent(
     navController: NavHostController,
     state: DashboardUiState = DashboardUiState.Loading,
-    onRetryClick: () -> Unit = {}
+    onRetryClick: () -> Unit = {},
+    isPasswordUpdating: Boolean = false,
+    changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
+    logout: (() -> Unit) -> Unit = {}
 ) {
     when(state) {
         is DashboardUiState.Error -> {
@@ -174,11 +195,17 @@ fun DashboardScreenContent(
         }
         is DashboardUiState.Success -> {
             val sheetState = rememberModalBottomSheetState()
-            var showBottomSheet by remember { mutableStateOf(false) }
+            val context = LocalContext.current
 
-            if (showBottomSheet) {
+            var showProfileBottomSheet by remember { mutableStateOf(false) }
+            var showMyProfileDialog by remember { mutableStateOf(false) }
+            var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
+            var showChangePasswordDialog by remember { mutableStateOf(false) }
+            var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+
+            if (showProfileBottomSheet) {
                 ModalBottomSheet(
-                    onDismissRequest = { showBottomSheet = false },
+                    onDismissRequest = { showProfileBottomSheet = false },
                     sheetState = sheetState,
                     dragHandle = { BottomSheetDefaults.DragHandle() },
                     containerColor = if (isSystemInDarkTheme()) {
@@ -188,10 +215,68 @@ fun DashboardScreenContent(
                     }
                 ) {
                     BioMedProfileSheet(
-                        role = state.currentUser.role.name,
-                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) }
+                        user = state.currentUser,
+                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) },
+                        onManageUsersClick = { navController.navigate(Screen.UserManagement.route) },
+                        onMyProfileClick = {
+                            showMyProfileDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onNotificationsPreferencesClick = {
+                            showNotificationsPreferencesDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onChangePasswordClick = {
+                            showChangePasswordDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onLogoutClick = {
+                            showLogoutConfirmDialog = true
+                            showProfileBottomSheet = false
+                        }
                     )
                 }
+            }
+
+            if (showMyProfileDialog) {
+                BioMedMyProfileDialog(
+                    user = state.currentUser,
+                    onDismiss = { showMyProfileDialog = false }
+                )
+            }
+
+            if (showNotificationsPreferencesDialog) {
+                BioMedNotificationPreferencesDialog(
+                    onDismiss = { showNotificationsPreferencesDialog = false }
+                )
+            }
+
+            if (showChangePasswordDialog) {
+                BioMedChangePasswordDialog(
+                    isLoading = isPasswordUpdating,
+                    onConfirm = { current, new ->
+                        changePassword(current, new) { result ->
+                            when (result) {
+                                is Result.Success -> {
+                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    showChangePasswordDialog = false
+                                }
+                                is Result.Error -> {
+                                    Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                                }
+                                else -> {}
+                            }
+                        }
+                    },
+                    onDismiss = { showChangePasswordDialog = false }
+                )
+            }
+
+            if (showLogoutConfirmDialog) {
+                BioMedLogoutDialog(
+                    onDismiss = { showLogoutConfirmDialog = false },
+                    onConfirm = { logout { navController.navigate(Screen.Login.route) } }
+                )
             }
 
             Scaffold(
@@ -200,7 +285,8 @@ fun DashboardScreenContent(
                         modifier = Modifier.padding(
                             top = 10.dp
                         ),
-                        onProfileClick = { showBottomSheet = true }
+                        onProfileClick = { showProfileBottomSheet = true },
+                        onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
                     )
                 },
                 floatingActionButton = {
@@ -226,12 +312,12 @@ fun DashboardScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     item {
-                        BioMedUserCard(
+                        BioMedUserOverview(
                             username = state.currentUser.name,
                             role = state.currentUser.role.name,
                             modifier = Modifier.padding(
-                                bottom = 15.dp,
-                                top = 20.dp
+                                vertical = 20.dp,
+                                horizontal = 15.dp
                             )
                         )
                     }
@@ -247,31 +333,38 @@ fun DashboardScreenContent(
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 10.dp)
+                                modifier = Modifier.padding(horizontal = 15.dp)
                             ) {
                                 BioMedInsightCard(
                                     value = state.stats.total.toString(),
-                                    status = ""
+                                    status = "",
+                                    modifier = Modifier.weight(1f)
                                 )
 
                                 BioMedInsightCard(
                                     value = state.stats.online.toString(),
-                                    status = "Online"
+                                    status = "Online",
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
 
+                            Spacer(modifier = Modifier.height(10.dp))
+
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 15.dp)
                             ) {
                                 BioMedInsightCard(
                                     value = state.stats.dueService.toString(),
-                                    status = "Service"
+                                    status = "Service",
+                                    modifier = Modifier.weight(1f)
                                 )
 
                                 BioMedInsightCard(
                                     value = state.stats.down.toString(),
-                                    status = "Down"
+                                    status = "Down",
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                         }
@@ -439,7 +532,72 @@ fun DashboardScreenContent(
 fun DashboardScreenPreview() {
     BioMedTheme {
         DashboardScreenContent(
-            navController = NavHostController(LocalContext.current)
+            navController = NavHostController(LocalContext.current),
+            state = DashboardUiState.Success(
+                currentUser = Technician(
+                    id = "1",
+                    name = "Khaled",
+                    email = "william.henry.harrison@example-pet-store.com",
+                    role = UserRole.ADMIN,
+                    assignedDepartments = emptyList(),
+                    employeeId = "1",
+                    isActive = true,
+                ),
+                stats = DashboardStats(
+                    total = 50,
+                    online = 44,
+                    down = 10,
+                    dueService = 2,
+                ),
+                recentActivities = listOf(
+                    ActivityItem(
+                        id = "1",
+                        type = ActivityType.STATUS_CHANGE,
+                        title = "Status Change to Service",
+                        equipmentId = "",
+                        equipmentModel = "4008S",
+                        equipmentSerial = "3535353",
+                        equipmentName = "Fresenius",
+                        equipmentStatus = EquipmentStatus.SERVICE,
+                        departmentName = "Dialysis Unit",
+                        technicianName = "Mark Milad",
+                        timestamp = 12/3/2026L,
+                        isRead = false
+                    )
+                ),
+                upcomingMaintenance = listOf(
+                    Equipment(
+                        id = "",
+                        manufacturer = "",
+                        status = EquipmentStatus.SERVICE,
+                        serialNumber = "35454545",
+                        model = "4008S",
+                        serviceIntervalDays = 190,
+                        installDate = 0L,
+                        location = "Dialysis Unit",
+                        agent = "",
+                        name = "Fresenius",
+                        category = "Dialysis Machine",
+                        createdBy = "Mark Milad",
+                        department = Department(
+                            totalEquipment = 14,
+                            downEquipment = 2,
+                            dueServiceEquipment = 3,
+                            id = "",
+                            name = ""
+                        )
+                    )
+                ),
+                allDepartments = listOf(
+                    Department(
+                        totalEquipment = 14,
+                        downEquipment = 2,
+                        dueServiceEquipment = 3,
+                        id = "",
+                        name = "Dilaysis Unit"
+                    )
+                )
+            )
         )
     }
 }
@@ -452,7 +610,72 @@ fun DashboardScreenPreview() {
 fun DashboardScreenDarkPreview() {
     BioMedTheme {
         DashboardScreenContent(
-            navController = NavHostController(LocalContext.current)
+            navController = NavHostController(LocalContext.current),
+            state = DashboardUiState.Success(
+                currentUser = Technician(
+                    id = "1",
+                    name = "Khaled",
+                    email = "william.henry.harrison@example-pet-store.com",
+                    role = UserRole.ADMIN,
+                    assignedDepartments = emptyList(),
+                    employeeId = "1",
+                    isActive = true,
+                ),
+                stats = DashboardStats(
+                    total = 50,
+                    online = 44,
+                    down = 10,
+                    dueService = 2,
+                ),
+                recentActivities = listOf(
+                    ActivityItem(
+                        id = "1",
+                        type = ActivityType.STATUS_CHANGE,
+                        title = "Status Change to Service",
+                        equipmentId = "",
+                        equipmentModel = "4008S",
+                        equipmentSerial = "3535353",
+                        equipmentName = "Fresenius",
+                        equipmentStatus = EquipmentStatus.SERVICE,
+                        departmentName = "Dialysis Unit",
+                        technicianName = "Mark Milad",
+                        timestamp = 12/3/2026L,
+                        isRead = false
+                    )
+                ),
+                upcomingMaintenance = listOf(
+                    Equipment(
+                        id = "",
+                        manufacturer = "",
+                        status = EquipmentStatus.SERVICE,
+                        serialNumber = "35454545",
+                        model = "4008S",
+                        serviceIntervalDays = 190,
+                        installDate = 0L,
+                        location = "Dialysis Unit",
+                        agent = "",
+                        name = "Fresenius",
+                        category = "Dialysis Machine",
+                        createdBy = "Mark Milad",
+                        department = Department(
+                            totalEquipment = 14,
+                            downEquipment = 2,
+                            dueServiceEquipment = 3,
+                            id = "",
+                            name = ""
+                        )
+                    )
+                ),
+                allDepartments = listOf(
+                    Department(
+                        totalEquipment = 14,
+                        downEquipment = 2,
+                        dueServiceEquipment = 3,
+                        id = "",
+                        name = "Dilaysis Unit"
+                    )
+                )
+            )
         )
     }
 }
