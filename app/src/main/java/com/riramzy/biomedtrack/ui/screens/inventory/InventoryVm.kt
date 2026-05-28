@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
 import com.riramzy.biomedtrack.domain.usecase.equipment.ChangeEquipmentStatusUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetAllEquipmentUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +24,7 @@ import javax.inject.Inject
 sealed class InventoryUiState {
     data object Loading: InventoryUiState()
     data class Success(
+        val currentUser: Technician,
         val equipment: List<Equipment>,
         val departments: List<Department>,
         val categories: List<String>,
@@ -52,15 +55,29 @@ class InventoryVm @Inject constructor(
     private val _uiState = MutableStateFlow<InventoryUiState>(InventoryUiState.Loading)
     val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
     private val _filters = MutableStateFlow(InventoryFilters())
+    private var fetchJob: Job? = null
 
     init {
+        loadInventory()
+    }
+
+    private fun loadInventory() {
+        fetchJob?.cancel()
         _uiState .value = InventoryUiState.Loading
+
         viewModelScope.launch {
             combine(
                 getAllEquipmentsUseCase(),
                 _filters,
                 departmentRepo.getAllDepartments()
             ) { equipment, filters, departments ->
+                val currentUser = sessionManager.currentUser.value
+
+                if (currentUser == null) {
+                    _uiState.value = InventoryUiState.Error("Failed to get current user")
+                    return@combine InventoryUiState.Error("Failed to get current user")
+                }
+
                 val allCategories = equipment.map { it.category }
                     .filter { it.isNotBlank() }
                     .distinct()
@@ -95,6 +112,7 @@ class InventoryVm @Inject constructor(
                 }
 
                 InventoryUiState.Success(
+                    currentUser = currentUser,
                     equipment = finalFiltered,
                     departments = departments,
                     categories = allCategories,
@@ -133,5 +151,9 @@ class InventoryVm @Inject constructor(
         viewModelScope.launch {
             changeEquipmentStatusUseCase(equipment, newStatus, notes)
         }
+    }
+
+    fun refresh() {
+        loadInventory()
     }
 }

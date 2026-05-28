@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.inventory
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,7 @@ import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedHorizontalSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
@@ -52,17 +54,27 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedSearchBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedChangeStatusDialog
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentOverviewCard
+import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
+import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.Timestamps.toDateString
+import com.riramzy.biomedtrack.utils.UserRole
 
 @Composable
 fun InventoryScreen(
     navController: NavHostController,
-    inventoryVm: InventoryVm = hiltViewModel()
+    inventoryVm: InventoryVm = hiltViewModel(),
+    authVm: AuthVm = hiltViewModel()
 ) {
     val state by inventoryVm.uiState.collectAsStateWithLifecycle()
+    val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
 
     InventoryScreenContent(
         navController,
@@ -71,10 +83,13 @@ fun InventoryScreen(
         onDepartmentSelected = { inventoryVm.filterByDepartment(it) },
         onCategorySelected = { inventoryVm.filterByCategory(it) },
         onStatusSelected = { inventoryVm.filterByStatus(it) },
-        onRetryClick = {  },
+        onRetryClick = { inventoryVm.refresh() },
         onStatusChangeConfirm = { equipment, status, note ->
             inventoryVm.changeStatus(equipment, status, note)
-        }
+        },
+        isPasswordUpdating = isPasswordUpdating,
+        changePassword = authVm::changePassword,
+        logout = authVm::logout
     )
 }
 
@@ -88,7 +103,10 @@ fun InventoryScreenContent(
     onCategorySelected: (String?) -> Unit = {},
     onStatusSelected: (EquipmentStatus?) -> Unit = {},
     onRetryClick: () -> Unit = {},
-    onStatusChangeConfirm: (Equipment, EquipmentStatus, String) -> Unit = { _, _, _ -> }
+    onStatusChangeConfirm: (Equipment, EquipmentStatus, String) -> Unit = { _, _, _ -> },
+    isPasswordUpdating: Boolean = false,
+    changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
+    logout: (() -> Unit) -> Unit = {}
 ) {
     when(state) {
         is InventoryUiState.Error -> {
@@ -184,10 +202,95 @@ fun InventoryScreenContent(
             }
         }
         is InventoryUiState.Success -> {
+            val context = LocalContext.current
+
             var selectedEquipment by remember { mutableStateOf<Equipment?>(null) }
 
-            var showFilterSheet by remember { mutableStateOf(false) }
             val filterSheetState = rememberModalBottomSheetState()
+            val sheetState = rememberModalBottomSheetState()
+
+            var showFilterSheet by remember { mutableStateOf(false) }
+            var showProfileBottomSheet by remember { mutableStateOf(false) }
+            var showMyProfileDialog by remember { mutableStateOf(false) }
+            var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
+            var showChangePasswordDialog by remember { mutableStateOf(false) }
+            var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+
+            if (showProfileBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showProfileBottomSheet = false },
+                    sheetState = sheetState,
+                    dragHandle = { BottomSheetDefaults.DragHandle() },
+                    containerColor = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.onSecondary
+                    } else {
+                        Color.White
+                    }
+                ) {
+                    BioMedProfileSheet(
+                        user = state.currentUser,
+                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) },
+                        onManageUsersClick = { navController.navigate(Screen.UserManagement.route) },
+                        onMyProfileClick = {
+                            showMyProfileDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onNotificationsPreferencesClick = {
+                            showNotificationsPreferencesDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onChangePasswordClick = {
+                            showChangePasswordDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onLogoutClick = {
+                            showLogoutConfirmDialog = true
+                            showProfileBottomSheet = false
+                        }
+                    )
+                }
+            }
+
+            if (showMyProfileDialog) {
+                BioMedMyProfileDialog(
+                    user = state.currentUser,
+                    onDismiss = { showMyProfileDialog = false }
+                )
+            }
+
+            if (showNotificationsPreferencesDialog) {
+                BioMedNotificationPreferencesDialog(
+                    onDismiss = { showNotificationsPreferencesDialog = false }
+                )
+            }
+
+            if (showChangePasswordDialog) {
+                BioMedChangePasswordDialog(
+                    isLoading = isPasswordUpdating,
+                    onConfirm = { current, new ->
+                        changePassword(current, new) { result ->
+                            when (result) {
+                                is Result.Success -> {
+                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    showChangePasswordDialog = false
+                                }
+                                is Result.Error -> {
+                                    Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                                }
+                                else -> {}
+                            }
+                        }
+                    },
+                    onDismiss = { showChangePasswordDialog = false }
+                )
+            }
+
+            if (showLogoutConfirmDialog) {
+                BioMedLogoutDialog(
+                    onDismiss = { showLogoutConfirmDialog = false },
+                    onConfirm = { logout { navController.navigate(Screen.Login.route) } }
+                )
+            }
 
             if (showFilterSheet) {
                 ModalBottomSheet(
@@ -284,7 +387,9 @@ fun InventoryScreenContent(
                     BioMedTopAppBar(
                         modifier = Modifier.padding(
                             top = 10.dp
-                        )
+                        ),
+                        onProfileClick = { showProfileBottomSheet = true },
+                        onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
                     )
                 },
                 floatingActionButton = {
@@ -494,7 +599,16 @@ fun InventoryScreenPreview() {
                 selectedCategory = null,
                 selectedStatus = null,
                 canAddEquipment = false,
-                canDeleteEquipment = false
+                canDeleteEquipment = false,
+                currentUser = Technician(
+                    id = "1",
+                    name = "Ramzy Habel",
+                    role = UserRole.ADMIN,
+                    email = "",
+                    employeeId = "",
+                    assignedDepartments = emptyList(),
+                    isActive = true,
+                )
             )
         )
     }
@@ -539,7 +653,16 @@ fun InventoryScreenDarkPreview() {
                 selectedCategory = null,
                 selectedStatus = null,
                 canAddEquipment = false,
-                canDeleteEquipment = false
+                canDeleteEquipment = false,
+                currentUser = Technician(
+                    id = "1",
+                    name = "Ramzy Habel",
+                    role = UserRole.ADMIN,
+                    email = "",
+                    employeeId = "",
+                    assignedDepartments = emptyList(),
+                    isActive = true,
+                )
             )
         )
     }
