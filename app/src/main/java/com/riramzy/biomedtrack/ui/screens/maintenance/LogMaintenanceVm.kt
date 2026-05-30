@@ -9,6 +9,7 @@ import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import com.riramzy.biomedtrack.domain.repo.StorageRepo
+import com.riramzy.biomedtrack.domain.repo.TaskRepo
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetEquipmentByIdUseCase
 import com.riramzy.biomedtrack.domain.usecase.maintenance.AddMaintenanceLogUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
@@ -18,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -59,11 +61,13 @@ class LogMaintenanceVm @Inject constructor(
     private val getEquipmentByIdUseCase: GetEquipmentByIdUseCase,
     private val addMaintenanceLogUseCase: AddMaintenanceLogUseCase,
     private val storageRepo: StorageRepo,
+    private val taskRepo: TaskRepo,
     sessionManager: SessionManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow(LogMaintenanceUiState())
     val uiState: StateFlow<LogMaintenanceUiState> = _uiState.asStateFlow()
     private val equipmentId = stateHandle.get<String>("equipmentId") ?: ""
+    private val taskId = stateHandle.get<String>("taskId")
     val user = sessionManager.currentUser.value
 
     init {
@@ -87,6 +91,16 @@ class LogMaintenanceVm @Inject constructor(
                 return@launch
             }
 
+            var checklist = _uiState.value.checklist
+
+            if (!taskId.isNullOrBlank()) {
+                val tasksSnapshot = taskRepo.getTasksForTechnician(user.id).firstOrNull()
+                val activeTask = tasksSnapshot?.find { it.id == taskId }
+                if (activeTask != null) {
+                    checklist = activeTask.scheduledChecklist
+                }
+            }
+
             if (equipmentId.isNotBlank()) {
                 _uiState.update {
                     it.copy(
@@ -99,7 +113,7 @@ class LogMaintenanceVm @Inject constructor(
                         notes = it.notes,
                         workDone = it.workDone,
                         technicianName = user.name,
-                        checklist = it.checklist,
+                        checklist = checklist,
                         isLoading = false
                     )
                 }
@@ -188,7 +202,7 @@ class LogMaintenanceVm @Inject constructor(
                 photoUrl = finalPhotoUrl
             )
 
-            when(val result = addMaintenanceLogUseCase(log)) {
+            when(val result = addMaintenanceLogUseCase(log, taskId)) {
                 is Result.Success -> {
                     _uiState.update { it.copy(isSuccess = true, isLoading = false) }
                 }
