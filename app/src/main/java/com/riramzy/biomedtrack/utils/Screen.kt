@@ -19,8 +19,14 @@ sealed class Screen(val route: String) {
         fun createRoute(equipmentId: String) = "equipment_detail/$equipmentId"
     }
 
-    object LogMaintenance: Screen("log_maintenance/{equipmentId}") {
-        fun createRoute(equipmentId: String) = "log_maintenance/$equipmentId"
+    object LogMaintenance: Screen("log_maintenance/{equipmentId}?taskId={taskId}") {
+        fun createRoute(equipmentId: String, taskId: String? = null): String {
+            return if (taskId != null) {
+                "log_maintenance/$equipmentId?taskId=$taskId"
+            } else {
+                "log_maintenance/$equipmentId"
+            }
+        }
     }
 
     object AddEquipment: Screen("add_equipment")

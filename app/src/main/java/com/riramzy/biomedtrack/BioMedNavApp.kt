@@ -96,7 +96,14 @@ fun BioMedApp(
 
         composable(
             Screen.LogMaintenance.route,
-            arguments = listOf(navArgument("equipmentId") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("equipmentId") { type = NavType.StringType },
+                navArgument("taskId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
         ) { backStackEntry ->
             val equipmentId = backStackEntry.arguments?.getString("equipmentId")
             LogMaintenanceScreen(navController)
