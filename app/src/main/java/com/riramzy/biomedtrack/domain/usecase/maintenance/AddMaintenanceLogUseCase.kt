@@ -7,7 +7,10 @@ import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
 import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
+import com.riramzy.biomedtrack.domain.repo.TaskRepo
 import com.riramzy.biomedtrack.utils.Result
+import com.riramzy.biomedtrack.utils.TaskStatus
+import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -15,10 +18,11 @@ class AddMaintenanceLogUseCase @Inject constructor(
     private val maintenanceRepository: MaintenanceRepo,
     private val equipmentRepository: EquipmentRepo,
     private val statusChangeRepo: StatusChangeRepo,
+    private val taskRepo: TaskRepo,
     private val sessionManager: SessionManager
 ) {
-    suspend operator fun invoke(log: MaintenanceLog): Result<Unit> {
-        sessionManager.currentUser.value ?: return Result.Error("User not logged in")
+    suspend operator fun invoke(log: MaintenanceLog, taskId: String?): Result<Unit> {
+        val user = sessionManager.currentUser.value ?: return Result.Error("User not logged in")
 
         if (!sessionManager.hasPermission(Permission.ADD_MAINTENANCE_LOG)) {
             return Result.Error("User doesn't have permission to log maintenance")
@@ -49,6 +53,20 @@ class AddMaintenanceLogUseCase @Inject constructor(
             return Result.Error("Failed to update equipment")
         }
 
+        if (!taskId.isNullOrBlank()) {
+            val tasksSnapshot = taskRepo.getTasksForTechnician(user.id).firstOrNull()
+
+            val activeTask = tasksSnapshot?.find { it.id == taskId }
+
+            if (activeTask != null) {
+                val updatedTaskResult = taskRepo.updateTask(activeTask.copy(status = TaskStatus.DONE))
+
+                if (updatedTaskResult is Result.Error) {
+                    return Result.Error("Failed to update scheduled task status")
+                }
+            }
+        }
+
         if (equipment.status != log.currentStatus) {
             val newStatusLogEntry = StatusChangeLog(
                 id = log.id,
@@ -59,10 +77,10 @@ class AddMaintenanceLogUseCase @Inject constructor(
                 department = equipment.department,
                 previousStatus = equipment.status,
                 newStatus = log.currentStatus,
-                changedBy = sessionManager.currentUser.value!!.id,
-                changedByName = sessionManager.currentUser.value!!.name,
+                changedBy = user.id,
+                changedByName = user.name,
                 timestamp = System.currentTimeMillis(),
-                notes = "Updated equipment status via maintenance log"
+                notes = "Completed scheduled maintenance task"
             )
 
             statusChangeRepo.logStatusChange(newStatusLogEntry)
