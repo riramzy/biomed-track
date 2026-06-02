@@ -22,11 +22,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.riramzy.biomedtrack.domain.model.Task
-import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
-import com.riramzy.biomedtrack.utils.TaskStatus
+import com.riramzy.biomedtrack.domain.model.Department
+import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.TaskStatus
 
 @Composable
 fun BioMedScheduleDayCard(
@@ -42,11 +42,7 @@ fun BioMedScheduleDayCard(
             .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.secondaryContainer
-            } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
         )
     ) {
         Column(
@@ -114,7 +110,9 @@ fun BioMedScheduleDayCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(
+    device = "id:pixel_9", showSystemUi = false, showBackground = true
+)
 @Composable
 fun BioMedScheduleDayCardPreview() {
     val mockTasks = listOf(
@@ -147,7 +145,8 @@ fun BioMedScheduleDayCardPreview() {
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true,
+@Preview(
+    device = "id:pixel_9", showSystemUi = false, showBackground = false,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
@@ -164,7 +163,7 @@ fun BioMedScheduleDayCardDarkPreview() {
             assignedToName = "John Doe",
             assignedBy = "sup1",
             dueDate = System.currentTimeMillis(),
-            status = TaskStatus.PENDING,
+            status = TaskStatus.IN_PROGRESS,
             notes = "Check pressure sensors and replace faulty filters",
             scheduledChecklist = listOf(
                 ChecklistItem("1", "Clean filters", false),

@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,6 +37,7 @@ import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.TaskStatus
 
 @Composable
@@ -48,18 +51,24 @@ fun BioMedTaskCard(
     val (statusText, statusBg, statusTextCol) = when(task.status) {
         TaskStatus.PENDING -> Triple(
             "Pending",
-            if (isDark) Color(0xFFF57F17).copy(alpha = 0.15f) else Color(0xFFFFF3E0),
-            if (isDark) Color(0xFFFFB300) else Color(0xFFE65100)
+            if (isDark) MaterialTheme.indicatorColors.yellow.copy(alpha = 0.15f) else MaterialTheme.indicatorColors.yellow.copy(
+                0.15f
+            ),
+            if (isDark) MaterialTheme.indicatorColors.yellow else MaterialTheme.indicatorColors.yellow
         )
         TaskStatus.IN_PROGRESS -> Triple(
             "In Progress",
-            if (isDark) MaterialTheme.colorScheme.primaryContainer.copy(0.3f) else MaterialTheme.colorScheme.surface.copy(0.7f),
+            if (isDark) MaterialTheme.colorScheme.primaryContainer.copy(0.7f) else MaterialTheme.colorScheme.primaryContainer.copy(
+                0.7f
+            ),
             if (isDark) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
         )
         TaskStatus.DONE -> Triple(
             "Done",
-            if (isDark) Color(0xFF2E7D32).copy(alpha = 0.15f) else Color(0xFFE8F5E9),
-            if (isDark) Color(0xFF81C784) else Color(0xFF2E7D32)
+            if (isDark) MaterialTheme.indicatorColors.green.copy(alpha = 0.15f) else MaterialTheme.indicatorColors.green.copy(
+                0.15f
+            ),
+            if (isDark) MaterialTheme.indicatorColors.green else MaterialTheme.indicatorColors.green
         )
     }
 
@@ -69,13 +78,8 @@ fun BioMedTaskCard(
             .wrapContentHeight(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isDark) {
-                MaterialTheme.colorScheme.onSecondary
-            } else {
-                MaterialTheme.colorScheme.primaryContainer
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         onClick = onCardClick
     ) {
         Column(
@@ -104,15 +108,19 @@ fun BioMedTaskCard(
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (isDark) MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                        color = if (isDark) Color.White.copy(alpha = 0.6f) else Color.Black.copy(
+                            alpha = 0.6f
+                        )
                     )
                 }
                 
                 Box(
                     modifier = Modifier
+                        .width(90.dp)
                         .clip(RoundedCornerShape(25.dp))
                         .background(statusBg)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = statusText,
@@ -137,13 +145,7 @@ fun BioMedTaskCard(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(25.dp))
-                            .background(
-                                if (isDark) {
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                                } else {
-                                    MaterialTheme.colorScheme.surface.copy(0.5f)
-                                }
-                            )
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(0.5f))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
@@ -170,7 +172,9 @@ fun BioMedTaskCard(
                             text = task.assignedToName,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Normal,
-                            color = if (isDark) MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f) else Color.DarkGray
+                            color = if (isDark) Color.White.copy(alpha = 0.9f) else Color.Black.copy(
+                                alpha = 0.9f
+                            )
                         )
                     }
                 }
@@ -207,9 +211,13 @@ fun BioMedTaskCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(
+    device = "id:pixel_9", showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
+    backgroundColor = 0xFFFFFFFF
+)
 @Composable
-fun BioMedTaskCardPendingPreview() {
+fun BioMedTaskCardPreview() {
     val mockTask = Task(
         id = "1",
         equipmentId = "eq1",
@@ -230,17 +238,23 @@ fun BioMedTaskCardPendingPreview() {
         )
     )
     BioMedTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
-            BioMedTaskCard(task = mockTask)
+        Surface(
+            color = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+        ) {
+            BioMedTaskCard(
+                task = mockTask,
+                modifier = Modifier.padding(15.dp)
+            )
         }
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true,
+@Preview(
+    device = "id:pixel_9", showBackground = false,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-fun BioMedTaskCardInProgressDarkPreview() {
+fun BioMedTaskCardDarkPreview() {
     val mockTask = Task(
         id = "2",
         equipmentId = "eq2",
@@ -261,36 +275,13 @@ fun BioMedTaskCardInProgressDarkPreview() {
         )
     )
     BioMedTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
-            BioMedTaskCard(task = mockTask)
-        }
-    }
-}
-
-@Preview(device = "id:pixel_9", showBackground = true)
-@Composable
-fun BioMedTaskCardDonePreview() {
-    val mockTask = Task(
-        id = "3",
-        equipmentId = "eq3",
-        equipmentName = "Dräger",
-        equipmentModel = "Evita V500",
-        equipmentSerial = "SN99887766",
-        department = Department(id = "3", name = "OR", totalEquipment = 8),
-        assignedTo = "tech3",
-        assignedToName = "Alex Mercer",
-        assignedBy = "sup1",
-        dueDate = System.currentTimeMillis(),
-        status = TaskStatus.DONE,
-        notes = "Routine yearly PM certification and testing",
-        scheduledChecklist = listOf(
-            ChecklistItem("1", "O2 sensor check", true),
-            ChecklistItem("2", "Alarm testing", true)
-        )
-    )
-    BioMedTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
-            BioMedTaskCard(task = mockTask)
+        Surface(
+            color = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+        ) {
+            BioMedTaskCard(
+                task = mockTask,
+                modifier = Modifier.padding(15.dp)
+            )
         }
     }
 }
