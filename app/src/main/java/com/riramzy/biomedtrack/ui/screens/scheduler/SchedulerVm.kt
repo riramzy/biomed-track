@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.usecase.task.GetTasksUseCase
+import com.riramzy.biomedtrack.domain.usecase.task.StartTaskUseCase
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.TaskStatus
 import com.riramzy.biomedtrack.utils.Timestamps.getEndOfWeek
 import com.riramzy.biomedtrack.utils.Timestamps.getStartOfWeek
@@ -37,6 +39,7 @@ sealed class SchedulerUiState {
 @HiltViewModel
 class SchedulerVm @Inject constructor(
     private val getTasksUseCase: GetTasksUseCase,
+    private val startTaskUseCase: StartTaskUseCase,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
@@ -53,8 +56,9 @@ class SchedulerVm @Inject constructor(
                 getTasksUseCase(),
                 _weekOffset,
                 _isListView,
-                _customDateRange
-            ) { tasks, offset, isListView, customRange ->
+                _customDateRange,
+                sessionManager.currentUser
+            ) { tasks, offset, isListView, customRange, currentUser ->
                 val start = customRange?.first ?: getStartOfWeek(offset)
                 val end = customRange?.second ?: getEndOfWeek(offset)
 
@@ -62,12 +66,20 @@ class SchedulerVm @Inject constructor(
                 val startLocal = Instant.ofEpochMilli(start).atZone(ZoneId.systemDefault()).toLocalDate()
                 val endLocal = Instant.ofEpochMilli(end).atZone(ZoneId.systemDefault()).toLocalDate()
 
-                val overdue = tasks.filter {
+                // Robust presentation-layer filtering: technicians only see their assigned tasks
+                val filteredTasks =
+                    if (currentUser != null && currentUser.role == com.riramzy.biomedtrack.utils.UserRole.TECHNICIAN) {
+                        tasks.filter { it.assignedTo == currentUser.id }
+                    } else {
+                        tasks
+                    }
+
+                val overdue = filteredTasks.filter {
                     it.dueDate.isOverdue() && it.status != TaskStatus.DONE
                 }.sortedByDescending { it.dueDate }
 
                 // Filter tasks within the local range (inclusive)
-                val rangeTasks = tasks.filter {
+                val rangeTasks = filteredTasks.filter {
                     val taskLocalDate = Instant.ofEpochMilli(it.dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
                     !taskLocalDate.isBefore(startLocal) && !taskLocalDate.isAfter(endLocal)
                 }.sortedBy { it.dueDate }
@@ -88,7 +100,7 @@ class SchedulerVm @Inject constructor(
                 val upcomingTasks = if (customRange != null) {
                     rangeTasks.filter { it.status != TaskStatus.DONE }
                 } else {
-                    tasks.filter { 
+                    filteredTasks.filter { 
                         it.dueDate >= System.currentTimeMillis() && it.status != TaskStatus.DONE 
                     }.sortedBy { it.dueDate }
                 }
@@ -106,6 +118,24 @@ class SchedulerVm @Inject constructor(
                 _uiState.value = SchedulerUiState.Error(e.message ?: "Failed to load tasks")
             }.collect { state ->
                 _uiState.value = state
+            }
+        }
+    }
+
+    fun startTask(taskId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = startTaskUseCase(taskId)) {
+                is Result.Success -> {
+                    onSuccess()
+                }
+
+                is Result.Error -> {
+                    _uiState.value = SchedulerUiState.Error(result.message)
+                }
+
+                is Result.Loading -> {
+                    _uiState.value = SchedulerUiState.Loading
+                }
             }
         }
     }
