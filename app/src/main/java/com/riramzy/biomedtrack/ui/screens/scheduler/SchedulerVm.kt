@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Task
+import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.usecase.task.GetTasksUseCase
 import com.riramzy.biomedtrack.domain.usecase.task.StartTaskUseCase
 import com.riramzy.biomedtrack.utils.Result
@@ -49,6 +50,9 @@ class SchedulerVm @Inject constructor(
     private val _weekOffset = MutableStateFlow(0)
     private val _isListView = MutableStateFlow(false)
     private val _customDateRange = MutableStateFlow<Pair<Long, Long>?>(null)
+
+    val canAssignTasks: Boolean
+        get() = sessionManager.hasPermission(Permission.ASSIGN_TASKS)
 
     init {
         viewModelScope.launch {

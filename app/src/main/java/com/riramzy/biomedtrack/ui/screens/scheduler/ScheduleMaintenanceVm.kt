@@ -52,6 +52,8 @@ sealed class ScheduleMaintenanceAction {
     data class SelectTechnician(val technicianName: String) : ScheduleMaintenanceAction()
     data class UpdateNotes(val notes: String) : ScheduleMaintenanceAction()
     data class ToggleChecklistItem(val item: ChecklistItem) : ScheduleMaintenanceAction()
+    data class AddChecklistItem(val item: ChecklistItem) : ScheduleMaintenanceAction()
+    data class RemoveChecklistItem(val item: ChecklistItem) : ScheduleMaintenanceAction()
     object ResetError : ScheduleMaintenanceAction()
     object ScheduleTask : ScheduleMaintenanceAction()
 }
@@ -199,6 +201,26 @@ class ScheduleMaintenanceVm @Inject constructor(
                 }
                 _uiState.update {
                     it.copy(checklist = updatedChecklist)
+                }
+            }
+
+            is ScheduleMaintenanceAction.AddChecklistItem -> {
+                if (action.item.label.isNotBlank()) {
+                    val newChecklistItem = ChecklistItem(
+                        id = UUID.randomUUID().toString(),
+                        label = action.item.label,
+                        isChecked = true
+                    )
+
+                    _uiState.update {
+                        it.copy(checklist = it.checklist + newChecklistItem)
+                    }
+                }
+            }
+
+            is ScheduleMaintenanceAction.RemoveChecklistItem -> {
+                _uiState.update {
+                    it.copy(checklist = it.checklist - action.item)
                 }
             }
 
