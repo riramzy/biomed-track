@@ -1,10 +1,12 @@
 package com.riramzy.biomedtrack.ui.components.custom
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,7 +37,9 @@ fun BioMedMultipleItemsSelector(
     modifier: Modifier = Modifier,
     title: String = "Tasks Completed",
     items: List<ChecklistItem> = emptyList(),
-    onToggle: (ChecklistItem) -> Unit = {}
+    onToggle: (ChecklistItem) -> Unit = {},
+    onAddNewItem: (String) -> Unit = {},
+    onRemoveItem: (ChecklistItem) -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -56,41 +64,90 @@ fun BioMedMultipleItemsSelector(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items.forEach { item ->
-                IconButton(
-                    onClick = {
-                        onToggle(item)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(25.dp),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    IconButton(
+                        onClick = {
+                            onToggle(item)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(25.dp)
+                            .weight(4f),
                     ) {
-                        Icon(
-                            painter = if (item.isChecked) painterResource(R.drawable.checked) else painterResource(R.drawable.unchecked),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .size(18.dp)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(
+                                painter = if (item.isChecked) painterResource(R.drawable.checked) else painterResource(
+                                    R.drawable.unchecked
+                                ),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .size(18.dp)
+                            )
 
-                        Text(
-                            text = item.label,
-                            style = MaterialTheme.typography.labelLarge,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = if (isSystemInDarkTheme()) {
-                                MaterialTheme.colorScheme.onSecondaryContainer
-                            } else {
-                                Color.Black
-                            }
-                        )
+                            Text(
+                                text = item.label,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = if (isSystemInDarkTheme()) {
+                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                } else {
+                                    Color.Black
+                                }
+                            )
+                        }
                     }
+
+                    Icon(
+                        painter = painterResource(R.drawable.error),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .clickable { onRemoveItem(item) }
+                    )
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        var customItemLabel by remember { mutableStateOf("") }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            BioMedTextField(
+                placeholder = "Add new task",
+                isWithLabel = false,
+                value = customItemLabel,
+                onValueChange = { customItemLabel = it },
+                modifier = Modifier.weight(3f)
+            )
+
+            BioMedButton(
+                text = "Add",
+                withIcon = false,
+                customColor = MaterialTheme.colorScheme.primary,
+                customTextColor = MaterialTheme.colorScheme.onPrimary,
+                onClick = {
+                    if (customItemLabel.isNotBlank()) {
+                        onAddNewItem(customItemLabel)
+                        customItemLabel = ""
+                    }
+                },
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }
@@ -99,7 +156,15 @@ fun BioMedMultipleItemsSelector(
 @Composable
 fun BioMedMultipleItemsSelectorPreview() {
     BioMedTheme {
-        BioMedMultipleItemsSelector()
+        BioMedMultipleItemsSelector(
+            items = listOf(
+                ChecklistItem(id = "1", label = "Task 1", isChecked = true),
+                ChecklistItem(id = "2", label = "Task 2", isChecked = false),
+                ChecklistItem(id = "3", label = "Task 3", isChecked = true),
+                ChecklistItem(id = "4", label = "Task 4", isChecked = false),
+                ChecklistItem(id = "5", label = "Task 5", isChecked = true)
+            )
+        )
     }
 }
 
@@ -110,6 +175,14 @@ fun BioMedMultipleItemsSelectorPreview() {
 @Composable
 fun BioMedMultipleItemsSelectorDarkPreview() {
     BioMedTheme {
-        BioMedMultipleItemsSelector()
+        BioMedMultipleItemsSelector(
+            items = listOf(
+                ChecklistItem(id = "1", label = "Task 1", isChecked = true),
+                ChecklistItem(id = "2", label = "Task 2", isChecked = false),
+                ChecklistItem(id = "3", label = "Task 3", isChecked = true),
+                ChecklistItem(id = "4", label = "Task 4", isChecked = false),
+                ChecklistItem(id = "5", label = "Task 5", isChecked = true)
+            )
+        )
     }
 }
