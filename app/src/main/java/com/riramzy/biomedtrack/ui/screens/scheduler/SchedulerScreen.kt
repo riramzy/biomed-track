@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.scheduler
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,13 +15,17 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDateRangeSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedHorizontalSelector
@@ -47,38 +54,79 @@ import com.riramzy.biomedtrack.ui.components.schedule.BioMedOverdueExpandedSecti
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedOverdueOverviewCard
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedScheduleDayCard
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskCard
+import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskDetailsSheet
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.Timestamps.toDayMonthString
 import com.riramzy.biomedtrack.utils.Timestamps.toDayName
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchedulerScreen(
     navController: NavHostController,
     schedulerVm: SchedulerVm = hiltViewModel()
 ) {
     val state by schedulerVm.uiState.collectAsStateWithLifecycle()
+    var targetedTask by remember { mutableStateOf<Task?>(null) }
+    val canAssignTasks = schedulerVm.canAssignTasks
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     SchedulerScreenContent(
         navController = navController,
         state = state,
+        canAssignTasks = canAssignTasks,
         onNextWeekClick = { schedulerVm.nextWeek() },
         onPreviousWeekClick = { schedulerVm.previousWeek() },
         onCurrentWeekClick = { schedulerVm.currentWeek() },
         onToggleViewClick = { schedulerVm.toggleViewMode() },
-        onCustomDateRangeSelected = { start, end -> schedulerVm.setCustomDateRange(start, end) }
+        onCustomDateRangeSelected = { start, end -> schedulerVm.setCustomDateRange(start, end) },
+        onTaskClick = { task ->
+            targetedTask = task
+        }
     )
+
+    if (targetedTask != null) {
+        ModalBottomSheet(
+            onDismissRequest = { targetedTask = null },
+            sheetState = sheetState,
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                Color.White
+            }
+        ) {
+            BioMedTaskDetailsSheet(
+                task = targetedTask!!,
+                onStartTaskClick = {
+                    val task = targetedTask!!
+                    targetedTask = null
+                    schedulerVm.startTask(task.id) {
+                        navController.navigate(
+                            Screen.LogMaintenance.createRoute(
+                                task.equipmentId,
+                                task.id
+                            )
+                        )
+                    }
+                }
+
+            )
+        }
+    }
 }
 
 @Composable
 fun SchedulerScreenContent(
     navController: NavHostController,
     state: SchedulerUiState = SchedulerUiState.Loading,
+    canAssignTasks: Boolean = false,
     onNextWeekClick: () -> Unit = {},
     onPreviousWeekClick: () -> Unit = {},
     onCurrentWeekClick: () -> Unit = {},
     onToggleViewClick: () -> Unit = {},
-    onCustomDateRangeSelected: (Long, Long) -> Unit = { _, _ -> }
+    onCustomDateRangeSelected: (Long, Long) -> Unit = { _, _ -> },
+    onTaskClick: (Task) -> Unit = {}
 ) {
     when (state) {
         is SchedulerUiState.Success -> {
@@ -106,9 +154,9 @@ fun SchedulerScreenContent(
                 },
                 floatingActionButton = {
                     BioMedNavBar(
-                        withActionButton = true,
-                        actionButtonIcon = R.drawable.add,
+                        withActionButton = canAssignTasks,
                         isActionButtonText = false,
+                        actionButtonIcon = R.drawable.add,
                         selectedPage = "Scheduler",
                         onInventoryClick = { navController.navigate(Screen.Inventory.route) },
                         onReportsClick = { navController.navigate(Screen.Reports.route) },
@@ -220,7 +268,8 @@ fun SchedulerScreenContent(
                                         "Next Week" -> onNextWeekClick()
                                         "Current Week" -> onCurrentWeekClick()
                                     }
-                                }
+                                },
+                                modifier = Modifier.weight(3f)
                             )
 
                             BioMedButton(
@@ -230,7 +279,7 @@ fun SchedulerScreenContent(
                                 onClick = {
                                     showDateRangePicker = true
                                 },
-                                modifier = Modifier
+                                modifier = Modifier.weight(1f)
                             )
                         }
                     }
@@ -257,9 +306,7 @@ fun SchedulerScreenContent(
                                     dayName = timestamp.toDayName(),
                                     dateDisplay = timestamp.toDayMonthString(),
                                     tasks = tasks,
-                                    onTaskClick = {
-                                        navController.navigate(Screen.LogMaintenance.createRoute(it.equipmentId))
-                                    }
+                                    onTaskClick = { onTaskClick(it) }
                                 )
                             }
                         }
@@ -270,9 +317,7 @@ fun SchedulerScreenContent(
                             BioMedOverdueExpandedSection(
                                 modifier = Modifier.padding(15.dp),
                                 overdueTasks = state.overdueTasks,
-                                onTaskClick = {
-                                    navController.navigate(Screen.LogMaintenance.createRoute(it.equipmentId))
-                                }
+                                onTaskClick = { onTaskClick(it) }
                             )
                         }
                     }
@@ -283,9 +328,7 @@ fun SchedulerScreenContent(
                                 BioMedTaskCard(
                                     task = task,
                                     modifier = Modifier.padding(15.dp),
-                                    onCardClick = {
-                                        navController.navigate(Screen.LogMaintenance.createRoute(task.equipmentId))
-                                    }
+                                    onCardClick = { onTaskClick(task) }
                                 )
                             }
                         }
@@ -304,7 +347,7 @@ fun SchedulerScreenContent(
                 },
                 floatingActionButton = {
                     BioMedNavBar(
-                        withActionButton = true,
+                        withActionButton = canAssignTasks,
                         actionButtonIcon = R.drawable.add,
                         selectedPage = "Scheduler",
                         onInventoryClick = { navController.navigate(Screen.Inventory.route) },
@@ -340,7 +383,7 @@ fun SchedulerScreenContent(
                 },
                 floatingActionButton = {
                     BioMedNavBar(
-                        withActionButton = true,
+                        withActionButton = canAssignTasks,
                         actionButtonIcon = R.drawable.add,
                         selectedPage = "Scheduler",
                         onInventoryClick = { navController.navigate(Screen.Inventory.route) },

@@ -47,6 +47,8 @@ fun BioMedScheduleMaintenanceCard(
     onNotesChanged: (String) -> Unit,
     checklist: List<ChecklistItem>,
     onToggleChecklist: (ChecklistItem) -> Unit,
+    onAddChecklistItem: (String) -> Unit,
+    onRemoveChecklistItem: (ChecklistItem) -> Unit,
     onScheduleClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
@@ -166,6 +168,8 @@ fun BioMedScheduleMaintenanceCard(
                     title = "Tasks Required",
                     items = checklist,
                     onToggle = onToggleChecklist,
+                    onAddNewItem = onAddChecklistItem,
+                    onRemoveItem = onRemoveChecklistItem,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
@@ -183,16 +187,14 @@ fun BioMedScheduleMaintenanceCard(
                         text = "Schedule",
                         customColor = MaterialTheme.colorScheme.primary,
                         customTextColor = MaterialTheme.colorScheme.onPrimary,
-                        onClick = onScheduleClick,
-                        modifier = Modifier.weight(1f)
+                        onClick = onScheduleClick
                     )
 
                     BioMedButton(
                         text = "Cancel",
                         customColor = MaterialTheme.colorScheme.primaryContainer,
                         customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        onClick = onCancelClick,
-                        modifier = Modifier.weight(1f),
+                        onClick = onCancelClick
                     )
                 }
             }
@@ -215,8 +217,14 @@ fun BioMedScheduleMaintenanceCardPreview() {
             onTechnicianSelected = {},
             notes = "",
             onNotesChanged = {},
-            checklist = emptyList(),
+            checklist = listOf(
+                ChecklistItem(id = "1", label = "Task 1", isChecked = false),
+                ChecklistItem(id = "2", label = "Task 2", isChecked = true),
+                ChecklistItem(id = "3", label = "Task 3", isChecked = false)
+            ),
             onToggleChecklist = {},
+            onAddChecklistItem = {},
+            onRemoveChecklistItem = {},
             onScheduleClick = {},
             onCancelClick = {}
         )
@@ -240,8 +248,14 @@ fun BioMedScheduleMaintenanceCardDarkPreview() {
             onTechnicianSelected = {},
             notes = "",
             onNotesChanged = {},
-            checklist = emptyList(),
+            checklist = listOf(
+                ChecklistItem(id = "1", label = "Task 1", isChecked = false),
+                ChecklistItem(id = "2", label = "Task 2", isChecked = true),
+                ChecklistItem(id = "3", label = "Task 3", isChecked = false)
+            ),
             onToggleChecklist = {},
+            onAddChecklistItem = {},
+            onRemoveChecklistItem = {},
             onScheduleClick = {},
             onCancelClick = {}
         )

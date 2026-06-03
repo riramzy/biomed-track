@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
@@ -79,11 +81,10 @@ fun ScheduleMaintenanceScreenContent(
                 )
             )
         },
-        bottomBar = {
+        floatingActionButton = {
             BioMedNavBar(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(18.dp),
+                    .fillMaxWidth(),
                 withActionButton = false,
                 selectedPage = "Scheduler",
                 onInventoryClick = { navController.navigate(Screen.Inventory.route) },
@@ -92,6 +93,7 @@ fun ScheduleMaintenanceScreenContent(
                 onSchedulerClick = { navController.navigate(Screen.Scheduler.route) }
             )
         },
+        floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = {
             SnackbarHost(snackbarHostState) {
                 BioMedSnackbar(
@@ -107,10 +109,15 @@ fun ScheduleMaintenanceScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BioMedScheduleMaintenanceCard(
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier.padding(
+                    top = 20.dp,
+                    start = 15.dp,
+                    end = 15.dp,
+                    bottom = 100.dp
+                ),
                 equipmentList = state.equipmentList,
                 selectedEquipment = state.selectedEquipment,
                 onEquipmentSelected = { onAction(ScheduleMaintenanceAction.SelectEquipment(it)) },
@@ -123,6 +130,14 @@ fun ScheduleMaintenanceScreenContent(
                 onNotesChanged = { onAction(ScheduleMaintenanceAction.UpdateNotes(it)) },
                 checklist = state.checklist,
                 onToggleChecklist = { onAction(ScheduleMaintenanceAction.ToggleChecklistItem(it)) },
+                onAddChecklistItem = {
+                    onAction(
+                        ScheduleMaintenanceAction.AddChecklistItem(
+                            ChecklistItem(id = "", label = it, isChecked = false)
+                        )
+                    )
+                },
+                onRemoveChecklistItem = { onAction(ScheduleMaintenanceAction.RemoveChecklistItem(it)) },
                 onScheduleClick = { onAction(ScheduleMaintenanceAction.ScheduleTask) },
                 onCancelClick = { navController.navigate(Screen.Scheduler.route) }
             )
