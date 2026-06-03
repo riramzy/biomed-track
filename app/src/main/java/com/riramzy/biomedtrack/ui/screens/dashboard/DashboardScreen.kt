@@ -44,7 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.BioMedActivityCard
 import com.riramzy.biomedtrack.ui.components.BioMedInsightCard
@@ -52,7 +52,7 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.department.BioMedDepartmentInsightCard
-import com.riramzy.biomedtrack.ui.components.equipment.BioMedEquipmentStatusCard
+import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskCard
 import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
@@ -66,6 +66,7 @@ import com.riramzy.biomedtrack.utils.ActivityType
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
+import com.riramzy.biomedtrack.utils.TaskStatus
 import com.riramzy.biomedtrack.utils.Timestamps.toRelativeTime
 import com.riramzy.biomedtrack.utils.UserRole
 
@@ -459,8 +460,8 @@ fun DashboardScreenContent(
                             }
 
                             state.upcomingMaintenance.forEach { upcomingMaintenance ->
-                                BioMedEquipmentStatusCard(
-                                    equipmentStatus = upcomingMaintenance.status,
+                                BioMedTaskCard(
+                                    task = upcomingMaintenance,
                                     modifier = Modifier.padding(bottom = 10.dp)
                                 )
                             }
@@ -566,26 +567,26 @@ fun DashboardScreenPreview() {
                     )
                 ),
                 upcomingMaintenance = listOf(
-                    Equipment(
+                    Task(
                         id = "",
-                        manufacturer = "",
-                        status = EquipmentStatus.SERVICE,
-                        serialNumber = "35454545",
-                        model = "4008S",
-                        serviceIntervalDays = 190,
-                        installDate = 0L,
-                        location = "Dialysis Unit",
-                        agent = "",
-                        name = "Fresenius",
-                        category = "Dialysis Machine",
-                        createdBy = "Mark Milad",
+                        equipmentId = "",
+                        equipmentName = "",
+                        equipmentModel = "",
+                        equipmentSerial = "",
                         department = Department(
                             totalEquipment = 14,
                             downEquipment = 2,
                             dueServiceEquipment = 3,
                             id = "",
-                            name = ""
-                        )
+                            name = "Dilaysis Unit"
+                        ),
+                        dueDate = 0L,
+                        status = TaskStatus.IN_PROGRESS,
+                        assignedTo = "",
+                        assignedToName = "",
+                        assignedBy = "",
+                        notes = "",
+                        scheduledChecklist = emptyList()
                     )
                 ),
                 allDepartments = listOf(
@@ -644,26 +645,26 @@ fun DashboardScreenDarkPreview() {
                     )
                 ),
                 upcomingMaintenance = listOf(
-                    Equipment(
+                    Task(
                         id = "",
-                        manufacturer = "",
-                        status = EquipmentStatus.SERVICE,
-                        serialNumber = "35454545",
-                        model = "4008S",
-                        serviceIntervalDays = 190,
-                        installDate = 0L,
-                        location = "Dialysis Unit",
-                        agent = "",
-                        name = "Fresenius",
-                        category = "Dialysis Machine",
-                        createdBy = "Mark Milad",
+                        equipmentId = "",
+                        equipmentName = "",
+                        equipmentModel = "",
+                        equipmentSerial = "",
                         department = Department(
                             totalEquipment = 14,
                             downEquipment = 2,
                             dueServiceEquipment = 3,
                             id = "",
-                            name = ""
-                        )
+                            name = "Dilaysis Unit"
+                        ),
+                        dueDate = 0L,
+                        status = TaskStatus.IN_PROGRESS,
+                        assignedTo = "",
+                        assignedToName = "",
+                        assignedBy = "",
+                        notes = "",
+                        scheduledChecklist = emptyList()
                     )
                 ),
                 allDepartments = listOf(
