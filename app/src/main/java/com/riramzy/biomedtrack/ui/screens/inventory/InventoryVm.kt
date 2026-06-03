@@ -11,6 +11,7 @@ import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
 import com.riramzy.biomedtrack.domain.usecase.equipment.ChangeEquipmentStatusUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetAllEquipmentUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,15 +79,30 @@ class InventoryVm @Inject constructor(
                     return@combine InventoryUiState.Error("Failed to get current user")
                 }
 
-                val allCategories = equipment.map { it.category }
+                val accessibleEquipment = if (currentUser.role == UserRole.TECHNICIAN) {
+                    val assignedNames = currentUser.assignedDepartments.map { it.name }.toSet()
+                    val assignedIds = currentUser.assignedDepartments.map { it.id }.toSet()
+
+                    equipment.filter { it.department.id in assignedIds || it.department.name in assignedNames }
+                } else {
+                    equipment
+                }
+
+                val accessibleDepartments = if (currentUser.role == UserRole.TECHNICIAN) {
+                    currentUser.assignedDepartments
+                } else {
+                    departments
+                }
+
+                val allCategories = accessibleEquipment.map { it.category }
                     .filter { it.isNotBlank() }
                     .distinct()
                     .sorted()
 
                 val filteredByDepartment = if (filters.department != null) {
-                    equipment.filter { it.department.id == filters.department.id }
+                    accessibleEquipment.filter { it.department.id == filters.department.id }
                 } else {
-                    equipment
+                    accessibleEquipment
                 }
 
                 val filteredByStatus = if (filters.status != null) {
@@ -114,7 +130,7 @@ class InventoryVm @Inject constructor(
                 InventoryUiState.Success(
                     currentUser = currentUser,
                     equipment = finalFiltered,
-                    departments = departments,
+                    departments = accessibleDepartments,
                     categories = allCategories,
                     selectedDepartment = filters.department,
                     searchQuery = filters.query,
