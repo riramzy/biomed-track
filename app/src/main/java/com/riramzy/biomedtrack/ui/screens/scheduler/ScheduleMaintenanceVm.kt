@@ -68,6 +68,8 @@ class ScheduleMaintenanceVm @Inject constructor(
     private val _uiState = MutableStateFlow(ScheduleMaintenanceUiState())
     val uiState: StateFlow<ScheduleMaintenanceUiState> = _uiState.asStateFlow()
 
+    private var allRawEquipment: List<Equipment> = emptyList()
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             combine(
@@ -85,8 +87,25 @@ class ScheduleMaintenanceVm @Inject constructor(
                     isLoading = false
                 )
             }.collect { (equipment, technicians) ->
+                allRawEquipment = equipment
+
+                val currentTechnician = _uiState.value.selectedTechnician
+
+                val filteredEquipment = if (currentTechnician != null) {
+                    val assignedDepartmentsIds =
+                        currentTechnician.assignedDepartments.map { it.id }.toSet()
+                    val assignedDepartmentsNames =
+                        currentTechnician.assignedDepartments.map { it.name }.toSet()
+
+                    equipment.filter {
+                        it.department.id in assignedDepartmentsIds || it.department.name in assignedDepartmentsNames
+                    }
+                } else {
+                    equipment
+                }
+
                 _uiState.value = _uiState.value.copy(
-                    equipmentList = equipment,
+                    equipmentList = filteredEquipment,
                     techniciansList = technicians,
                     isLoading = false
                 )
@@ -180,8 +199,35 @@ class ScheduleMaintenanceVm @Inject constructor(
                 val selectedTechnician = _uiState.value.techniciansList.find {
                     it.name == action.technicianName
                 }
+
+                val filteredEquipment = if (selectedTechnician != null) {
+                    val assignedDepartmentsIds =
+                        selectedTechnician.assignedDepartments.map { it.id }.toSet()
+                    val assignedDepartmentsNames =
+                        selectedTechnician.assignedDepartments.map { it.name }.toSet()
+
+                    allRawEquipment.filter {
+                        it.department.id in assignedDepartmentsIds || it.department.name in assignedDepartmentsNames
+                    }
+                } else {
+                    allRawEquipment
+                }
+
+                val updatedSelectedEquipment = if (_uiState.value.selectedEquipment != null &&
+                    filteredEquipment.none { it.id == _uiState.value.selectedEquipment?.id }
+                ) {
+                    null
+                } else {
+                    _uiState.value.selectedEquipment
+                }
+
+
                 _uiState.update {
-                    it.copy(selectedTechnician = selectedTechnician)
+                    it.copy(
+                        selectedTechnician = selectedTechnician,
+                        equipmentList = filteredEquipment,
+                        selectedEquipment = updatedSelectedEquipment
+                    )
                 }
             }
 
