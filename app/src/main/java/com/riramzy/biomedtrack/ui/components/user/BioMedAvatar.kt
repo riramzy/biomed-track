@@ -3,7 +3,6 @@ package com.riramzy.biomedtrack.ui.components.user
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -26,7 +26,7 @@ import kotlin.math.abs
 @Composable
 fun BioMedAvatar(
     name: String = "John Doe",
-    size: Dp = 40.dp,
+    size: Dp = 25.dp,
     textSize: TextUnit = (size.value * 0.4f).sp,
     textColor: Color = Color.White,
     backgroundColor: Color? = null
@@ -57,8 +57,7 @@ fun BioMedAvatar(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(avatarBackgroundColors)
-            .padding(4.dp),
+            .background(avatarBackgroundColors),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -66,7 +65,10 @@ fun BioMedAvatar(
             color = textColor,
             fontSize = textSize,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            softWrap = false,
+            textAlign = TextAlign.Center
         )
     }
 }

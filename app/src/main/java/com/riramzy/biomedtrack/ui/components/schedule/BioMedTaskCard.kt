@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,6 +35,7 @@ import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
+import com.riramzy.biomedtrack.ui.components.user.BioMedAvatar
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.TaskStatus
@@ -160,12 +160,9 @@ fun BioMedTaskCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.avatar),
-                            contentDescription = "Technician Avatar",
-                            modifier = Modifier
-                                .size(14.dp)
-                                .clip(CircleShape)
+                        BioMedAvatar(
+                            name = task.assignedToName,
+                            size = 25.dp,
                         )
                         
                         Text(
