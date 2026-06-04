@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.scheduler
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Task
+import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDateRangeSelector
 import com.riramzy.biomedtrack.ui.components.custom.BioMedHorizontalSelector
@@ -55,25 +57,37 @@ import com.riramzy.biomedtrack.ui.components.schedule.BioMedOverdueOverviewCard
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedScheduleDayCard
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskCard
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskDetailsSheet
+import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
+import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.Timestamps.toDayMonthString
 import com.riramzy.biomedtrack.utils.Timestamps.toDayName
+import com.riramzy.biomedtrack.utils.UserRole
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchedulerScreen(
     navController: NavHostController,
-    schedulerVm: SchedulerVm = hiltViewModel()
+    schedulerVm: SchedulerVm = hiltViewModel(),
+    authVm: AuthVm = hiltViewModel()
 ) {
     val state by schedulerVm.uiState.collectAsStateWithLifecycle()
+    val currentUser = schedulerVm.currentUser.collectAsStateWithLifecycle().value
     var targetedTask by remember { mutableStateOf<Task?>(null) }
     val canAssignTasks = schedulerVm.canAssignTasks
+    val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     SchedulerScreenContent(
         navController = navController,
         state = state,
+        currentUser = currentUser!!,
         canAssignTasks = canAssignTasks,
         onNextWeekClick = { schedulerVm.nextWeek() },
         onPreviousWeekClick = { schedulerVm.previousWeek() },
@@ -82,7 +96,10 @@ fun SchedulerScreen(
         onCustomDateRangeSelected = { start, end -> schedulerVm.setCustomDateRange(start, end) },
         onTaskClick = { task ->
             targetedTask = task
-        }
+        },
+        isPasswordUpdating = isPasswordUpdating,
+        changePassword = authVm::changePassword,
+        logout = authVm::logout
     )
 
     if (targetedTask != null) {
@@ -116,21 +133,118 @@ fun SchedulerScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchedulerScreenContent(
     navController: NavHostController,
     state: SchedulerUiState = SchedulerUiState.Loading,
+    currentUser: Technician,
     canAssignTasks: Boolean = false,
     onNextWeekClick: () -> Unit = {},
     onPreviousWeekClick: () -> Unit = {},
     onCurrentWeekClick: () -> Unit = {},
     onToggleViewClick: () -> Unit = {},
     onCustomDateRangeSelected: (Long, Long) -> Unit = { _, _ -> },
-    onTaskClick: (Task) -> Unit = {}
+    onTaskClick: (Task) -> Unit = {},
+    isPasswordUpdating: Boolean = false,
+    changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
+    logout: (() -> Unit) -> Unit = {}
 ) {
     when (state) {
         is SchedulerUiState.Success -> {
             var showDateRangePicker by remember { mutableStateOf(false) }
+
+            val sheetState = rememberModalBottomSheetState()
+            val context = LocalContext.current
+
+            var showProfileBottomSheet by remember { mutableStateOf(false) }
+            var showMyProfileDialog by remember { mutableStateOf(false) }
+            var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
+            var showChangePasswordDialog by remember { mutableStateOf(false) }
+            var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+
+            if (showProfileBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showProfileBottomSheet = false },
+                    sheetState = sheetState,
+                    dragHandle = { BottomSheetDefaults.DragHandle() },
+                    containerColor = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.onSecondary
+                    } else {
+                        Color.White
+                    }
+                ) {
+                    BioMedProfileSheet(
+                        user = currentUser,
+                        onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) },
+                        onManageUsersClick = { navController.navigate(Screen.UserManagement.route) },
+                        onMyProfileClick = {
+                            showMyProfileDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onNotificationsPreferencesClick = {
+                            showNotificationsPreferencesDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onChangePasswordClick = {
+                            showChangePasswordDialog = true
+                            showProfileBottomSheet = false
+                        },
+                        onLogoutClick = {
+                            showLogoutConfirmDialog = true
+                            showProfileBottomSheet = false
+                        }
+                    )
+                }
+            }
+
+            if (showMyProfileDialog) {
+                BioMedMyProfileDialog(
+                    user = currentUser,
+                    onDismiss = { showMyProfileDialog = false }
+                )
+            }
+
+            if (showNotificationsPreferencesDialog) {
+                BioMedNotificationPreferencesDialog(
+                    onDismiss = { showNotificationsPreferencesDialog = false }
+                )
+            }
+
+            if (showChangePasswordDialog) {
+                BioMedChangePasswordDialog(
+                    isLoading = isPasswordUpdating,
+                    onConfirm = { current, new ->
+                        changePassword(current, new) { result ->
+                            when (result) {
+                                is Result.Success -> {
+                                    Toast.makeText(
+                                        context,
+                                        "Password updated successfully!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    showChangePasswordDialog = false
+                                }
+
+                                is Result.Error -> {
+                                    Toast.makeText(context, result.message, Toast.LENGTH_LONG)
+                                        .show()
+                                }
+
+                                else -> {}
+                            }
+                        }
+                    },
+                    onDismiss = { showChangePasswordDialog = false }
+                )
+            }
+
+            if (showLogoutConfirmDialog) {
+                BioMedLogoutDialog(
+                    onDismiss = { showLogoutConfirmDialog = false },
+                    onConfirm = { logout { navController.navigate(Screen.Login.route) } }
+                )
+            }
 
             if (showDateRangePicker) {
                 BioMedDateRangeSelector(
@@ -149,7 +263,9 @@ fun SchedulerScreenContent(
                     BioMedTopAppBar(
                         modifier = Modifier.padding(
                             top = 10.dp
-                        )
+                        ),
+                        onProfileClick = { showProfileBottomSheet = true },
+                        onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
                     )
                 },
                 floatingActionButton = {
@@ -456,6 +572,15 @@ fun SchedulerScreenPreview() {
                 isListView = false,
                 weekRangeText = "28 Mar - 31 Mar",
                 isCustomRangeActive = false
+            ),
+            currentUser = Technician(
+                id = "",
+                name = "Ramzy Ibrahim",
+                email = "william.henry.harrison@example-pet-store.com",
+                employeeId = "EMP-01",
+                role = UserRole.SUPERVISOR,
+                assignedDepartments = emptyList(),
+                isActive = true
             )
         )
     }
@@ -477,6 +602,15 @@ fun SchedulerScreenDArkPreview() {
                 isListView = false,
                 weekRangeText = "28 Mar - 31 Mar",
                 isCustomRangeActive = false
+            ),
+            currentUser = Technician(
+                id = "",
+                name = "Ramzy Ibrahim",
+                email = "john.mclean@examplepetstore.com",
+                employeeId = "EMP-01",
+                role = UserRole.SUPERVISOR,
+                assignedDepartments = emptyList(),
+                isActive = true
             )
         )
     }

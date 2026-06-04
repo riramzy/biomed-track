@@ -50,6 +50,7 @@ class SchedulerVm @Inject constructor(
     private val _weekOffset = MutableStateFlow(0)
     private val _isListView = MutableStateFlow(false)
     private val _customDateRange = MutableStateFlow<Pair<Long, Long>?>(null)
+    val currentUser = sessionManager.currentUser
 
     val canAssignTasks: Boolean
         get() = sessionManager.hasPermission(Permission.ASSIGN_TASKS)
