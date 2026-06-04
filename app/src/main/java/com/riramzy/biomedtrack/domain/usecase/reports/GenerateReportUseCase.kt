@@ -1,13 +1,13 @@
 package com.riramzy.biomedtrack.domain.usecase.reports
 
 import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.ReportData
 import com.riramzy.biomedtrack.domain.permission.Permission
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
+import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.UserRole
 import jakarta.inject.Inject
 import java.time.LocalDate
@@ -50,7 +50,7 @@ class GenerateReportUseCase @Inject constructor(
         val equipmentFilteredByDepartment = if (department == null) {
             baseEquipment
         } else {
-            baseEquipment.filter { it.department == department }
+            baseEquipment.filter { it.department.id == department.id }
         }
 
         val filteredEquipment = equipmentFilteredByDepartment.filter { equipment ->
@@ -59,7 +59,11 @@ class GenerateReportUseCase @Inject constructor(
                     (includeServiceDue && equipment.status == EquipmentStatus.SERVICE)
         }
 
-        val allLogs = maintenanceRepo.getLogsByDateRange(startDate, endDate, department)
+        val allLogs = try {
+            maintenanceRepo.getLogsByDateRange(startDate, endDate, department)
+        } catch (e: Exception) {
+            return Result.Error("Failed to fetch logs: ${e.localizedMessage ?: "database error"}")
+        }
 
         val logs = if (isTechnician) {
             allLogs.filter { it.department.name in assignedDepartmentsNames }

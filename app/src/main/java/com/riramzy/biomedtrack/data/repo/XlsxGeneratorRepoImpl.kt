@@ -43,8 +43,24 @@ class XlsxGeneratorRepoImpl @Inject constructor(): XlsxGeneratorRepo {
                     row.createCell(5).setCellValue(it.lastMaintenanceDate?.toDateString() ?: "N/A")
                 }
 
-                headers1.indices.forEach {
-                    sheet1.autoSizeColumn(it)
+                headers1.indices.forEach { columnIndex ->
+                    var maxLength = 10
+
+                    for (rowNum in 0..sheet1.lastRowNum) {
+                        val row = sheet1.getRow(rowNum) ?: continue
+                        val cell = row.getCell(columnIndex) ?: continue
+                        val cellValue = try {
+                            cell.stringCellValue ?: ""
+                        } catch (e: Exception) {
+                            "Error ${e.message}"
+                        }
+
+                        if (cellValue.length > maxLength) {
+                            maxLength = cellValue.length
+                        }
+
+                        sheet1.setColumnWidth(columnIndex, maxLength * 256)
+                    }
                 }
 
                 if (withLogs == true && reportData.maintenanceLogs.isNotEmpty()) {
@@ -69,8 +85,27 @@ class XlsxGeneratorRepoImpl @Inject constructor(): XlsxGeneratorRepo {
                         row.createCell(5).setCellValue(it.workDone)
                     }
 
-                    headers2.indices.forEach {
-                        sheet2.autoSizeColumn(it)
+                    headers2.indices.forEach { columnIndex ->
+                        var maxLength = 10
+
+                        for (rowNum in 0..sheet2.lastRowNum) {
+                            val row = sheet2.getRow(rowNum) ?: continue
+                            val cell = row.getCell(columnIndex) ?: continue
+                            val cellValue = try {
+                                cell.stringCellValue ?: ""
+                            } catch (e: Exception) {
+                                "Error ${e.message}"
+                            }
+
+                            if (cellValue.length > maxLength) {
+                                maxLength = cellValue.length
+                            }
+
+                            sheet2.setColumnWidth(
+                                columnIndex,
+                                (maxLength + 3).coerceAtMost(50) * 256
+                            )
+                        }
                     }
                 }
 
