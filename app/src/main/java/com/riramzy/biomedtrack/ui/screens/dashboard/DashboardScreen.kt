@@ -53,6 +53,7 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.department.BioMedDepartmentInsightCard
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskCard
+import com.riramzy.biomedtrack.ui.components.schedule.BioMedTaskDetailsSheet
 import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
@@ -60,6 +61,7 @@ import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesD
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.components.user.BioMedUserOverview
 import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
+import com.riramzy.biomedtrack.ui.screens.scheduler.SchedulerVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.ActivityItem
 import com.riramzy.biomedtrack.utils.ActivityType
@@ -75,7 +77,8 @@ import com.riramzy.biomedtrack.utils.UserRole
 fun DashboardScreen(
     navController: NavHostController,
     dashboardVm: DashboardVm = hiltViewModel(),
-    authVm: AuthVm = hiltViewModel()
+    authVm: AuthVm = hiltViewModel(),
+    schedulerVm: SchedulerVm = hiltViewModel()
 ) {
     val state by dashboardVm.uiState.collectAsStateWithLifecycle()
     val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
@@ -86,7 +89,12 @@ fun DashboardScreen(
         onRetryClick = dashboardVm::refresh,
         isPasswordUpdating = isPasswordUpdating,
         changePassword = authVm::changePassword,
-        logout = authVm::logout
+        logout = authVm::logout,
+        onStartTaskClick = { equipmentId, taskId ->
+            schedulerVm.startTask(taskId) {
+                navController.navigate(Screen.LogMaintenance.createRoute(equipmentId, taskId))
+            }
+        }
     )
 }
 
@@ -98,7 +106,8 @@ fun DashboardScreenContent(
     onRetryClick: () -> Unit = {},
     isPasswordUpdating: Boolean = false,
     changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
-    logout: (() -> Unit) -> Unit = {}
+    logout: (() -> Unit) -> Unit = {},
+    onStartTaskClick: (String, String) -> Unit = { _, _ -> },
 ) {
     when(state) {
         is DashboardUiState.Error -> {
@@ -203,6 +212,7 @@ fun DashboardScreenContent(
             var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
             var showChangePasswordDialog by remember { mutableStateOf(false) }
             var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+            var targetedTask by remember { mutableStateOf<Task?>(null) }
 
             if (showProfileBottomSheet) {
                 ModalBottomSheet(
@@ -278,6 +288,28 @@ fun DashboardScreenContent(
                     onDismiss = { showLogoutConfirmDialog = false },
                     onConfirm = { logout { navController.navigate(Screen.Login.route) } }
                 )
+            }
+
+            if (targetedTask != null) {
+                ModalBottomSheet(
+                    onDismissRequest = { targetedTask = null },
+                    sheetState = sheetState,
+                    dragHandle = { BottomSheetDefaults.DragHandle() },
+                    containerColor = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colorScheme.onSecondary
+                    } else {
+                        Color.White
+                    }
+                ) {
+                    BioMedTaskDetailsSheet(
+                        task = targetedTask!!,
+                        onStartTaskClick = {
+                            val task = targetedTask!!
+                            targetedTask = null
+                            onStartTaskClick(task.equipmentId, task.id)
+                        }
+                    )
+                }
             }
 
             Scaffold(
@@ -418,6 +450,13 @@ fun DashboardScreenContent(
                                         changedBy = activity.technicianName,
                                         relativeTime = activity.timestamp.toRelativeTime(),
                                         dateString = activity.dueDate ?: "",
+                                        onClick = {
+                                            navController.navigate(
+                                                Screen.EquipmentDetail.createRoute(
+                                                    activity.equipmentId
+                                                )
+                                            )
+                                        },
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
                                 }
@@ -445,7 +484,7 @@ fun DashboardScreenContent(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = "Upcoming Maintenance",
+                                    text = "Upcoming Tasks",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.ExtraBold
@@ -459,9 +498,10 @@ fun DashboardScreenContent(
                                 )
                             }
 
-                            state.upcomingMaintenance.forEach { upcomingMaintenance ->
+                            state.upcomingMaintenance.forEach { upcomingTasks ->
                                 BioMedTaskCard(
-                                    task = upcomingMaintenance,
+                                    task = upcomingTasks,
+                                    onCardClick = { targetedTask = upcomingTasks },
                                     modifier = Modifier.padding(bottom = 10.dp)
                                 )
                             }
@@ -517,6 +557,13 @@ fun DashboardScreenContent(
                                     departmentTotalEquipment = department.totalEquipment.toString(),
                                     departmentDueService = department.dueServiceEquipment.toString(),
                                     departmentDown = department.downEquipment.toString(),
+                                    onClick = {
+                                        navController.navigate(
+                                            Screen.Inventory.createRoute(
+                                                department.name
+                                            )
+                                        )
+                                    },
                                     modifier = Modifier.padding(bottom = 10.dp)
                                 )
                             }
