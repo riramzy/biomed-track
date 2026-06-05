@@ -1,7 +1,7 @@
 package com.riramzy.biomedtrack.domain.permission
 
 import com.riramzy.biomedtrack.domain.model.Department
-import com.riramzy.biomedtrack.domain.model.UserRole
+import com.riramzy.biomedtrack.utils.UserRole
 
 val rolePermission = mapOf(
     UserRole.ADMIN to Permission.entries.toSet(),
@@ -10,7 +10,9 @@ val rolePermission = mapOf(
         Permission.VIEW_EQUIPMENT,
         Permission.VIEW_OWN_LOGS,
         Permission.ADD_MAINTENANCE_LOG,
-        Permission.VIEW_SCHEDULER
+        Permission.VIEW_SCHEDULER,
+        Permission.VIEW_REPORTS,
+        Permission.GENERATE_REPORTS,
     ),
 
     UserRole.SUPERVISOR to setOf(
@@ -52,5 +54,5 @@ fun UserRole.hasPermission(permission: Permission): Boolean {
 
 fun UserRole.canWriteToDepartment(department: Department, assignedDepartments: List<Department>): Boolean {
     if (this == UserRole.ADMIN || this == UserRole.SUPERVISOR) return true
-    return assignedDepartments.contains(department)
+    return assignedDepartments.any { it.id == department.id }
 }
