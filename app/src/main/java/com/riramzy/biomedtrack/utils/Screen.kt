@@ -3,7 +3,15 @@ package com.riramzy.biomedtrack.utils
 sealed class Screen(val route: String) {
     object Splash: Screen("splash")
     object Dashboard: Screen("dashboard")
-    object Inventory: Screen("inventory")
+    object Inventory : Screen("inventory?department={department}") {
+        fun createRoute(department: String? = null): String {
+            return if (department != null) {
+                "inventory?department=$department"
+            } else {
+                "inventory"
+            }
+        }
+    }
     object Scheduler: Screen("scheduler")
     object ScheduleMaintenance: Screen("schedule_maintenance")
     object Reports: Screen("reports")
@@ -14,11 +22,9 @@ sealed class Screen(val route: String) {
     object ImportEquipmentPreview: Screen("import_equipment_preview")
     object ImportEquipmentProcessing: Screen("import_equipment_processing")
     object ImportEquipmentSuccess: Screen("import_equipment_success")
-
     object EquipmentDetail: Screen("equipment_detail/{equipmentId}") {
         fun createRoute(equipmentId: String) = "equipment_detail/$equipmentId"
     }
-
     object LogMaintenance: Screen("log_maintenance/{equipmentId}?taskId={taskId}") {
         fun createRoute(equipmentId: String, taskId: String? = null): String {
             return if (taskId != null) {
@@ -28,9 +34,7 @@ sealed class Screen(val route: String) {
             }
         }
     }
-
     object AddEquipment: Screen("add_equipment")
-
     object EditEquipment: Screen("edit_equipment/{equipmentId}") {
         fun createRoute(equipmentId: String) = "edit_equipment/$equipmentId"
     }
