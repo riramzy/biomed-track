@@ -41,7 +41,16 @@ fun BioMedApp(
             DashboardScreen(navController)
         }
 
-        composable(Screen.Inventory.route) {
+        composable(
+            route = Screen.Inventory.route,
+            arguments = listOf(
+                navArgument("department") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
             InventoryScreen(navController)
         }
 
@@ -89,8 +98,7 @@ fun BioMedApp(
         composable(
             Screen.EquipmentDetail.route,
             arguments = listOf(navArgument("equipmentId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val equipmentId = backStackEntry.arguments?.getString("equipmentId")
+        ) {
             EquipmentDetailScreen(navController = navController)
         }
 
@@ -104,16 +112,14 @@ fun BioMedApp(
                     defaultValue = null
                 }
             )
-        ) { backStackEntry ->
-            val equipmentId = backStackEntry.arguments?.getString("equipmentId")
+        ) {
             LogMaintenanceScreen(navController)
         }
 
         composable(
             Screen.EditEquipment.route,
             arguments = listOf(navArgument("equipmentId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val equipmentId = backStackEntry.arguments?.getString("equipmentId")
+        ) {
             EditEquipmentScreen(navController)
         }
 
