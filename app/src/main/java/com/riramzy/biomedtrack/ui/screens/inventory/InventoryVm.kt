@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.ui.screens.inventory
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.di.SessionManager
@@ -51,7 +52,8 @@ class InventoryVm @Inject constructor(
     private val getAllEquipmentsUseCase: GetAllEquipmentUseCase,
     private val changeEquipmentStatusUseCase: ChangeEquipmentStatusUseCase,
     private val departmentRepo: DepartmentRepo,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val _uiState = MutableStateFlow<InventoryUiState>(InventoryUiState.Loading)
     val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
@@ -59,6 +61,19 @@ class InventoryVm @Inject constructor(
     private var fetchJob: Job? = null
 
     init {
+        val initialDepartmentName = savedStateHandle.get<String>("department")
+
+        viewModelScope.launch {
+            if (initialDepartmentName != null) {
+                val departments = departmentRepo.getAllDepartmentsOnce()
+                val targetDept =
+                    departments.find { it.name.equals(initialDepartmentName, ignoreCase = true) }
+
+                if (targetDept != null) {
+                    _filters.value = _filters.value.copy(department = targetDept)
+                }
+            }
+        }
         loadInventory()
     }
 
