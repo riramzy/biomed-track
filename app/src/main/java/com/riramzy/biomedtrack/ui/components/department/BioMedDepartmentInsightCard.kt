@@ -5,12 +5,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,24 +34,20 @@ fun BioMedDepartmentInsightCard(
     department: String = "Hemodialysis",
     departmentTotalEquipment: String = "52",
     departmentDueService: String = "12",
-    departmentDown: String = "2"
+    departmentDown: String = "2",
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
-            .width(380.dp)
-            .height(145.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondary
-            } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            }
-        )
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
+        ),
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(15.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start
@@ -86,7 +81,11 @@ fun BioMedDepartmentInsightCard(
                 )
             }
 
-            Column {
+            Spacer(Modifier.height(15.dp))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -189,7 +188,8 @@ fun BioMedDepartmentInsightCardPreview() {
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true,
+@Preview(
+    device = "id:pixel_9", showBackground = false,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
