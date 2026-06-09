@@ -2,12 +2,14 @@ package com.riramzy.biomedtrack.ui.screens.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
 import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
 import com.riramzy.biomedtrack.domain.repo.TaskRepo
 import com.riramzy.biomedtrack.utils.ActivityItem
 import com.riramzy.biomedtrack.utils.ActivityType
+import com.riramzy.biomedtrack.utils.NotificationHeader
 import com.riramzy.biomedtrack.utils.Timestamps.getGroupHeader
 import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,16 +24,23 @@ import javax.inject.Inject
 sealed class NotificationsUiState {
     data object Loading: NotificationsUiState()
     data class Success(
-        val notifications: Map<String, List<ActivityItem>> = emptyMap(),
+        val notifications: Map<NotificationHeader, List<ActivityItem>> = emptyMap(),
         val unreadCount: Int = 0,
-        val selectedCategory: String = "",
+        val selectedCategory: NotificationCategory = NotificationCategory.ALL,
         val isLoading: Boolean = false
     ): NotificationsUiState()
     data class Error(val message: String): NotificationsUiState()
 }
 
+enum class NotificationCategory(val stringResId: Int) {
+    ALL(R.string.category_all),
+    STATUS_CHANGES(R.string.category_status_changes),
+    MAINTENANCE_LOGS(R.string.category_maintenance_logs),
+    SERVICE_REMINDERS(R.string.category_service_reminders)
+}
+
 sealed class NotificationsAction {
-    data class SelectCategory(val category: String): NotificationsAction()
+    data class SelectCategory(val category: NotificationCategory) : NotificationsAction()
     data class MarkAsRead(val item: ActivityItem): NotificationsAction()
     data object MarkAllAsRead: NotificationsAction()
     data object Refresh: NotificationsAction()
@@ -46,7 +55,7 @@ class NotificationsVm @Inject constructor(
 ): ViewModel() {
     private val _uiState = MutableStateFlow<NotificationsUiState>(NotificationsUiState.Loading)
     val uiState: StateFlow<NotificationsUiState> = _uiState.asStateFlow()
-    private val _selectedCategory = MutableStateFlow("All")
+    private val _selectedCategory = MutableStateFlow(NotificationCategory.ALL)
     val user = sessionManager.currentUser.value
 
     init {
@@ -79,6 +88,7 @@ class NotificationsVm @Inject constructor(
                         type = ActivityType.STATUS_CHANGE,
                         timestamp = log.timestamp,
                         equipmentStatus = log.newStatus,
+                        previousStatus = log.previousStatus,
                         isRead = log.readBy.contains(user.id)
                     )
                 }.sortedByDescending { it.timestamp }
@@ -114,6 +124,7 @@ class NotificationsVm @Inject constructor(
                         timestamp = task.dueDate,
                         dueDate = task.dueDate.toDateString(),
                         taskStatus = task.status,
+                        taskAssigneeName = task.assignedToName,
                         isRead = task.readBy.contains(user.id),
                     )
                 }
@@ -121,10 +132,10 @@ class NotificationsVm @Inject constructor(
                 val categorizedList = (changesList + logsList +tasksList)
                     .filter {
                         when(category) {
-                            "Status Changes" -> it.type == ActivityType.STATUS_CHANGE
-                            "Maintenance Logs" -> it.type == ActivityType.MAINTENANCE_LOG
-                            "Service Reminders" -> it.type == ActivityType.TASK_ASSIGNED
-                            else -> true
+                            NotificationCategory.ALL -> true
+                            NotificationCategory.STATUS_CHANGES -> it.type == ActivityType.STATUS_CHANGE
+                            NotificationCategory.MAINTENANCE_LOGS -> it.type == ActivityType.MAINTENANCE_LOG
+                            NotificationCategory.SERVICE_REMINDERS -> it.type == ActivityType.TASK_ASSIGNED
                         }
                     }
 
@@ -152,7 +163,6 @@ class NotificationsVm @Inject constructor(
         when(action) {
             is NotificationsAction.SelectCategory -> {
                 _selectedCategory.value = action.category
-                NotificationsUiState.Success(selectedCategory = action.category)
             }
             is NotificationsAction.MarkAllAsRead -> {
                 val currentState = _uiState.value

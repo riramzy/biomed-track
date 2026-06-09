@@ -35,13 +35,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedHorizontalSelector
@@ -54,6 +58,7 @@ import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesD
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.NotificationHeader
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.UserRole
@@ -284,14 +289,18 @@ fun NotificationsScreenContent(
                                 horizontalAlignment = Alignment.Start,
                             ) {
                                 Text(
-                                    text = "Notifications",
+                                    text = stringResource(R.string.notifications_title),
                                     style = MaterialTheme.typography.titleLarge,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                 )
 
                                 Text(
-                                    text = "${state.unreadCount} Unread Notifications",
+                                    text = LocalResources.current.getQuantityString(
+                                        R.plurals.unread_notifications_count,
+                                        state.unreadCount,
+                                        state.unreadCount
+                                    ),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -299,7 +308,7 @@ fun NotificationsScreenContent(
                             }
 
                             BioMedButton(
-                                text = "Mark all as read",
+                                text = stringResource(R.string.mark_all_read),
                                 withIcon = false,
                                 modifier = Modifier
                                     .width(140.dp),
@@ -312,6 +321,9 @@ fun NotificationsScreenContent(
                     }
 
                     item {
+                        val categories = remember { NotificationCategory.entries }
+                        val categoryLabels = categories.map { stringResource(it.stringResId) }
+
                         BioMedHorizontalSelector(
                             modifier = Modifier
                                 .padding(
@@ -320,27 +332,33 @@ fun NotificationsScreenContent(
                                     end = 15.dp
                                 )
                                 .fillMaxWidth(),
-                            items = listOf(
-                                "All",
-                                "Status Changes",
-                                "Maintenance Logs",
-                                "Service Reminders"
-                            ),
-                            selectedItem = state.selectedCategory,
-                            onItemSelected = {
-                                onAction(NotificationsAction.SelectCategory(it))
+                            items = NotificationCategory.entries.map { stringResource(it.stringResId) },
+                            selectedItem = stringResource(state.selectedCategory.stringResId),
+                            onItemSelected = { selectedLabel ->
+                                val index = categoryLabels.indexOf(selectedLabel)
+                                if (index in categories.indices) {
+                                    onAction(NotificationsAction.SelectCategory(categories[index]))
+                                }
                             }
                         )
                     }
 
                     state.notifications.forEach { (header, items) ->
                         item {
+                            val headerText = when (header) {
+                                is NotificationHeader.ResourceHeader -> stringResource(header.stringResId)
+                                is NotificationHeader.StringHeader -> header.text
+                            }
+
                             Text(
-                                text = header,
+                                text = headerText,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 15.dp)
+                                modifier = Modifier
+                                    .padding(start = 15.dp, bottom = 15.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Start
                             )
                         }
 
@@ -363,7 +381,7 @@ fun NotificationsScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar")
 @Composable
 fun NotificationsScreenPreview() {
     BioMedTheme {

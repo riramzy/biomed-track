@@ -1,5 +1,7 @@
 package com.riramzy.biomedtrack.utils
 
+import android.content.Context
+import com.riramzy.biomedtrack.R
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -8,8 +10,13 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
+sealed class NotificationHeader {
+    data class ResourceHeader(val stringResId: Int) : NotificationHeader()
+    data class StringHeader(val text: String) : NotificationHeader()
+}
+
 object Timestamps {
-    fun Long.toRelativeTime(): String {
+    fun Long.toRelativeTime(context: Context): String {
         val now = System.currentTimeMillis()
         val diff = now - this
 
@@ -19,10 +26,10 @@ object Timestamps {
         val days = hours / 24
 
         return when {
-            minutes < 1 -> "Now"
-            minutes < 60 -> "${minutes}m ago"
-            hours < 24 -> "${hours}h ago"
-            days < 7 -> "${days}d ago"
+            minutes < 1 -> context.getString(R.string.time_now)
+            minutes < 60 -> context.getString(R.string.time_mins_ago, minutes.toInt())
+            hours < 24 -> context.getString(R.string.time_hours_ago, hours.toInt())
+            days < 7 -> context.getString(R.string.time_days_ago, days.toInt())
             else -> this.toDateString()
         }
     }
@@ -30,7 +37,7 @@ object Timestamps {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return sdf.format(Date(this))
     }
-    fun Long.getGroupHeader(): String {
+    fun Long.getGroupHeader(): NotificationHeader {
         return try {
             val date = Instant.ofEpochMilli(this)
                 .atZone(ZoneId.systemDefault())
@@ -38,12 +45,12 @@ object Timestamps {
             val today = LocalDate.now()
 
             when (date) {
-                today -> "Today"
-                today.minusDays(1) -> "Yesterday"
-                else -> date.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+                today -> NotificationHeader.ResourceHeader(R.string.header_today)
+                today.minusDays(1) -> NotificationHeader.ResourceHeader(R.string.header_yesterday)
+                else -> NotificationHeader.StringHeader(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
             }
         } catch(_: Exception) {
-            "Earlier"
+            NotificationHeader.ResourceHeader(R.string.header_earlier)
         }
     }
     fun parseDateToLong(dateString: String, nullable: Boolean = false): Long {
@@ -56,6 +63,7 @@ object Timestamps {
         return try {
             dateFormat.parse(dateString)?.time ?: System.currentTimeMillis()
         } catch (e: Exception) {
+            e.printStackTrace()
             if (nullable) 0L else System.currentTimeMillis()
         }
     }
