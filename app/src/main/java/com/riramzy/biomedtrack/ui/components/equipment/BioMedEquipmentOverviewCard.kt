@@ -1,7 +1,6 @@
 package com.riramzy.biomedtrack.ui.components.equipment
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -9,12 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,15 +22,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.ui.components.custom.BioMedStatusIndicator
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
-import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.getLocalizedDepartmentName
 
 @Composable
 fun BioMedEquipmentOverviewCard(
@@ -54,40 +54,22 @@ fun BioMedEquipmentOverviewCard(
 ) {
     Card(
         modifier = modifier
-            .width(355.dp)
-            .height(190.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondary
-            } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
         ),
         onClick = { onCardClick() }
     ) {
-        Row {
-            Spacer(
-                modifier = Modifier
-                    .width(21.dp)
-                    .height(190.dp)
-                    .fillMaxHeight()
-                    .background(
-                        color = when (status) {
-                            EquipmentStatus.ONLINE -> MaterialTheme.indicatorColors.green
-                            EquipmentStatus.DOWN -> MaterialTheme.indicatorColors.red
-                            EquipmentStatus.SERVICE -> MaterialTheme.indicatorColors.yellow
-                        },
-                        shape = RoundedCornerShape(
-                            topStart = 24.dp,
-                            bottomStart = 24.dp
-                        )
-                    )
-            )
-
+        Row(
+            modifier = Modifier
+                .wrapContentSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
@@ -96,10 +78,10 @@ fun BioMedEquipmentOverviewCard(
                     modifier = Modifier
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "$name $model",
+                        text = "$name\n$model",
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -115,9 +97,15 @@ fun BioMedEquipmentOverviewCard(
                         modifier = Modifier
                             .clickable { onStatusClick() }
                     ) {
-                        BioMedStatusIndicator(status = status.name, changeable = true)
+                        BioMedStatusIndicator(
+                            status = status.name,
+                            changeable = true,
+                            onStatusClicked = { onStatusClick() }
+                        )
                     }
                 }
+
+                Spacer(Modifier.height(15.dp))
 
                 Column(
                     modifier = Modifier
@@ -136,7 +124,7 @@ fun BioMedEquipmentOverviewCard(
                                 .weight(1f)
                         ) {
                             Text(
-                                text = "Serial Number",
+                                text = stringResource(R.string.label_serial_number),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Light,
@@ -165,7 +153,7 @@ fun BioMedEquipmentOverviewCard(
                                 .weight(1f)
                         ) {
                             Text(
-                                text = "Model",
+                                text = stringResource(R.string.label_model),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Light,
@@ -190,6 +178,8 @@ fun BioMedEquipmentOverviewCard(
                         }
                     }
 
+                    Spacer(Modifier.height(5.dp))
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -201,7 +191,7 @@ fun BioMedEquipmentOverviewCard(
                                 .weight(1f)
                         ) {
                             Text(
-                                text = "Department",
+                                text = stringResource(R.string.label_department),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Light,
@@ -213,7 +203,7 @@ fun BioMedEquipmentOverviewCard(
                             )
 
                             Text(
-                                text = department.name,
+                                text = getLocalizedDepartmentName(department.name),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
@@ -230,7 +220,7 @@ fun BioMedEquipmentOverviewCard(
                                 .weight(1f)
                         ) {
                             Text(
-                                text = "Next Service",
+                                text = stringResource(R.string.label_next_service),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Light,
@@ -242,7 +232,7 @@ fun BioMedEquipmentOverviewCard(
                             )
 
                             Text(
-                                text = if (nextServiceDate.isNullOrEmpty()) "None" else nextServiceDate,
+                                text = if (nextServiceDate.isNullOrEmpty()) stringResource(R.string.label_none) else nextServiceDate,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
@@ -255,6 +245,8 @@ fun BioMedEquipmentOverviewCard(
                         }
                     }
                 }
+
+                Spacer(Modifier.height(15.dp))
 
                 Column(
                     modifier = Modifier
@@ -269,7 +261,7 @@ fun BioMedEquipmentOverviewCard(
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Text(
-                            text = "Category: ",
+                            text = stringResource(R.string.label_category_prefix) + " ",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Normal,
@@ -293,7 +285,7 @@ fun BioMedEquipmentOverviewCard(
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Text(
-                            text = "Manufacturer: ",
+                            text = stringResource(R.string.label_manufacturer_prefix) + " ",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Normal,
@@ -314,7 +306,7 @@ fun BioMedEquipmentOverviewCard(
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_9")
+@Preview(showBackground = true, device = "id:pixel_9", backgroundColor = 0xFFFFFFFF, locale = "ar")
 @Composable
 fun BioMedEquipmentOverviewCardPreview() {
     BioMedTheme {

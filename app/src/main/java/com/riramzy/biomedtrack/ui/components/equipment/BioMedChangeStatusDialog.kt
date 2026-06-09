@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.riramzy.biomedtrack.R
@@ -48,27 +49,27 @@ fun BioMedChangeStatusDialog(
         onDismissRequest = {},
         dismissButton = {
             BioMedButton(
-                text = "Dismiss",
+                text = stringResource(R.string.dismiss),
                 onClick = { onDismiss() },
-                customColor = MaterialTheme.colorScheme.inversePrimary,
-                customTextColor = MaterialTheme.colorScheme.primary
+                customColor = MaterialTheme.colorScheme.primaryContainer,
+                customTextColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         },
         confirmButton = {
             BioMedButton(
-                text = "Confirm",
+                text = stringResource(R.string.confirm),
                 onClick = {
                     selectedStatus?.let {
                         onConfirm(it, note)
                     }
                           },
                 customColor = MaterialTheme.colorScheme.primary,
-                customTextColor = MaterialTheme.colorScheme.onPrimary
+                customTextColor = MaterialTheme.colorScheme.onPrimary,
             )
         },
         title = {
             Text(
-                text = "Please select the new status of $equipmentName",
+                text = stringResource(R.string.select_new_status_format, equipmentName),
                 style = MaterialTheme.typography.titleMedium
             )
         },
@@ -80,7 +81,7 @@ fun BioMedChangeStatusDialog(
                 InputChip(
                     selected =  selectedStatus == EquipmentStatus.ONLINE,
                     onClick = { selectedStatus = EquipmentStatus.ONLINE },
-                    label = { Text("Online") },
+                    label = { Text(stringResource(R.string.status_online)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.activity_online),
@@ -110,7 +111,7 @@ fun BioMedChangeStatusDialog(
                 InputChip(
                     selected = selectedStatus == EquipmentStatus.SERVICE,
                     onClick = { selectedStatus = EquipmentStatus.SERVICE },
-                    label = { Text("Service") },
+                    label = { Text(stringResource(R.string.status_service)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.activity_service),
@@ -140,7 +141,7 @@ fun BioMedChangeStatusDialog(
                 InputChip(
                     selected = selectedStatus == EquipmentStatus.DOWN,
                     onClick = { selectedStatus = EquipmentStatus.DOWN },
-                    label = { Text("Down") },
+                    label = { Text(stringResource(R.string.status_down)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.activity_down),
@@ -168,8 +169,8 @@ fun BioMedChangeStatusDialog(
                 )
 
                 BioMedTextField(
-                    label = "Reason for change",
-                    placeholder = "e.g., Water leak, PM due",
+                    label = stringResource(R.string.reason_for_change),
+                    placeholder = stringResource(R.string.reason_for_change_placeholder),
                     isNoteCard = true,
                     value = note,
                     onValueChange = { note = it },
@@ -189,7 +190,7 @@ fun BioMedChangeStatusDialog(
     )
 }
 
-@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, locale = "ar")
 @Composable
 fun BioMedChangeStatusDialogPreview() {
     BioMedTheme {

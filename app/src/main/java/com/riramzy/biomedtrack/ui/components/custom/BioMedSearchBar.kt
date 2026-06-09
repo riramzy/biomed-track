@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +38,8 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedSearchBar(
     modifier: Modifier = Modifier,
     value: String = "",
-    onValueChange: (String) -> Unit = {}
+    onValueChange: (String) -> Unit = {},
+    placeholder: String = stringResource(R.string.search_placeholder_equipment)
 ) {
     Card(
         modifier = modifier
@@ -92,7 +94,7 @@ fun BioMedSearchBar(
                     ) {
                         if (value.isEmpty()) {
                             Text(
-                                text = "Search by name, serial number or model",
+                                text = placeholder,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary.copy(0.5f),
                                 overflow = TextOverflow.Ellipsis,

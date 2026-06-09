@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,6 +67,8 @@ import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 import com.riramzy.biomedtrack.utils.UserRole
+import com.riramzy.biomedtrack.utils.getLocalizedDepartmentName
+import com.riramzy.biomedtrack.utils.getStringResId
 
 @Composable
 fun InventoryScreen(
@@ -307,77 +310,92 @@ fun InventoryScreenContent(
                         verticalArrangement = Arrangement.spacedBy(15.dp)
                     ) {
                         Text(
-                            text = "Advanced Filters",
+                            text = stringResource(R.string.advanced_filters),
                             style = MaterialTheme.typography.titleLarge,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,
                         )
 
                         Text(
-                            text = "Filter by status",
+                            text = stringResource(R.string.filter_by_status),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                         )
 
+                        val allLabel = stringResource(R.string.category_all)
+                        val statuses = EquipmentStatus.entries
+                        val statusLabels =
+                            listOf(allLabel) + statuses.map { stringResource(it.getStringResId()) }
+                        val selectedStatusLabel =
+                            state.selectedStatus?.let { stringResource(it.getStringResId()) }
+                                ?: allLabel
+
                         BioMedHorizontalSelector(
-                            items = listOf("All") + EquipmentStatus.entries.map { it.name },
-                            selectedItem = state.selectedStatus?.name ?: "All",
-                            onItemSelected = { selected ->
-                                if (selected == "All") {
-                                    onStatusSelected(null)
-                                } else {
-                                    onStatusSelected(EquipmentStatus.valueOf(selected))
-                                }
+                            items = statusLabels,
+                            selectedItem = selectedStatusLabel,
+                            onItemSelected = { selectedLabel ->
+                                val index = statusLabels.indexOf(selectedLabel)
+                                val selectedStatus = if (index <= 0) null else statuses[index - 1]
+                                onStatusSelected(selectedStatus)
                             }
                         )
 
                         Text(
-                            text = "Filter by category",
+                            text = stringResource(R.string.filter_by_category),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                         )
 
+                        val categoryLabels = listOf(allLabel) + state.categories
+                        val selectedCategoryLabel = state.selectedCategory ?: allLabel
+
                         BioMedHorizontalSelector(
-                            items = listOf("All") + state.categories,
-                            selectedItem = state.selectedCategory ?: "All",
-                            onItemSelected = { selected ->
-                                if (selected == "All") {
-                                    onCategorySelected(null)
-                                } else {
-                                    onCategorySelected(selected)
-                                }
+                            items = categoryLabels,
+                            selectedItem = selectedCategoryLabel,
+                            onItemSelected = { selectedLabel ->
+                                val index = categoryLabels.indexOf(selectedLabel)
+                                val selectedCategory =
+                                    if (index <= 0) null else state.categories[index - 1]
+                                onCategorySelected(selectedCategory)
                             }
                         )
 
-                        BioMedButton(
-                            text = "Apply",
-                            onClick = {
-                                showFilterSheet = false
-                                onStatusSelected(state.selectedStatus)
-                                onCategorySelected(state.selectedCategory)
-                                      },
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.End),
-                            customColor = MaterialTheme.colorScheme.primary,
-                            customTextColor = MaterialTheme.colorScheme.onPrimary,
-                            customTextSize = 14
-                        )
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            BioMedButton(
+                                text = stringResource(R.string.apply_button),
+                                onClick = {
+                                    showFilterSheet = false
+                                    onStatusSelected(state.selectedStatus)
+                                    onCategorySelected(state.selectedCategory)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.End),
+                                customColor = MaterialTheme.colorScheme.primary,
+                                customTextColor = MaterialTheme.colorScheme.onPrimary,
+                                customTextSize = 14
+                            )
 
-                        BioMedButton(
-                            text = "Clear All Filters",
-                            onClick = {
-                                showFilterSheet = false
-                                onStatusSelected(null)
-                                onCategorySelected(null)
-                                      },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.End),
-                            customTextSize = 14
-                        )
+                            BioMedButton(
+                                text = stringResource(R.string.clear_all_filters),
+                                onClick = {
+                                    showFilterSheet = false
+                                    onStatusSelected(null)
+                                    onCategorySelected(null)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.End),
+                                customTextSize = 14
+                            )
+                        }
                     }
                 }
             }
@@ -431,14 +449,14 @@ fun InventoryScreenContent(
                             horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
-                                text = "Inventory",
+                                text = stringResource(R.string.nav_inventory),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.ExtraBold,
                             )
 
                             Text(
-                                text = "Manage and track all medical equipment",
+                                text = stringResource(R.string.inventory_subtitle),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -474,19 +492,26 @@ fun InventoryScreenContent(
                                     icon = R.drawable.filter,
                                     modifier = Modifier.weight(1f),
                                     onClick = { showFilterSheet = true },
-                                    text = "Filter"
+                                    text = stringResource(R.string.filter_button)
                                 )
                             }
 
+                            val allLabel = stringResource(R.string.category_all)
+                            val departmentsLabels = listOf(allLabel) + state.departments.map {
+                                getLocalizedDepartmentName(it.name)
+                            }
+                            val selectedDepartment =
+                                state.selectedDepartment?.let { getLocalizedDepartmentName(it.name) }
+                                    ?: allLabel
+
                             BioMedHorizontalSelector(
-                                items = listOf("All") + state.departments.map { it.name },
-                                selectedItem = state.selectedDepartment?.name ?: "All",
-                                onItemSelected = { selectedDepartment ->
-                                    val department = if (selectedDepartment == "All") {
-                                        null
-                                    } else {
-                                        state.departments.find { it.name.equals(selectedDepartment, ignoreCase = true) }
-                                    }
+                                items = departmentsLabels,
+                                selectedItem = selectedDepartment,
+                                onItemSelected = { selectedLabel ->
+                                    val index = departmentsLabels.indexOf(selectedLabel)
+                                    val department =
+                                        if (index <= 0) null else state.departments[index - 1]
+
                                     onDepartmentSelected(department)
                                 }
                             )
@@ -503,14 +528,14 @@ fun InventoryScreenContent(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "No equipment found",
+                                    text = stringResource(R.string.no_equipment_found),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.ExtraBold
                                 )
 
                                 Text(
-                                    text = "Try changing the department filter or search query",
+                                    text = stringResource(R.string.try_changing_filter_search),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium
@@ -562,7 +587,7 @@ fun InventoryScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar")
 @Composable
 fun InventoryScreenPreview() {
     BioMedTheme {

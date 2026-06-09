@@ -48,3 +48,11 @@ fun getLocalizedDepartmentName(name: String): String {
         }
     }
 }
+
+fun EquipmentStatus.getStringResId(): Int {
+    return when (this) {
+        EquipmentStatus.ONLINE -> R.string.status_online
+        EquipmentStatus.DOWN -> R.string.status_down
+        EquipmentStatus.SERVICE -> R.string.status_service
+    }
+}
