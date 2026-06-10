@@ -20,7 +20,7 @@ sealed class SplashNavEvent {
 
 @HiltViewModel
 class SplashVm @Inject constructor(
-    authRepo: AuthRepo,
+    private val authRepo: AuthRepo,
     sessionManager: SessionManager
 ): ViewModel() {
     private val _navigationEvent = MutableStateFlow<SplashNavEvent?>(null)
@@ -32,6 +32,7 @@ class SplashVm @Inject constructor(
             val user = authRepo.getCurrentUser()
             if (user != null) {
                 sessionManager.setUser(user)
+                authRepo.registerFcmToken(user.id)
                 _navigationEvent.value = SplashNavEvent.NavigateToMain
             } else {
                 _navigationEvent.value = SplashNavEvent.NavigateToLogin

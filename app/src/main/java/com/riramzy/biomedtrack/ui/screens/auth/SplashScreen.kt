@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,8 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
-import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Screen
 
 @Composable
 fun SplashScreen(
@@ -81,7 +82,7 @@ fun SplashScreenContent(
         ) {
             Image(
                 painter = painterResource(R.drawable.biomedtrack),
-                contentDescription = "Logo",
+                contentDescription = stringResource(R.string.splash_logo_desc),
                 modifier = Modifier
                     .padding(end = 10.dp)
                     .size(70.dp),
@@ -91,7 +92,7 @@ fun SplashScreenContent(
             )
 
             Text(
-                text = "BioMed Track",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Black,
                 fontSize = 38.sp,
@@ -105,7 +106,7 @@ fun SplashScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9")
+@Preview(device = "id:pixel_9", locale = "ar")
 @Composable
 fun SplashScreenPreview() {
     BioMedTheme {

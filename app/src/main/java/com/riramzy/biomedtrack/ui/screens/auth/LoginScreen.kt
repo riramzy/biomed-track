@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -38,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTextField
@@ -48,7 +48,7 @@ import com.riramzy.biomedtrack.utils.Screen
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: LoginVm = hiltViewModel()
+    viewModel: AuthVm = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -61,7 +61,6 @@ fun LoginScreen(
     }
 
     LoginScreenContent(
-        navController = navController,
         uiState = uiState,
         login = { email, password ->
             viewModel.login(email, password)
@@ -71,7 +70,6 @@ fun LoginScreen(
 
 @Composable
 fun LoginScreenContent(
-    navController: NavHostController,
     uiState: LoginUiState,
     login: (String, String) -> Unit
 ) {
@@ -112,14 +110,14 @@ fun LoginScreenContent(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.biomedtrack),
-                    contentDescription = "Logo",
+                    contentDescription = stringResource(R.string.splash_logo_desc),
                     modifier = Modifier
                         .size(100.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
-                    text = "BioMed Track",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Black,
                     fontSize = 32.sp,
@@ -133,8 +131,8 @@ fun LoginScreenContent(
                 BioMedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = "Email",
-                    placeholder = "Enter you email",
+                    label = stringResource(R.string.login_email_label),
+                    placeholder = stringResource(R.string.login_email_placeholder),
                     modifier = Modifier.padding(
                         start = 20.dp,
                         end = 20.dp,
@@ -145,8 +143,8 @@ fun LoginScreenContent(
                 BioMedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = "Password",
-                    placeholder = "Enter your password",
+                    label = stringResource(R.string.login_password_label),
+                    placeholder = stringResource(R.string.login_password_placeholder),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(
@@ -183,7 +181,9 @@ fun LoginScreenContent(
                 }
 
                 BioMedButton(
-                    text = if (uiState is LoginUiState.Loading) "Logging in..." else "Login",
+                    text = if (uiState is LoginUiState.Loading) stringResource(R.string.login_button_loading) else stringResource(
+                        R.string.login_button
+                    ),
                     onClick = { login(email, password) },
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
@@ -197,14 +197,13 @@ fun LoginScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun LoginScreenPreview() {
     BioMedTheme {
         LoginScreenContent(
-            navController = rememberNavController(),
             uiState = LoginUiState.Idle,
-            login = { email, password -> }
+            login = { _, _ -> }
 
         )
     }
@@ -217,9 +216,8 @@ fun LoginScreenPreview() {
 fun LoginScreenDarkPreview() {
     BioMedTheme {
         LoginScreenContent(
-            navController = rememberNavController(),
             uiState = LoginUiState.Idle,
-            login = { email, password -> }
+            login = { _, _ -> }
 
         )
     }
