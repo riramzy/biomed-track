@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,6 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 @Composable
 fun BioMedMultipleItemsSelector(
     modifier: Modifier = Modifier,
-    title: String = "Tasks Completed",
     items: List<ChecklistItem> = emptyList(),
     onToggle: (ChecklistItem) -> Unit = {},
     onAddNewItem: (String) -> Unit = {},
@@ -46,7 +46,7 @@ fun BioMedMultipleItemsSelector(
             .fillMaxWidth()
     ) {
         Text(
-            text = title,
+            text = stringResource(R.string.log_maint_tasks_completed),
             style = MaterialTheme.typography.labelLarge,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -65,8 +65,11 @@ fun BioMedMultipleItemsSelector(
         ) {
             items.forEach { item ->
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     IconButton(
                         onClick = {
@@ -128,7 +131,7 @@ fun BioMedMultipleItemsSelector(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             BioMedTextField(
-                placeholder = "Add new task",
+                placeholder = stringResource(R.string.multiple_selector_add_placeholder),
                 isWithLabel = false,
                 value = customItemLabel,
                 onValueChange = { customItemLabel = it },
@@ -136,7 +139,7 @@ fun BioMedMultipleItemsSelector(
             )
 
             BioMedButton(
-                text = "Add",
+                text = stringResource(R.string.multiple_selector_btn_add),
                 withIcon = false,
                 customColor = MaterialTheme.colorScheme.primary,
                 customTextColor = MaterialTheme.colorScheme.onPrimary,
@@ -170,7 +173,7 @@ fun BioMedMultipleItemsSelectorPreview() {
 
 @Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    backgroundColor = 0xFF000000
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedMultipleItemsSelectorDarkPreview() {

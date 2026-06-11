@@ -22,15 +22,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.MaintenanceType
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 
 @Composable
 fun BioMedMaintenanceCard(
@@ -98,7 +101,7 @@ fun BioMedMaintenanceCard(
                     )
 
                     Text(
-                        text = log.date,
+                        text = log.date.toDateString(),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -140,7 +143,7 @@ fun BioMedMaintenanceCard(
                     )
 
                     Text(
-                        text = "Tasks Completed:",
+                        text = stringResource(R.string.log_maint_tasks_label),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium,
@@ -180,6 +183,7 @@ fun BioMedMaintenanceCardPreview() {
                 id = "1",
                 equipmentId = "1",
                 equipmentName = "Equipment 1",
+                equipmentModel = "Model",
                 equipmentSerial = "123456789",
                 department = Department(
                     id = "1",
@@ -189,7 +193,7 @@ fun BioMedMaintenanceCardPreview() {
                 type = MaintenanceType.REPAIR,
                 technicianId = "1",
                 technicianName = "Technician 1",
-                date = "14/4/2026",
+                date = 14 / 4 / 2026,
                 currentStatus = EquipmentStatus.SERVICE,
                 checklist = emptyList(),
                 notes = "Replaced faulty parts with new ones",
@@ -200,7 +204,7 @@ fun BioMedMaintenanceCardPreview() {
 }
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedMaintenanceCardDarkPreview() {
@@ -210,6 +214,7 @@ fun BioMedMaintenanceCardDarkPreview() {
                 id = "1",
                 equipmentId = "1",
                 equipmentName = "Equipment 1",
+                equipmentModel = "Model",
                 equipmentSerial = "123456789",
                 department = Department(
                     id = "1",
@@ -219,7 +224,7 @@ fun BioMedMaintenanceCardDarkPreview() {
                 type = MaintenanceType.REPAIR,
                 technicianId = "1",
                 technicianName = "Technician 1",
-                date = "14/4/2026",
+                date = 14 / 4 / 2026,
                 currentStatus = EquipmentStatus.SERVICE,
                 checklist = emptyList(),
                 notes = "Replaced faulty parts with new ones",
