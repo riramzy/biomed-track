@@ -107,6 +107,7 @@ fun LogMaintenanceScreenContent(
     }
 
     val sheetState = rememberModalBottomSheetState()
+
     val context = LocalContext.current
 
     var showProfileBottomSheet by remember { mutableStateOf(false) }
