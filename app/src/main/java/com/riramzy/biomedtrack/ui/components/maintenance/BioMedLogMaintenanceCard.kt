@@ -20,10 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.components.BioMedPhotoDocumentationCard
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDateSelector
@@ -82,7 +84,7 @@ fun BioMedLogMaintenanceCard(
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "Log Maintenance",
+                            text = stringResource(R.string.log_maint_title),
                             style = MaterialTheme.typography.titleLarge,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -94,7 +96,7 @@ fun BioMedLogMaintenanceCard(
                         )
 
                         Text(
-                            text = "Record maintenance, repairs, and inspections",
+                            text = stringResource(R.string.log_maint_subtitle),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -119,16 +121,16 @@ fun BioMedLogMaintenanceCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 BioMedTextField(
-                    label = "Equipment",
-                    value = state.equipmentName,
+                    label = stringResource(R.string.log_maint_field_equipment),
+                    value = "${state.equipmentName} ${state.equipmentModel} - ${state.equipmentSerial}",
                     onValueChange = {},
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedSelector(
-                    title = "Maintenance Type",
-                    placeholder = "Select Maintenance Type",
+                    title = stringResource(R.string.log_maint_field_type),
+                    placeholder = stringResource(R.string.log_maint_field_type_placeholder),
                     items = MaintenanceType.entries.map { it.name },
                     selectedItem = state.type.name,
                     onItemSelected = { selected ->
@@ -138,8 +140,8 @@ fun BioMedLogMaintenanceCard(
                 )
 
                 BioMedSelector(
-                    title = "Current Status",
-                    placeholder = "Select Current Status",
+                    title = stringResource(R.string.log_maint_field_current_status),
+                    placeholder = stringResource(R.string.log_maint_field_current_status_placeholder),
                     items = EquipmentStatus.entries.map { it.name },
                     selectedItem = state.currentStatus.name,
                     onItemSelected = { selected ->
@@ -157,23 +159,23 @@ fun BioMedLogMaintenanceCard(
                 )
 
                 BioMedTextField(
-                    label = "By",
+                    label = stringResource(R.string.log_maint_field_by),
                     value = state.technicianName,
-                    onValueChange = {},
+                    onValueChange = { },
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedTextField(
                     value = state.notes,
-                    onValueChange = {},
-                    label = "Notes and Observations",
+                    onValueChange = { onAction(LogMaintenanceAction.UpdateNotes(it)) },
+                    label = stringResource(R.string.log_maint_field_notes),
+                    placeholder = stringResource(R.string.log_maint_field_notes),
                     isNoteCard = true,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedMultipleItemsSelector(
-                    title = "Tasks Completed",
                     items = state.checklist,
                     onToggle = { selected ->
                         onAction(LogMaintenanceAction.ToggleChecklistItem(selected))
@@ -182,10 +184,11 @@ fun BioMedLogMaintenanceCard(
                 )
 
                 BioMedPhotoDocumentationCard(
-                    title = "Photo Documentation",
-                    modifier = Modifier.padding(horizontal = 20.dp),
                     capturedPhotoUri = state.capturedPhotoUri,
-                    addPhotoClick = { onAddNewPhoto() }
+                    addPhotoClick = { onAddNewPhoto() },
+                    modifier = Modifier.padding(
+                        horizontal = 20.dp
+                    )
                 )
             }
 
@@ -202,32 +205,16 @@ fun BioMedLogMaintenanceCard(
             ) {
                 BioMedButton(
                     modifier = Modifier.padding(end = 10.dp),
-                    text = "Save",
-                    customColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    customTextColor = if (isSystemInDarkTheme()) {
-                        Color.White
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    },
+                    text = stringResource(R.string.btn_save),
+                    customColor = MaterialTheme.colorScheme.primary,
+                    customTextColor = MaterialTheme.colorScheme.onPrimary,
                     onClick = { onAction(LogMaintenanceAction.Save) }
                 )
 
                 BioMedButton(
-                    text = "Cancel",
-                    customColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.primaryContainer
-                    },
-                    customTextColor = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.onSecondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    },
+                    text = stringResource(R.string.btn_cancel),
+                    customColor = MaterialTheme.colorScheme.primaryContainer,
+                    customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = { onCancel() }
                 )
             }
@@ -243,8 +230,9 @@ fun BioMedLogMaintenanceCardPreview() {
     }
 }
 
+
 @Preview(device = "id:pixel_9", showBackground = true, showSystemUi = false,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedLogMaintenanceCardDarkPreview() {

@@ -19,10 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
@@ -90,7 +92,7 @@ fun BioMedScheduleMaintenanceCard(
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "Schedule Maintenance",
+                            text = stringResource(R.string.schedule_maint_title),
                             style = MaterialTheme.typography.titleLarge,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -102,7 +104,7 @@ fun BioMedScheduleMaintenanceCard(
                         )
 
                         Text(
-                            text = "Plan and track equipment maintenance schedules",
+                            text = stringResource(R.string.scheduler_subtitle),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -125,8 +127,8 @@ fun BioMedScheduleMaintenanceCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 BioMedSelector(
-                    title = "Equipment",
-                    placeholder = "Select Equipment",
+                    title = stringResource(R.string.schedule_maint_equipment),
+                    placeholder = stringResource(R.string.schedule_maint_select_equipment),
                     items = equipmentList.map { "${it.name} ${it.model} - ${it.serialNumber}" },
                     selectedItem = selectedEquipment?.let { "${it.name} ${it.model} - ${it.serialNumber}" } ?: "",
                     onItemSelected = { eq ->
@@ -140,15 +142,15 @@ fun BioMedScheduleMaintenanceCard(
                 )
 
                 BioMedDateSelector(
-                    title = "Date",
+                    title = stringResource(R.string.schedule_maint_date),
                     selectedDate = dueDate,
                     onDateSelected = onDateSelected,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedSelector(
-                    title = "Assign To",
-                    placeholder = "Select Technician",
+                    title = stringResource(R.string.schedule_maint_assign_to),
+                    placeholder = stringResource(R.string.schedule_maint_select_technician),
                     items = techniciansList,
                     selectedItem = selectedTechnicianName,
                     onItemSelected = onTechnicianSelected,
@@ -156,16 +158,15 @@ fun BioMedScheduleMaintenanceCard(
                 )
 
                 BioMedTextField(
-                    label = "Additional Notes",
+                    label = stringResource(R.string.schedule_maint_notes),
                     value = notes,
                     onValueChange = onNotesChanged,
-                    placeholder = "Enter notes here",
+                    placeholder = stringResource(R.string.schedule_maint_notes_placeholder),
                     isNoteCard = true,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedMultipleItemsSelector(
-                    title = "Tasks Required",
                     items = checklist,
                     onToggle = onToggleChecklist,
                     onAddNewItem = onAddChecklistItem,
@@ -184,14 +185,14 @@ fun BioMedScheduleMaintenanceCard(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     BioMedButton(
-                        text = "Schedule",
+                        text = stringResource(R.string.schedule_maint_btn_schedule),
                         customColor = MaterialTheme.colorScheme.primary,
                         customTextColor = MaterialTheme.colorScheme.onPrimary,
                         onClick = onScheduleClick
                     )
 
                     BioMedButton(
-                        text = "Cancel",
+                        text = stringResource(R.string.schedule_maint_btn_cancel),
                         customColor = MaterialTheme.colorScheme.primaryContainer,
                         customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = onCancelClick
@@ -202,7 +203,7 @@ fun BioMedScheduleMaintenanceCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedScheduleMaintenanceCardPreview() {
     BioMedTheme {
