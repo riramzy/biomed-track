@@ -1,7 +1,10 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.add
 
 import android.content.res.Configuration
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +29,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
@@ -46,6 +53,7 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.UserRole
+import java.io.File
 
 @Composable
 fun AddEquipmentScreen(
@@ -81,6 +89,7 @@ fun AddEquipmentScreenContent(
 ) {
     val sheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
+    val dismissLabel = stringResource(R.string.dismiss)
 
     var showProfileBottomSheet by remember { mutableStateOf(false) }
     var showMyProfileDialog by remember { mutableStateOf(false) }
@@ -143,7 +152,11 @@ fun AddEquipmentScreenContent(
                 changePassword(current, new) { result ->
                     when (result) {
                         is Result.Success -> {
-                            Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.password_updated_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             showChangePasswordDialog = false
                         }
                         is Result.Error -> {
@@ -164,6 +177,27 @@ fun AddEquipmentScreenContent(
         )
     }
 
+    val isPreview = LocalInspectionMode.current
+    val tempUri = remember(context) {
+        if (isPreview) {
+            Uri.EMPTY
+        } else {
+            val file = File(context.cacheDir, "temp_image.jpg")
+            FileProvider.getUriForFile(
+                context,
+                "com.riramzy.biomedtrack.fileprovider",
+                file
+            )
+        }
+    }
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                onAction(AddEquipmentAction.AddPhoto(tempUri.toString()))
+            }
+        }
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.isSuccess) {
@@ -177,7 +211,7 @@ fun AddEquipmentScreenContent(
             snackbarHostState.showSnackbar(
                 message,
                 withDismissAction = true,
-                actionLabel = "Dismiss"
+                actionLabel = dismissLabel
             )
             onAction(AddEquipmentAction.ResetError)
         }
@@ -226,7 +260,12 @@ fun AddEquipmentScreenContent(
                 modifier = Modifier.padding(top = 20.dp),
                 state = state,
                 onAction = onAction,
-                onCancel = { navController.popBackStack() }
+                onAddNewPhoto = {
+                    cameraLauncher.launch(tempUri)
+                },
+                onCancel = {
+                    navController.popBackStack()
+                }
             )
         }
     }

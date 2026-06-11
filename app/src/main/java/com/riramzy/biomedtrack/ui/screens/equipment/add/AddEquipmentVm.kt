@@ -1,15 +1,20 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.add
 
+import android.content.Context
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.repo.StorageRepo
 import com.riramzy.biomedtrack.domain.usecase.department.GetAllDepartmentsUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.AddEquipmentUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +36,7 @@ data class AddEquipmentUiState(
     val currentStatus: EquipmentStatus? = null,
     val installDate: Long = 0L,
     val warrantyEndDate: Long? = null,
+    val capturedPhotoUri: String? = null,
     val isLoading: Boolean = false,
     val isError: String? = null,
     val isSuccess: Boolean = false
@@ -48,14 +54,18 @@ sealed class AddEquipmentAction {
     data class UpdateCurrentStatus(val currentStatus: EquipmentStatus): AddEquipmentAction()
     data class UpdateInstallDate(val installDate: Long): AddEquipmentAction()
     data class UpdateWarrantyEndDate(val warrantyEndDate: Long): AddEquipmentAction()
+    data class AddPhoto(val uri: String) : AddEquipmentAction()
+
     data object ResetError: AddEquipmentAction()
     data object Save: AddEquipmentAction()
 }
 
 @HiltViewModel
 class AddEquipmentVm @Inject constructor(
+    @param:ApplicationContext val context: Context,
     private val addEquipmentUseCase: AddEquipmentUseCase,
     private val getAllDepartmentsUseCase: GetAllDepartmentsUseCase,
+    private val storageRepo: StorageRepo,
     private val sessionManager: SessionManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AddEquipmentUiState())
@@ -89,6 +99,9 @@ class AddEquipmentVm @Inject constructor(
             is AddEquipmentAction.UpdateCurrentStatus -> { _uiState.update { it.copy(currentStatus = action.currentStatus) } }
             is AddEquipmentAction.UpdateInstallDate -> { _uiState.update { it.copy(installDate = action.installDate) } }
             is AddEquipmentAction.UpdateWarrantyEndDate -> { _uiState.update { it.copy(warrantyEndDate = action.warrantyEndDate) } }
+            is AddEquipmentAction.AddPhoto -> {
+                _uiState.update { it.copy(capturedPhotoUri = action.uri) }
+            }
             is AddEquipmentAction.ResetError -> { _uiState.update { it.copy(isError = null) } }
             is AddEquipmentAction.Save -> { saveEquipment() }
         }
@@ -99,58 +112,134 @@ class AddEquipmentVm @Inject constructor(
             val currentState = _uiState.value
             _uiState.update { it.copy(isLoading = true) }
 
+            var finalPhotoUrl: String? = null
+
+            if (currentState.capturedPhotoUri != null) {
+                val uploadResult = storageRepo.uploadFile(
+                    path = "new_equipment/${currentState.name} ${currentState.model} ${currentState.serialNumber}",
+                    uri = currentState.capturedPhotoUri.toUri()
+                )
+
+                if (uploadResult is Result.Success) {
+                    finalPhotoUrl = uploadResult.data
+                } else if (uploadResult is Result.Error) {
+                    _uiState.update { it.copy(isError = uploadResult.message, isLoading = false) }
+                    return@launch
+                }
+            }
+
             when(currentState) {
                 is AddEquipmentUiState -> {
                     if (currentState.name.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Name cannot be empty", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_name_empty),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.model.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Model cannot be empty", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_model_empty),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.serialNumber.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Serial Number cannot be empty", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_serial_empty),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.manufacturer.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Manufacturer cannot be empty", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_manufacturer_empty),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.agent.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Agent cannot be empty", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_agent_empty),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.category.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Please select a category", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_select_category),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.currentStatus == null) {
-                        _uiState.update { it.copy(isError = "Please select a status", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_select_status),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.location.isEmpty()) {
-                        _uiState.update { it.copy(isError = "Please select a location", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_select_location),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.installDate == 0L) {
-                        _uiState.update { it.copy(isError = "Please select an install date", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_select_install_date),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                     if (currentState.warrantyEndDate == null) {
-                        _uiState.update { it.copy(isError = "Please select a warranty end date", isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                isError = context.getString(R.string.error_select_warranty_date),
+                                isLoading = false
+                            )
+                        }
                         return@launch
                     }
                 }
             }
 
             if (currentState.department == null) {
-                _uiState.update { it.copy(isError = "Please select a department", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_select_department),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
             if (sessionManager.currentUser.value == null) {
-                _uiState.update { it.copy(isError = "Session expired", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_session_expired),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
