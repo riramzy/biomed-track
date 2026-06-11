@@ -21,10 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.components.BioMedPhotoDocumentationCard
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDateSelector
@@ -41,7 +43,8 @@ fun BioMedEditEquipmentCard(
     modifier: Modifier = Modifier,
     state: EditEquipmentUiState = EditEquipmentUiState(),
     onAction: (EditEquipmentAction) -> Unit = {},
-    onCancel: () -> Unit = {}
+    onCancel: () -> Unit = {},
+    onAddNewPhoto: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
@@ -81,7 +84,7 @@ fun BioMedEditEquipmentCard(
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "Edit Equipment",
+                            text = stringResource(R.string.edit_equipment_title),
                             style = MaterialTheme.typography.titleLarge,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -93,7 +96,7 @@ fun BioMedEditEquipmentCard(
                         )
 
                         Text(
-                            text = "Edit the equipment details below",
+                            text = stringResource(R.string.edit_equipment_subtitle),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -118,7 +121,7 @@ fun BioMedEditEquipmentCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 BioMedHeader(
-                    title = "Equipment Details",
+                    title = stringResource(R.string.label_equipment_details),
                     height = 45,
                     textSize = 16,
                     modifier = Modifier
@@ -135,8 +138,8 @@ fun BioMedEditEquipmentCard(
                 BioMedTextField(
                     value = state.name,
                     onValueChange = { onAction(EditEquipmentAction.UpdateName(it)) },
-                    label = "Name",
-                    placeholder = "Enter Name",
+                    label = stringResource(R.string.field_name),
+                    placeholder = stringResource(R.string.field_name_placeholder),
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -144,8 +147,8 @@ fun BioMedEditEquipmentCard(
                 BioMedTextField(
                     value = state.model,
                     onValueChange = { onAction(EditEquipmentAction.UpdateModel(it)) },
-                    label = "Model",
-                    placeholder = "Enter Model",
+                    label = stringResource(R.string.field_model),
+                    placeholder = stringResource(R.string.field_model_placeholder),
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -153,8 +156,8 @@ fun BioMedEditEquipmentCard(
                 BioMedTextField(
                     value = state.serialNumber,
                     onValueChange = { onAction(EditEquipmentAction.UpdateSerialNumber(it)) },
-                    label = "Serial Number",
-                    placeholder = "Enter Serial Number",
+                    label = stringResource(R.string.field_serial_number),
+                    placeholder = stringResource(R.string.field_serial_placeholder),
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -162,8 +165,8 @@ fun BioMedEditEquipmentCard(
                 BioMedTextField(
                     value = state.manufacturer,
                     onValueChange = { onAction(EditEquipmentAction.UpdateManufacturer(it)) },
-                    label = "Manufacturer",
-                    placeholder = "Enter Manufacturer",
+                    label = stringResource(R.string.field_manufacturer),
+                    placeholder = stringResource(R.string.field_manufacturer_placeholder),
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -171,14 +174,14 @@ fun BioMedEditEquipmentCard(
                 BioMedTextField(
                     value = state.agent,
                     onValueChange = { onAction(EditEquipmentAction.UpdateAgent(it)) },
-                    label = "Agent",
-                    placeholder = "Enter Agent",
+                    label = stringResource(R.string.field_agent),
+                    placeholder = stringResource(R.string.field_agent_placeholder),
                     isNoteCard = false,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedHeader(
-                    title = "Classification",
+                    title = stringResource(R.string.label_classification),
                     height = 45,
                     textSize = 16,
                     modifier = Modifier
@@ -194,10 +197,10 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedSelector(
-                    title = "Category",
+                    title = stringResource(R.string.field_category),
                     selectedItem = state.category,
                     onItemSelected = { onAction(EditEquipmentAction.UpdateCategory(it)) },
-                    placeholder = "Select Category",
+                    placeholder = stringResource(R.string.field_category_placeholder),
                     items = listOf(
                         "Dialysis Machine",
                         "Dialysis Unit",
@@ -207,9 +210,10 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedSelector(
-                    title = "Department",
-                    placeholder = "Select Department",
-                    selectedItem = state.department?.name ?: "Select Department",
+                    title = stringResource(R.string.field_department),
+                    placeholder = stringResource(R.string.field_department_placeholder),
+                    selectedItem = state.department?.name
+                        ?: stringResource(R.string.field_department_placeholder),
                     onItemSelected = { selectedName ->
                         state.departments.find { it.name == selectedName }?.let {
                             onAction(EditEquipmentAction.UpdateDepartment(it))
@@ -220,22 +224,24 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedSelector(
-                    title = "Current Status",
-                    selectedItem = state.currentStatus?.name ?: "Select Status",
+                    title = stringResource(R.string.field_status),
+                    selectedItem = state.currentStatus?.name
+                        ?: stringResource(R.string.field_status_placeholder),
                     onItemSelected = {
                         onAction(EditEquipmentAction.UpdateCurrentStatus(EquipmentStatus.valueOf(it)))
                     },
-                    placeholder = "Select Status",
+                    placeholder = stringResource(R.string.field_status_placeholder),
                     items = EquipmentStatus.entries.map { it.name },
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedHeader(
-                    title = "Location and Dates",
+                    title = stringResource(R.string.label_location_and_dates),
                     height = 45,
                     textSize = 16,
                     modifier = Modifier
                         .padding(
+                            top = 15.dp,
                             start = 20.dp,
                             end = 20.dp,
                             bottom = 15.dp
@@ -246,8 +252,8 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedSelector(
-                    title = "Location",
-                    placeholder = "Dialysis Unit",
+                    title = stringResource(R.string.field_location),
+                    placeholder = stringResource(R.string.field_location_placeholder),
                     selectedItem = state.location,
                     onItemSelected = { onAction(EditEquipmentAction.UpdateLocation(it)) },
                     items = listOf(
@@ -260,24 +266,24 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedDateSelector(
-                    title = "Installation Date",
+                    title = stringResource(R.string.field_install_date),
                     selectedDate = state.installDate,
                     onDateSelected = { onAction(EditEquipmentAction.UpdateInstallDate(it)) },
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedDateSelector(
-                    title = "Warranty End Date",
+                    title = stringResource(R.string.field_warranty_expiry),
                     selectedDate = state.warrantyEndDate ?: 0L,
                     onDateSelected = { onAction(EditEquipmentAction.UpdateWarrantyEndDate(it)) },
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
 
                 BioMedTextField(
-                    value = state.contractInfo ?: "No contract",
+                    value = state.contractInfo ?: stringResource(R.string.no_contract),
                     onValueChange = { onAction(EditEquipmentAction.UpdateContractInfo(it)) },
-                    label = "Contract Info",
-                    placeholder = "Enter contract information",
+                    label = stringResource(R.string.field_contract_info),
+                    placeholder = stringResource(R.string.field_contract_info_placeholder),
                     isNoteCard = false,
                     modifier = Modifier.padding(
                         start = 20.dp,
@@ -287,8 +293,8 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedPhotoDocumentationCard(
-                    title = "Photo Documentation",
-                    description = "Take photos of installation reports or documentations",
+                    capturedPhotoUri = state.capturedPhotoUri,
+                    addPhotoClick = onAddNewPhoto,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
@@ -306,7 +312,7 @@ fun BioMedEditEquipmentCard(
             ) {
                 BioMedButton(
                     modifier = Modifier.padding(end = 10.dp),
-                    text = "Save",
+                    text = stringResource(R.string.btn_save),
                     customColor = if (isSystemInDarkTheme()) {
                         MaterialTheme.colorScheme.primary
                     } else {
@@ -323,7 +329,7 @@ fun BioMedEditEquipmentCard(
                 )
 
                 BioMedButton(
-                    text = "Cancel",
+                    text = stringResource(R.string.btn_cancel),
                     customColor = if (isSystemInDarkTheme()) {
                         MaterialTheme.colorScheme.secondaryContainer
                     } else {
@@ -350,7 +356,7 @@ fun BioMedEditEquipmentCardPreview() {
 }
 
 @Preview(device = "id:pixel_9", showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedEditEquipmentCardDarkPreview() {

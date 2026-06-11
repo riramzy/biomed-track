@@ -1,17 +1,22 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.edit
 
+import android.content.Context
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
+import com.riramzy.biomedtrack.domain.repo.StorageRepo
 import com.riramzy.biomedtrack.domain.usecase.department.GetAllDepartmentsUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.GetEquipmentByIdUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.UpdateEquipmentUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +40,7 @@ data class EditEquipmentUiState(
     val installDate: Long = 0L,
     val contractInfo: String? = "",
     val warrantyEndDate: Long? = null,
+    val capturedPhotoUri: String? = null,
     val isLoading: Boolean = false,
     val isError: String? = null,
     val isSuccess: Boolean = false
@@ -54,16 +60,19 @@ sealed class EditEquipmentAction {
     data class UpdateInstallDate(val installDate: Long): EditEquipmentAction()
     data class UpdateContractInfo(val contractInfo: String): EditEquipmentAction()
     data class UpdateWarrantyEndDate(val warrantyEndDate: Long): EditEquipmentAction()
+    data class AddPhoto(val uri: String) : EditEquipmentAction()
     data object ResetError: EditEquipmentAction()
     data object Save: EditEquipmentAction()
 }
 
 @HiltViewModel
 class EditEquipmentVm @Inject constructor(
+    @param:ApplicationContext val context: Context,
     stateHandle: SavedStateHandle,
     private val sessionManager: SessionManager,
     private val getEquipmentByIdUseCase: GetEquipmentByIdUseCase,
     private val getAllDepartmentsUseCase: GetAllDepartmentsUseCase,
+    private val storageRepo: StorageRepo,
     private val updateEquipmentUseCase: UpdateEquipmentUseCase,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(EditEquipmentUiState())
@@ -90,7 +99,12 @@ class EditEquipmentVm @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val equipment = getEquipmentByIdUseCase(equipmentId)
             if (equipment == null) {
-                _uiState.update { it.copy(isError = "Equipment not found", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.no_equipment_found),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
@@ -113,7 +127,12 @@ class EditEquipmentVm @Inject constructor(
                     )
                 }
             } else {
-                _uiState.update { it.copy(isError = "Equipment not found", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.no_equipment_found),
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -121,19 +140,51 @@ class EditEquipmentVm @Inject constructor(
     fun updateEquipment() {
         viewModelScope.launch {
             val currentState = _uiState.value
+            _uiState.update { it.copy(isLoading = true) }
+
+            var finalPhotoUrl: String? = null
+
+            if (currentState.capturedPhotoUri != null) {
+                val uploadResult = storageRepo.uploadFile(
+                    path = "new_equipment/${currentState.name} ${currentState.model} ${currentState.serialNumber}",
+                    uri = currentState.capturedPhotoUri.toUri()
+                )
+
+                if (uploadResult is Result.Success) {
+                    finalPhotoUrl = uploadResult.data
+                } else if (uploadResult is Result.Error) {
+                    _uiState.update { it.copy(isError = uploadResult.message, isLoading = false) }
+                    return@launch
+                }
+            }
 
             if (currentState.department == null) {
-                _uiState.update { it.copy(isError = "Please select a department", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_select_department),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
             if (currentState.currentStatus == null) {
-                _uiState.update { it.copy(isError = "Please select a status", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_select_status),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
             if (sessionManager.currentUser.value == null) {
-                _uiState.update { it.copy(isError = "Session expired", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_session_expired),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
@@ -184,6 +235,9 @@ class EditEquipmentVm @Inject constructor(
             is EditEquipmentAction.UpdateInstallDate -> { _uiState.update { it.copy(installDate = action.installDate) } }
             is EditEquipmentAction.UpdateContractInfo -> { _uiState.update { it.copy(contractInfo = action.contractInfo) } }
             is EditEquipmentAction.UpdateWarrantyEndDate -> { _uiState.update { it.copy(warrantyEndDate = action.warrantyEndDate) } }
+            is EditEquipmentAction.AddPhoto -> {
+                _uiState.update { it.copy(capturedPhotoUri = action.uri) }
+            }
             is EditEquipmentAction.ResetError -> { _uiState.update { it.copy(isError = null) } }
             is EditEquipmentAction.Save -> {
                 updateEquipment()
