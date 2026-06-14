@@ -33,6 +33,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -117,10 +119,13 @@ fun ReportsScreenContent(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-
-    var selectedPeriod by remember { mutableStateOf("This Month") }
-
+    var selectedPeriodIndex by remember { mutableIntStateOf(1) }
     val sheetState = rememberModalBottomSheetState()
+
+    val dismissLabel = stringResource(R.string.dismiss)
+    val generationSuccessMessage = stringResource(R.string.reports_download_success)
+    val generationErrorMessage = stringResource(R.string.reports_download_failed)
+    val reportsShareChooser = stringResource(R.string.reports_share_chooser_title)
 
     var showProfileBottomSheet by remember { mutableStateOf(false) }
     var showMyProfileDialog by remember { mutableStateOf(false) }
@@ -183,7 +188,11 @@ fun ReportsScreenContent(
                 changePassword(current, new) { result ->
                     when (result) {
                         is Result.Success -> {
-                            Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.password_updated_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             showChangePasswordDialog = false
                         }
                         is Result.Error -> {
@@ -207,18 +216,18 @@ fun ReportsScreenContent(
     LaunchedEffect(state.generationResult, state.generationError) {
         state.generationResult?.let {
             snackbarHostState.showSnackbar(
-                it,
+                message = generationSuccessMessage,
                 withDismissAction = true,
-                actionLabel = "Dismiss"
+                actionLabel = dismissLabel
             )
             onAction(ReportsAction.ClearGenerationResult)
         }
 
         state.generationError?.let {
             snackbarHostState.showSnackbar(
-                it,
+                message = generationErrorMessage,
                 withDismissAction = true,
-                actionLabel = "Dismiss"
+                actionLabel = dismissLabel
             )
             onAction(ReportsAction.ClearGenerationResult)
         }
@@ -290,14 +299,14 @@ fun ReportsScreenContent(
                     horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
-                        text = "Reports",
+                        text = stringResource(R.string.reports_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                     )
 
                     Text(
-                        text = "Generate and export detailed reports at ease",
+                        text = stringResource(R.string.reports_subtitle),
                         style = MaterialTheme.typography.labelLarge,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -308,54 +317,80 @@ fun ReportsScreenContent(
             item {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(
                             bottom = 15.dp,
                             start = 15.dp,
                             end = 15.dp
-                        ),
+                        )
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    val periodLabels = listOf(
+                        stringResource(R.string.reports_period_previous),
+                        stringResource(R.string.reports_period_current),
+                        stringResource(R.string.reports_period_next)
+                    )
+
                     BioMedHorizontalSelector(
-                        items = listOf("Previous Month", "This Month", "Next Month"),
-                        selectedItem = selectedPeriod,
-                        onItemSelected = { period ->
-                            selectedPeriod = period
+                        items = periodLabels,
+                        selectedItem = periodLabels[selectedPeriodIndex],
+                        onItemSelected = { label ->
+                            val index = periodLabels.indexOf(label)
+                            selectedPeriodIndex = index
 
                             val now = LocalDate.now()
                             val zoneId = ZoneId.systemDefault()
 
-                            when(period) {
-                                "Previous Month" -> {
+                            when (index) {
+                                0 -> {
                                     val prev = now.minusMonths(1)
-                                    val start = prev.withDayOfMonth(1).atStartOfDay(zoneId).toInstant().toEpochMilli()
-                                    val end = prev.withDayOfMonth(prev.lengthOfMonth()).atTime(23, 59, 59).atZone(zoneId).toInstant().toEpochMilli()
-
-                                    onAction(ReportsAction.SelectDateRange(start, end))
+                                    onAction(
+                                        ReportsAction.SelectDateRange(
+                                            prev.withDayOfMonth(1).atStartOfDay(zoneId).toInstant()
+                                                .toEpochMilli(),
+                                            prev.withDayOfMonth(prev.lengthOfMonth())
+                                                .atTime(23, 59, 59).atZone(zoneId).toInstant()
+                                                .toEpochMilli()
+                                        )
+                                    )
                                 }
-                                "This Month" -> {
-                                    val start = now.withDayOfMonth(1).atStartOfDay(zoneId).toInstant().toEpochMilli()
-                                    val end = now.withDayOfMonth(now.lengthOfMonth()).atTime(23, 59, 59).atZone(zoneId).toInstant().toEpochMilli()
 
-                                    onAction(ReportsAction.SelectDateRange(start, end))
+                                1 -> {
+                                    onAction(
+                                        ReportsAction.SelectDateRange(
+                                            now.withDayOfMonth(1).atStartOfDay(zoneId).toInstant()
+                                                .toEpochMilli(),
+                                            now.withDayOfMonth(now.lengthOfMonth())
+                                                .atTime(23, 59, 59).atZone(zoneId).toInstant()
+                                                .toEpochMilli()
+                                        )
+                                    )
                                 }
-                                "Next Month" -> {
+
+                                2 -> {
                                     val next = now.plusMonths(1)
-                                    val start = next.withDayOfMonth(1).atStartOfDay(zoneId).toInstant().toEpochMilli()
-                                    val end = next.withDayOfMonth(next.lengthOfMonth()).atTime(23, 59, 59).atZone(zoneId).toInstant().toEpochMilli()
-
-                                    onAction(ReportsAction.SelectDateRange(start, end))
+                                    onAction(
+                                        ReportsAction.SelectDateRange(
+                                            next.withDayOfMonth(1).atStartOfDay(zoneId).toInstant()
+                                                .toEpochMilli(),
+                                            next.withDayOfMonth(next.lengthOfMonth())
+                                                .atTime(23, 59, 59).atZone(zoneId).toInstant()
+                                                .toEpochMilli()
+                                        )
+                                    )
                                 }
                             }
-                        }
+                        },
+                        modifier = Modifier.weight(3f)
                     )
 
                     BioMedButton(
-                        text = "Filter",
+                        text = stringResource(R.string.filter_button),
                         withIcon = true,
                         icon = R.drawable.filter,
-                        onClick = { onAction(ReportsAction.SetFilterDialogVisibility(true)) }
+                        onClick = { onAction(ReportsAction.SetFilterDialogVisibility(true)) },
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
@@ -385,23 +420,29 @@ fun ReportsScreenContent(
                             .fillMaxWidth()
                             .padding(10.dp)
                     ) {
-                        BioMedHorizontalSelector(
-                            items = listOf("All", "Healthy", "Due Service", "Down"),
-                            selectedItem = when(state.selectedStatus) {
-                                EquipmentStatus.ONLINE -> "Healthy"
-                                EquipmentStatus.SERVICE -> "Due Service"
-                                EquipmentStatus.DOWN -> "Down"
-                                else -> "All"
-                            },
-                            onItemSelected = {
-                                val status = when(it) {
-                                    "Healthy" -> EquipmentStatus.ONLINE
-                                    "Due Service" -> EquipmentStatus.SERVICE
-                                    "Down" -> EquipmentStatus.DOWN
-                                    else -> null
-                                }
+                        val statusLabels = listOf(
+                            stringResource(R.string.reports_status_all),
+                            stringResource(R.string.status_online),
+                            stringResource(R.string.status_service),
+                            stringResource(R.string.status_down)
+                        )
 
-                                onAction(ReportsAction.SelectStatus(status))
+                        val statusValues = listOf(
+                            null,
+                            EquipmentStatus.ONLINE,
+                            EquipmentStatus.SERVICE,
+                            EquipmentStatus.DOWN
+                        )
+
+                        val selectedStatusIndex =
+                            statusValues.indexOf(state.selectedStatus).let { if (it < 0) 0 else it }
+
+                        BioMedHorizontalSelector(
+                            items = statusLabels,
+                            selectedItem = statusLabels[selectedStatusIndex],
+                            onItemSelected = { label ->
+                                val index = statusLabels.indexOf(label)
+                                onAction(ReportsAction.SelectStatus(statusValues.getOrElse(index) { null }))
                             }
                         )
                     }
@@ -421,11 +462,12 @@ fun ReportsScreenContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val departments = listOf("All Departments") + state.departmentsList.map { it.name }
+                    val allDeptLabel = stringResource(R.string.reports_dept_all)
+                    val departments = listOf(allDeptLabel) + state.departmentsList.map { it.name }
 
                     BioMedHorizontalSelector(
                         items = departments,
-                        selectedItem = state.selectedDepartment?.name ?: "All Departments",
+                        selectedItem = state.selectedDepartment?.name ?: allDeptLabel,
                         onItemSelected = { deptName ->
                             val selectedDepartment = state.departmentsList.find { it.name == deptName }
                             onAction(ReportsAction.SelectDepartment(selectedDepartment))
@@ -445,7 +487,7 @@ fun ReportsScreenContent(
                         )
                 ) {
                     BioMedToggle(
-                        text = "Include Maintenance Logs",
+                        text = stringResource(R.string.reports_toggle_include_logs),
                         modifier = Modifier
                             .fillMaxWidth(),
                         isChecked = state.includeLogs,
@@ -474,14 +516,14 @@ fun ReportsScreenContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Report Summary",
+                            text = stringResource(R.string.reports_section_summary),
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
 
                         Text(
-                            text = "Refresh Preview",
+                            text = stringResource(R.string.reports_refresh_preview),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
@@ -518,7 +560,7 @@ fun ReportsScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Export Format",
+                        text = stringResource(R.string.reports_section_export_format),
                         style = MaterialTheme.typography.titleMedium,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -563,7 +605,7 @@ fun ReportsScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Last Generated",
+                        text = stringResource(R.string.reports_section_last_generated),
                         style = MaterialTheme.typography.titleMedium,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -598,9 +640,9 @@ fun ReportsScreenContent(
 
                                             withContext(Dispatchers.Main) {
                                                 snackbarHostState.showSnackbar(
-                                                    "File downloaded successfully",
+                                                    message = generationSuccessMessage,
                                                     withDismissAction = true,
-                                                    actionLabel = "Dismiss"
+                                                    actionLabel = dismissLabel
                                                 )
                                             }
                                         }
@@ -609,9 +651,9 @@ fun ReportsScreenContent(
 
                                         withContext(Dispatchers.Main) {
                                             snackbarHostState.showSnackbar(
-                                                "Failed to download file",
+                                                message = generationErrorMessage,
                                                 withDismissAction = true,
-                                                actionLabel = "Dismiss"
+                                                actionLabel = dismissLabel
                                             )
                                         }
                                     }
@@ -625,7 +667,12 @@ fun ReportsScreenContent(
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }
 
-                                context.startActivity(Intent.createChooser(shareIntent, "Share Report"))
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        shareIntent,
+                                        reportsShareChooser
+                                    )
+                                )
                             },
                             onPreviewClick = {
                                 val previewIntent = Intent(Intent.ACTION_VIEW).apply {
@@ -649,7 +696,7 @@ fun ReportsScreenContent(
     }
 }
 
-@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun ReportsScreenPreview() {
     BioMedTheme {
@@ -669,7 +716,7 @@ fun ReportsScreenPreview() {
 }
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun ReportsScreenDarkPreview() {

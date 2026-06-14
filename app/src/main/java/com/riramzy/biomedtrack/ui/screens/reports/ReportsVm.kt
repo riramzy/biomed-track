@@ -1,8 +1,9 @@
 package com.riramzy.biomedtrack.ui.screens.reports
 
-import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
@@ -14,6 +15,7 @@ import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,6 +82,7 @@ sealed class ReportsAction {
 
 @HiltViewModel
 class ReportsVm @Inject constructor(
+    @param:ApplicationContext val context: Context,
     private val equipmentRepo: EquipmentRepo,
     private val departmentsRepo: DepartmentRepo,
     private val generateReportUseCase: GenerateReportUseCase,
@@ -177,7 +180,12 @@ class ReportsVm @Inject constructor(
             }
             is ReportsAction.GeneratePdfReport -> {
                 if (action.outputStream == null || action.uri == null) {
-                    _uiState.update { it.copy(generationError = "Failed to create target file", generationLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            generationError = context.getString(R.string.reports_error_no_file),
+                            generationLoading = false
+                        )
+                    }
                     return
                 }
 
@@ -218,7 +226,7 @@ class ReportsVm @Inject constructor(
                                     )
                                     _uiState.update {
                                         it.copy(
-                                            generationResult = "Report generated successfully",
+                                            generationResult = context.getString(R.string.reports_generated_success),
                                             generationLoading = false,
                                             generatedReports = it.generatedReports.plus(newReport)
                                         )
@@ -229,7 +237,12 @@ class ReportsVm @Inject constructor(
                                     _uiState.update { it.copy(generationError = pdfResult.message, generationLoading = false) }
                                 }
                                 else -> {
-                                    _uiState.update { it.copy(generationError = "Unknown error", generationLoading = false) }
+                                    _uiState.update {
+                                        it.copy(
+                                            generationError = context.getString(R.string.reports_error_unknown),
+                                            generationLoading = false
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -237,14 +250,24 @@ class ReportsVm @Inject constructor(
                             _uiState.update { it.copy(generationError = result.message, generationLoading = false) }
                         }
                         else -> {
-                            _uiState.update { it.copy(generationError = "Unknown error", generationLoading = false) }
+                            _uiState.update {
+                                it.copy(
+                                    generationError = context.getString(R.string.reports_error_unknown),
+                                    generationLoading = false
+                                )
+                            }
                         }
                     }
                 }
             }
             is ReportsAction.GenerateExcelReport -> {
                 if (action.outputStream == null  || action.uri == null) {
-                    _uiState.update { it.copy(generationError = "Failed to create target file", generationLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            generationError = context.getString(R.string.reports_error_no_file),
+                            generationLoading = false
+                        )
+                    }
                     return
                 }
 
@@ -286,7 +309,7 @@ class ReportsVm @Inject constructor(
 
                                     _uiState.update {
                                         it.copy(
-                                            generationResult = "Report generated successfully",
+                                            generationResult = context.getString(R.string.reports_generated_success),
                                             generationLoading = false,
                                             generatedReports = it.generatedReports.plus(generatedReport)
                                         )
@@ -296,7 +319,12 @@ class ReportsVm @Inject constructor(
                                     _uiState.update { it.copy(generationError = excelResult.message, generationLoading = false) }
                                 }
                                 else -> {
-                                    _uiState.update { it.copy(generationError = "Unknown error", generationLoading = false) }
+                                    _uiState.update {
+                                        it.copy(
+                                            generationError = context.getString(R.string.reports_error_unknown),
+                                            generationLoading = false
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -304,7 +332,12 @@ class ReportsVm @Inject constructor(
                             _uiState.update { it.copy(generationError = result.message, generationLoading = false) }
                         }
                         else -> {
-                            _uiState.update { it.copy(generationError = "Unknown error", generationLoading = false) }
+                            _uiState.update {
+                                it.copy(
+                                    generationError = context.getString(R.string.reports_error_unknown),
+                                    generationLoading = false
+                                )
+                            }
                         }
                     }
                 }
@@ -312,14 +345,13 @@ class ReportsVm @Inject constructor(
         }
     }
 
-    @SuppressLint("DefaultLocale")
     private fun formatFileSize(sizeInBytes: Long): String {
         val sizeInMb = sizeInBytes / (1024.0 * 1024.0)
         return if (sizeInMb >= 1.0) {
-            String.format("%.1f MB", sizeInMb)
+            context.getString(R.string.generated_file_card_mb, sizeInMb)
         } else {
             val sizeInKb = sizeInBytes / 1024.0
-            String.format("%.1f KB", sizeInKb)
+            context.getString(R.string.generated_file_card_kb, sizeInKb)
         }
     }
 }
