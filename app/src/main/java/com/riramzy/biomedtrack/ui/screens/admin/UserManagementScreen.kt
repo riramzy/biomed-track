@@ -1,6 +1,7 @@
 package com.riramzy.biomedtrack.ui.screens.admin
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,10 +52,17 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.department.BioMedManageDepartmentsSheet
 import com.riramzy.biomedtrack.ui.components.user.BioMedAddNewUserSheet
+import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedChangeRoleSheet
+import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesDialog
+import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.components.user.BioMedUserInfoCard
 import com.riramzy.biomedtrack.ui.components.user.BioMedUsersInsightCard
+import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.UserRole
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -61,21 +71,25 @@ import kotlinx.coroutines.flow.SharedFlow
 @Composable
 fun UserManagementScreen(
     navController: NavHostController,
-    userManagementVm: UserManagementVm = hiltViewModel()
+    userManagementVm: UserManagementVm = hiltViewModel(),
+    authVm: AuthVm = hiltViewModel()
 ) {
     val state by userManagementVm.uiState.collectAsStateWithLifecycle()
+    val currentUser by userManagementVm.currentUser.collectAsStateWithLifecycle()
     val searchQuery by userManagementVm.searchQuery.collectAsStateWithLifecycle()
-    val selectedRole by userManagementVm.selectedRole.collectAsStateWithLifecycle()
+    val selectedRoleIndex by userManagementVm.selectedRoleIndex.collectAsStateWithLifecycle()
     val allDepartments by userManagementVm.allDepartments.collectAsStateWithLifecycle()
     val snackbarMessage by userManagementVm.snackbarMessage.collectAsStateWithLifecycle()
     val isSnackbarMessageAnError by userManagementVm.isSnackbarMessageError.collectAsStateWithLifecycle()
     val userCreatedEvent = userManagementVm.userCreatedEvent
+    val isPasswordUpdating by authVm.isPasswordUpdating.collectAsStateWithLifecycle()
 
     UserManagementScreenContent(
         navController = navController,
         state = state,
+        currentUser = currentUser!!,
         searchQuery = searchQuery,
-        selectedRole = selectedRole,
+        selectedRoleIndex = selectedRoleIndex,
         allDepartments = allDepartments,
         onSearchQueryChange = userManagementVm::setSearchQuery,
         onSelectedRoleChange = userManagementVm::setSelectedRole,
@@ -86,7 +100,10 @@ fun UserManagementScreen(
         snackbarMessage = snackbarMessage,
         isSnackbarMessageAnError = isSnackbarMessageAnError,
         onSnackbarMessageConsumed = userManagementVm::clearSnackbarMessage,
-        userCreatedEvent = userCreatedEvent
+        userCreatedEvent = userCreatedEvent,
+        isPasswordUpdating = isPasswordUpdating,
+        changePassword = authVm::changePassword,
+        logout = authVm::logout
     )
 }
 
@@ -95,11 +112,12 @@ fun UserManagementScreen(
 fun UserManagementScreenContent(
     navController: NavHostController,
     state: UserManagementUiState = UserManagementUiState.Loading,
+    currentUser: Technician,
     searchQuery: String = "",
-    selectedRole: String = "",
+    selectedRoleIndex: Int = 0,
     allDepartments: List<Department> = emptyList(),
     onSearchQueryChange: (String) -> Unit = {},
-    onSelectedRoleChange: (String) -> Unit = {},
+    onSelectedRoleChange: (Int) -> Unit = {},
     toggleUserActiveStatus: (Technician) -> Unit = {},
     changeUserRole: (String, UserRole) -> Unit = { _, _ -> },
     updateUserDepartments: (String, List<Department>) -> Unit = { _, _ -> },
@@ -107,13 +125,107 @@ fun UserManagementScreenContent(
     snackbarMessage: String? = null,
     isSnackbarMessageAnError: Boolean = false,
     onSnackbarMessageConsumed: () -> Unit = {},
-    userCreatedEvent: SharedFlow<Unit> = MutableSharedFlow()
+    userCreatedEvent: SharedFlow<Unit> = MutableSharedFlow(),
+    isPasswordUpdating: Boolean = false,
+    changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
+    logout: (() -> Unit) -> Unit = {}
 ) {
     var showManageDepartmentsSheet by remember { mutableStateOf(false) }
     var showChangeRoleSheet by remember { mutableStateOf(false) }
     var showAddNewUserSheet by remember { mutableStateOf(false) }
     var selectedUser by remember { mutableStateOf<Technician?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val sheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current
+
+    var showProfileBottomSheet by remember { mutableStateOf(false) }
+    var showMyProfileDialog by remember { mutableStateOf(false) }
+    var showNotificationsPreferencesDialog by remember { mutableStateOf(false) }
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var showLogoutConfirmDialog by remember { mutableStateOf(false) }
+
+    if (showProfileBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showProfileBottomSheet = false },
+            sheetState = sheetState,
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                Color.White
+            }
+        ) {
+            BioMedProfileSheet(
+                user = currentUser,
+                onImportEquipmentClick = { navController.navigate(Screen.ImportEquipmentSelectFile.route) },
+                onManageUsersClick = { navController.navigate(Screen.UserManagement.route) },
+                onMyProfileClick = {
+                    showMyProfileDialog = true
+                    showProfileBottomSheet = false
+                },
+                onNotificationsPreferencesClick = {
+                    showNotificationsPreferencesDialog = true
+                    showProfileBottomSheet = false
+                },
+                onChangePasswordClick = {
+                    showChangePasswordDialog = true
+                    showProfileBottomSheet = false
+                },
+                onLogoutClick = {
+                    showLogoutConfirmDialog = true
+                    showProfileBottomSheet = false
+                }
+            )
+        }
+    }
+
+    if (showMyProfileDialog) {
+        BioMedMyProfileDialog(
+            user = currentUser,
+            onDismiss = { showMyProfileDialog = false }
+        )
+    }
+
+    if (showNotificationsPreferencesDialog) {
+        BioMedNotificationPreferencesDialog(
+            onDismiss = { showNotificationsPreferencesDialog = false }
+        )
+    }
+
+    if (showChangePasswordDialog) {
+        BioMedChangePasswordDialog(
+            isLoading = isPasswordUpdating,
+            onConfirm = { current, new ->
+                changePassword(current, new) { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            Toast.makeText(
+                                context,
+                                R.string.password_updated_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            showChangePasswordDialog = false
+                        }
+
+                        is Result.Error -> {
+                            Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                        }
+
+                        else -> {}
+                    }
+                }
+            },
+            onDismiss = { showChangePasswordDialog = false }
+        )
+    }
+
+    if (showLogoutConfirmDialog) {
+        BioMedLogoutDialog(
+            onDismiss = { showLogoutConfirmDialog = false },
+            onConfirm = { logout { navController.navigate(Screen.Login.route) } }
+        )
+    }
 
     LaunchedEffect(snackbarMessage) {
         snackbarMessage?.let {
@@ -133,7 +245,9 @@ fun UserManagementScreenContent(
             BioMedTopAppBar(
                 modifier = Modifier.padding(
                     top = 10.dp
-                )
+                ),
+                onProfileClick = { showProfileBottomSheet = true },
+                onNotificationsClick = { navController.navigate(Screen.Notifications.route) }
             )
         },
         floatingActionButton = {
@@ -248,14 +362,14 @@ fun UserManagementScreenContent(
                             horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
-                                text = "Users Management",
+                                text = stringResource(R.string.user_mgmt_title),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.ExtraBold,
                             )
 
                             Text(
-                                text = "Manage users, roles and department access",
+                                text = stringResource(R.string.user_mgmt_subtitle),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -273,23 +387,27 @@ fun UserManagementScreenContent(
                                     end = 15.dp
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(5.dp)
                         ) {
                             BioMedUsersInsightCard(
                                 numberOfUsers = state.adminCount,
-                                usersRole = "Admin"
+                                usersRole = stringResource(R.string.user_mgmt_role_admins),
+                                modifier = Modifier.weight(1f)
                             )
                             BioMedUsersInsightCard(
                                 numberOfUsers = state.supervisorCount,
-                                usersRole = "Supervisors"
+                                usersRole = stringResource(R.string.user_mgmt_role_supervisors),
+                                modifier = Modifier.weight(1f)
                             )
                             BioMedUsersInsightCard(
                                 numberOfUsers = state.technicianCount,
-                                usersRole = "Technicians"
+                                usersRole = stringResource(R.string.user_mgmt_role_technicians),
+                                modifier = Modifier.weight(1f)
                             )
                             BioMedUsersInsightCard(
                                 numberOfUsers = state.totalUsersCount,
-                                usersRole = "Total Users"
+                                usersRole = stringResource(R.string.insight_card_total),
+                                modifier = Modifier.weight(1f)
                             )
                         }
                     }
@@ -309,18 +427,26 @@ fun UserManagementScreenContent(
                     }
 
                     item {
+                        val roleLabels = listOf(
+                            stringResource(R.string.user_mgmt_role_all),
+                            stringResource(R.string.user_mgmt_role_admins),
+                            stringResource(R.string.user_mgmt_role_supervisors),
+                            stringResource(R.string.user_mgmt_role_technicians)
+                        )
+
                         BioMedHorizontalSelector(
-                            items = listOf(
-                                "All",
-                                "Admins",
-                                "Supervisors",
-                                "Technicians"
-                            ),
-                            selectedItem = selectedRole,
-                            onItemSelected = { onSelectedRoleChange(it) },
+                            items = roleLabels,
+                            selectedItem = roleLabels[selectedRoleIndex],
+                            onItemSelected = { label ->
+                                val index = roleLabels.indexOf(label)
+                                onSelectedRoleChange(index)
+                            },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 15.dp)
+                                .padding(
+                                    bottom = 15.dp,
+                                    start = 15.dp,
+                                    end = 15.dp
+                                )
                         )
                     }
 
@@ -381,7 +507,7 @@ fun UserManagementScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9")
+@Preview(device = "id:pixel_9", locale = "ar")
 @Composable
 fun UserManagementScreenContentPreview() {
     BioMedTheme {
@@ -403,6 +529,15 @@ fun UserManagementScreenContentPreview() {
                 supervisorCount = 0,
                 technicianCount = 0,
                 totalUsersCount = 0
+            ),
+            currentUser = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "john.c.calhoun@examplepetstore.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true,
             )
         )
     }
@@ -432,6 +567,15 @@ fun UserManagementScreenContentDarkPreview() {
                 supervisorCount = 0,
                 technicianCount = 0,
                 totalUsersCount = 0
+            ),
+            currentUser = Technician(
+                id = "1",
+                name = "Khaled",
+                email = "john.c.calhoun@examplepetstore.com",
+                role = UserRole.ADMIN,
+                assignedDepartments = emptyList(),
+                employeeId = "1",
+                isActive = true,
             )
         )
     }
