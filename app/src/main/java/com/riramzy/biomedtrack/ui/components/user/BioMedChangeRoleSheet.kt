@@ -17,10 +17,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
@@ -51,7 +53,7 @@ fun BioMedChangeRoleSheet(
         )
 
         Text(
-            text = "Change Role",
+            text = stringResource(id = R.string.change_role_title),
             style = MaterialTheme.typography.titleLarge,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -69,19 +71,22 @@ fun BioMedChangeRoleSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BioMedUserRoleSelectionCard(
-                role = "Supervisor",
+                role = stringResource(R.string.change_role_supervisor),
+                description = stringResource(R.string.change_role_supervisor_desc),
                 isSelected = selectedRole == UserRole.SUPERVISOR,
                 onRoleClick = { selectedRole = UserRole.SUPERVISOR }
             )
 
             BioMedUserRoleSelectionCard(
-                role = "Admin",
+                role = stringResource(R.string.change_role_admin),
+                description = stringResource(R.string.change_role_admin_desc),
                 isSelected = selectedRole == UserRole.ADMIN,
                 onRoleClick = { selectedRole = UserRole.ADMIN }
             )
 
             BioMedUserRoleSelectionCard(
-                role = "Technician",
+                role = stringResource(R.string.change_role_technician),
+                description = stringResource(R.string.change_role_technician_desc),
                 isSelected = selectedRole == UserRole.TECHNICIAN,
                 onRoleClick = { selectedRole = UserRole.TECHNICIAN }
             )
@@ -91,7 +96,7 @@ fun BioMedChangeRoleSheet(
             modifier = Modifier
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             BioMedButton(
                 text = "Save",
@@ -105,29 +110,22 @@ fun BioMedChangeRoleSheet(
                 } else {
                     MaterialTheme.colorScheme.onPrimary
                 },
-                modifier = Modifier.padding(end = 10.dp),
+                modifier = Modifier.weight(1f),
                 onClick = { onSave(selectedRole) }
             )
 
             BioMedButton(
                 text = "Cancel",
-                customColor = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.secondaryContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
-                customTextColor = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.onSecondaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                },
-                onClick = onCancel
+                customColor = MaterialTheme.colorScheme.primaryContainer,
+                customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                onClick = onCancel,
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
 
-@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedChangeRoleSheetPreview() {
     BioMedTheme {
@@ -147,7 +145,7 @@ fun BioMedChangeRoleSheetPreview() {
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedChangeRoleSheetDarkPreview() {

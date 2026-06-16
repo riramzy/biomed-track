@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -55,7 +56,7 @@ fun BioMedAddNewUserSheet(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var selectedRole by remember { mutableStateOf(UserRole.TECHNICIAN) }
+    var selectedRole: UserRole? by remember { mutableStateOf(null) }
 
     Column(
         modifier = modifier
@@ -65,7 +66,7 @@ fun BioMedAddNewUserSheet(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Add New User",
+            text = stringResource(R.string.add_user_title),
             style = MaterialTheme.typography.titleLarge,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -74,8 +75,7 @@ fun BioMedAddNewUserSheet(
             } else {
                 Color.Black
             },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
         Column (
@@ -90,8 +90,8 @@ fun BioMedAddNewUserSheet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BioMedTextField(
-                    label = "First Name",
-                    placeholder = "First Name",
+                    label = stringResource(R.string.add_user_field_first_name),
+                    placeholder = stringResource(R.string.field_name_placeholder),
                     value = firstName,
                     onValueChange = { firstName = it },
                     isNoteCard = false,
@@ -103,8 +103,8 @@ fun BioMedAddNewUserSheet(
                 )
 
                 BioMedTextField(
-                    label = "Last Name",
-                    placeholder = "Last Name",
+                    label = stringResource(R.string.add_user_field_last_name),
+                    placeholder = stringResource(R.string.field_name_placeholder),
                     value = lastName,
                     onValueChange = { lastName = it },
                     modifier = Modifier.padding(
@@ -116,8 +116,8 @@ fun BioMedAddNewUserSheet(
                 )
 
                 BioMedTextField(
-                    label = "Employee ID",
-                    placeholder = "Employee ID",
+                    label = stringResource(R.string.add_user_field_employee_id),
+                    placeholder = stringResource(R.string.add_user_validation_employee_id),
                     value = employeeId,
                     onValueChange = { employeeId = it },
                     modifier = Modifier.padding(
@@ -129,8 +129,8 @@ fun BioMedAddNewUserSheet(
                 )
 
                 BioMedTextField(
-                    label = "Email",
-                    placeholder = "Email",
+                    label = stringResource(R.string.add_user_field_email),
+                    placeholder = stringResource(R.string.login_email_placeholder),
                     value = email,
                     onValueChange = { email = it },
                     modifier = Modifier.padding(
@@ -144,8 +144,8 @@ fun BioMedAddNewUserSheet(
                 BioMedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = "Password",
-                    placeholder = "Enter your password",
+                    label = stringResource(R.string.add_user_field_password),
+                    placeholder = stringResource(R.string.login_password_placeholder),
                     isNoteCard = false,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -175,10 +175,11 @@ fun BioMedAddNewUserSheet(
                 )
 
                 BioMedSelector(
-                    title = "Role",
-                    selectedItem = selectedRole.name,
+                    title = stringResource(R.string.add_user_field_role),
+                    selectedItem = selectedRole?.name
+                        ?: stringResource(R.string.add_user_field_role_placeholder),
                     onItemSelected = { selectedRole = UserRole.valueOf(it) },
-                    placeholder = "Select Role",
+                    placeholder = stringResource(R.string.add_user_field_role_placeholder),
                     items = UserRole.entries.map { it.name },
                     modifier = Modifier.padding(
                         start = 20.dp,
@@ -193,41 +194,66 @@ fun BioMedAddNewUserSheet(
             modifier = Modifier
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             BioMedButton(
-                text = "Confirm",
+                text = stringResource(R.string.confirm),
                 customColor = MaterialTheme.colorScheme.primary,
                 customTextColor = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(end = 10.dp),
+                modifier = Modifier.weight(1f),
                 onClick = {
                     when {
                         firstName.isBlank() -> {
-                            Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.add_user_validation_first_name,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@BioMedButton
                         }
                         lastName.isBlank() -> {
-                            Toast.makeText(context, "Last name is required", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.add_user_validation_last_name,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@BioMedButton
                         }
                         employeeId.isBlank() -> {
-                            Toast.makeText(context, "Employee ID is required", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.add_user_validation_employee_id,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@BioMedButton
                         }
                         email.isBlank() -> {
-                            Toast.makeText(context, "Email is required", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.add_user_validation_email,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@BioMedButton
                         }
                         !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                            Toast.makeText(context, "Invalid email format", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.add_user_validation_email_format,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@BioMedButton
                         }
                         password.isBlank() -> {
-                            Toast.makeText(context, "Password is required", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.add_user_validation_password,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@BioMedButton
                         }
                         password.length < 6 -> {
-                            Toast.makeText(context, "Password must be at least 6 characters", Toast.
+                            Toast.makeText(
+                                context, R.string.add_user_validation_password_length, Toast.
                             LENGTH_SHORT).show()
                             return@BioMedButton
                         }
@@ -237,7 +263,7 @@ fun BioMedAddNewUserSheet(
                         id = "",
                         name = "$firstName $lastName",
                         email = email,
-                        role = selectedRole,
+                        role = selectedRole ?: UserRole.TECHNICIAN,
                         assignedDepartments = emptyList(),
                         employeeId = employeeId,
                         isActive = true
@@ -248,7 +274,7 @@ fun BioMedAddNewUserSheet(
             )
 
             BioMedButton(
-                text = "Cancel",
+                text = stringResource(R.string.btn_cancel),
                 customColor = if (isSystemInDarkTheme()) {
                     MaterialTheme.colorScheme.secondaryContainer
                 } else {
@@ -259,13 +285,14 @@ fun BioMedAddNewUserSheet(
                 } else {
                     MaterialTheme.colorScheme.onPrimaryContainer
                 },
-                onClick = onCancel
+                onClick = onCancel,
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
 
-@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedAddNewUserSheetPreview() {
     BioMedTheme {
@@ -275,7 +302,7 @@ fun BioMedAddNewUserSheetPreview() {
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedAddNewUserSheetDarkPreview() {

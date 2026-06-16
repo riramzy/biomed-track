@@ -1,7 +1,6 @@
 package com.riramzy.biomedtrack.ui.components.user
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,16 +18,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 
 @Composable
 fun BioMedUserRoleSelectionCard(
     modifier: Modifier = Modifier,
-    role: String = "Supervisor",
+    role: String = "",
+    description: String = "",
     isSelected: Boolean = false,
     onRoleClick: () -> Unit = {}
 ) {
@@ -39,17 +41,9 @@ fun BioMedUserRoleSelectionCard(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.primary
-                }
+                MaterialTheme.colorScheme.primary
             } else {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-                }
+                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
             }
         ),
         onClick = onRoleClick
@@ -84,44 +78,23 @@ fun BioMedUserRoleSelectionCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isSystemInDarkTheme()) {
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
+                    color = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
+                        MaterialTheme.colorScheme.primary
                     }
                 )
 
                 Text(
-                    text = when (role) {
-                        "Supervisor" -> "Full access to all department, can assign tasks and generate reports"
-                        "Admin" -> "Full system access including users management and equipment administration"
-                        "Technician" -> "Can view all equipment and log maintenance in assigned departments only"
-                        else -> ""
-                    },
+                    text = description,
                     style = MaterialTheme.typography.labelLarge,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     lineHeight = 15.sp,
-                    color = if (isSystemInDarkTheme()) {
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
+                    color = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
+                        MaterialTheme.colorScheme.primary
                     }
                 )
             }
@@ -133,7 +106,10 @@ fun BioMedUserRoleSelectionCard(
 @Composable
 fun BioMedUserRoleSelectionCardPreview() {
     BioMedTheme {
-        BioMedUserRoleSelectionCard()
+        BioMedUserRoleSelectionCard(
+            role = stringResource(R.string.change_role_supervisor),
+            description = stringResource(R.string.change_role_supervisor_desc),
+        )
     }
 }
 
@@ -144,6 +120,9 @@ fun BioMedUserRoleSelectionCardPreview() {
 @Composable
 fun BioMedUserRoleSelectionCardDarkPreview() {
     BioMedTheme {
-        BioMedUserRoleSelectionCard()
+        BioMedUserRoleSelectionCard(
+            role = stringResource(R.string.change_role_supervisor),
+            description = stringResource(R.string.change_role_supervisor_desc),
+        )
     }
 }
