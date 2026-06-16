@@ -99,23 +99,15 @@ fun BioMedChangeRoleSheet(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             BioMedButton(
-                text = "Save",
-                customColor = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.primary
-                },
-                customTextColor = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onPrimary
-                },
+                text = stringResource(R.string.btn_save),
+                customColor = MaterialTheme.colorScheme.primary,
+                customTextColor = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.weight(1f),
                 onClick = { onSave(selectedRole) }
             )
 
             BioMedButton(
-                text = "Cancel",
+                text = stringResource(R.string.btn_cancel),
                 customColor = MaterialTheme.colorScheme.primaryContainer,
                 customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 onClick = onCancel,
