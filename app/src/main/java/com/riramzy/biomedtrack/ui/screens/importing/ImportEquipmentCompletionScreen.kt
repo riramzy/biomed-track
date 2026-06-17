@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
@@ -176,7 +178,11 @@ fun ImportEquipmentCompletionScreenContent(
                 changePassword(current, new) { result ->
                     when (result) {
                         is Result.Success -> {
-                            Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.password_updated_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             showChangePasswordDialog = false
                         }
                         is Result.Error -> {
@@ -244,14 +250,14 @@ fun ImportEquipmentCompletionScreenContent(
                     horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
-                        text = "Import Equipment",
+                        text = stringResource(R.string.import_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                     )
 
                     Text(
-                        text = "Bulk import equipment from an excel file",
+                        text = stringResource(R.string.import_subtitle),
                         style = MaterialTheme.typography.labelLarge,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -260,8 +266,14 @@ fun ImportEquipmentCompletionScreenContent(
             }
 
             item {
+                val stepsLabels = listOf(
+                    stringResource(R.string.import_step_select_file),
+                    stringResource(R.string.import_step_preview),
+                    stringResource(R.string.import_step_import)
+                )
+
                 BioMedProgressIndicator(
-                    steps = listOf("Select File", "Preview", "Import"),
+                    steps = stepsLabels,
                     currentStep = 3,
                     modifier = Modifier
                         .padding(bottom = 15.dp)
@@ -292,7 +304,7 @@ fun ImportEquipmentCompletionScreenContent(
                     ) {
                         BioMedButton(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "Import Another File",
+                            text = stringResource(R.string.import_btn_import_another),
                             customTextSize = 14,
                             onClick = {
                                 onImportAnotherClick()
@@ -301,7 +313,7 @@ fun ImportEquipmentCompletionScreenContent(
 
                         BioMedButton(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "Go to Inventory",
+                            text = stringResource(R.string.import_btn_go_to_inventory),
                             customTextSize = 14,
                             customColor = MaterialTheme.colorScheme.primary,
                             customTextColor = MaterialTheme.colorScheme.onPrimary,
@@ -316,7 +328,7 @@ fun ImportEquipmentCompletionScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9")
+@Preview(device = "id:pixel_9", locale = "ar")
 @Composable
 fun ImportEquipmentCompletionScreenPreview() {
     BioMedTheme {
@@ -336,7 +348,7 @@ fun ImportEquipmentCompletionScreenPreview() {
 }
 
 @Preview(device = "id:pixel_9",
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun ImportEquipmentCompletionScreenDarkPreview() {

@@ -234,7 +234,7 @@ fun ImportEquipmentSelectFileScreenContent(
                 selectedPage = "None",
                 withActionButton = true,
                 isActionButtonText = true,
-                actionButtonText = "Preview",
+                actionButtonText = stringResource(R.string.import_step_preview),
                 onActionButtonClick = {
                     if (state is ImportingUiState.PreviewReady) {
                         navController.navigate(Screen.ImportEquipmentPreview.route)
@@ -368,7 +368,10 @@ fun ImportEquipmentSelectFileScreenContent(
                         BioMedGeneratedFileCard(
                             isUploaded = true,
                             fileName = file.fileName,
-                            fileSize = "${file.fileSize / 1024} KB"
+                            fileSize = stringResource(
+                                R.string.import_file_size_kb,
+                                file.fileSize / 1024
+                            )
                         )
                     }
                 }

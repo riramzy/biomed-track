@@ -65,7 +65,7 @@ fun BioMedProcessCompletedCard(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.insight_online),
-                    contentDescription = "Success",
+                    contentDescription = stringResource(R.string.import_complete_icon_desc),
                     tint = Color.White,
                     modifier = Modifier.size(80.dp)
                 )
