@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -89,7 +90,7 @@ fun BioMedUploadFileCard(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Your file has been uploaded successfully",
+                    text = stringResource(R.string.upload_excel_file_success),
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -99,7 +100,7 @@ fun BioMedUploadFileCard(
                 Spacer(modifier = Modifier.height(15.dp))
 
                 BioMedButton(
-                    text = "Reupload",
+                    text = stringResource(R.string.upload_excel_file_reupload),
                     modifier = Modifier.width(136.dp),
                     customColor = MaterialTheme.indicatorColors.green,
                     customTextColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
@@ -122,7 +123,7 @@ fun BioMedUploadFileCard(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Select your excel file",
+                    text = stringResource(R.string.upload_excel_file),
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -130,7 +131,7 @@ fun BioMedUploadFileCard(
                 )
 
                 Text(
-                    text = "Supports .xlsx and .xls formats",
+                    text = stringResource(R.string.upload_excel_file_desc),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
@@ -140,7 +141,7 @@ fun BioMedUploadFileCard(
                 Spacer(modifier = Modifier.height(15.dp))
 
                 BioMedButton(
-                    text = "Browse Files",
+                    text = stringResource(R.string.upload_excel_file_browse_files),
                     modifier = Modifier.width(136.dp),
                     customColor = MaterialTheme.colorScheme.primary,
                     customTextColor = MaterialTheme.colorScheme.onPrimary,
@@ -152,7 +153,7 @@ fun BioMedUploadFileCard(
     }
 }
 
-@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedUploadFileCardPreview() {
     BioMedTheme {
@@ -164,7 +165,7 @@ fun BioMedUploadFileCardPreview() {
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    backgroundColor = 0xFF000000
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedUploadFileCardDarkPreview() {

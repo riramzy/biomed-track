@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,12 +56,11 @@ fun BioMedProcessCompletedCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // --- Large Success Icon ---
             Box(
                 modifier = Modifier
                     .size(115.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.indicatorColors.green), // Thick green border color
+                    .background(MaterialTheme.indicatorColors.green),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -73,9 +73,8 @@ fun BioMedProcessCompletedCard(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // --- Title ---
             Text(
-                text = "Import Complete",
+                text = stringResource(R.string.import_complete_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Black,
@@ -88,25 +87,30 @@ fun BioMedProcessCompletedCard(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- Summary List ---
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 SummaryItem(
-                    countText = "$successCount equipment imported successfully",
+                    countText = stringResource(
+                        R.string.import_complete_success_count,
+                        successCount
+                    ),
                     iconRes = R.drawable.activity_online,
                     color = MaterialTheme.indicatorColors.green
                 )
                 
                 SummaryItem(
-                    countText = "$warningCount rows skipped successfully",
+                    countText = stringResource(
+                        R.string.import_complete_skipped_count,
+                        warningCount
+                    ),
                     iconRes = R.drawable.warning,
                     color = MaterialTheme.indicatorColors.yellow
                 )
                 
                 SummaryItem(
-                    countText = "Failed to import $errorCount rows",
+                    countText = stringResource(R.string.import_complete_failed_count, errorCount),
                     iconRes = R.drawable.error,
                     color = MaterialTheme.indicatorColors.red
                 )
@@ -154,7 +158,7 @@ private fun SummaryItem(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedProcessCompletedCardPreview() {
     BioMedTheme {
@@ -164,7 +168,7 @@ fun BioMedProcessCompletedCardPreview() {
 
 @Preview(device = "id:pixel_9", showBackground = true, showSystemUi = false,
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedProcessCompletedCardDarkPreview() {

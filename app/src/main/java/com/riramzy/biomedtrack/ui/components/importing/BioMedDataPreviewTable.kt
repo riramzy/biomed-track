@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +72,16 @@ fun BioMedDataPreviewTable(
     onToggleSelectAll: (Boolean) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
+
+    val headers = listOf(
+        stringResource(R.string.table_header_name),
+        stringResource(R.string.table_header_model),
+        stringResource(R.string.table_header_serial),
+        stringResource(R.string.table_header_department),
+        stringResource(R.string.table_header_category),
+        stringResource(R.string.table_header_status),
+        stringResource(R.string.table_header_logs)
+    )
 
     Column(
         modifier = modifier
@@ -125,7 +136,6 @@ fun BioMedDataPreviewTable(
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(30.dp)
                     ) {
-                        val headers = listOf("Name", "Model", "Serial Number", "Department", "Category", "Status", "Logs")
                         headers.forEach { header ->
                             Card(
                                 modifier = Modifier
@@ -214,6 +224,13 @@ fun BioMedDataPreviewTable(
                                 val messageColor = if (row.validationStatus == ValidationStatus.ERROR)
                                     MaterialTheme.indicatorColors.red else MaterialTheme.indicatorColors.yellow
 
+                                val displayMessage = when (row.message) {
+                                    "Serial Number is blank" -> stringResource(R.string.import_validation_serial_blank)
+                                    "Serial Number already exists" -> stringResource(R.string.import_validation_serial_exists_db)
+                                    "Serial Number already exists in the file" -> stringResource(R.string.import_validation_serial_exists_file)
+                                    else -> row.message
+                                }
+
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -238,7 +255,7 @@ fun BioMedDataPreviewTable(
                                     }
 
                                     Text(
-                                        text = row.message,
+                                        text = displayMessage,
                                         color = messageColor,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
@@ -259,7 +276,7 @@ fun BioMedDataPreviewTable(
             BioMedButton(
                 modifier = Modifier
                     .weight(1f),
-                text = "Select All",
+                text = stringResource(R.string.import_btn_select_all),
                 customColor = MaterialTheme.colorScheme.primary,
                 customTextColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = { onToggleSelectAll(true) }
@@ -268,7 +285,7 @@ fun BioMedDataPreviewTable(
             BioMedButton(
                 modifier = Modifier
                     .weight(1f),
-                text = "Deselect All",
+                text = stringResource(R.string.import_btn_deselect_all),
                 onClick = { onToggleSelectAll(false) }
             )
         }
@@ -276,20 +293,116 @@ fun BioMedDataPreviewTable(
 
 }
 
-@Preview(showBackground = true, device = "id:pixel_9")
+@Preview(showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedDataPreviewTablePreview() {
     BioMedTheme {
         val sampleRows = listOf(
             DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", ValidationStatus.VALID),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Service", "Logs", ValidationStatus.WARNING, "Warning: Serial number format is unusual"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number is blank"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Service",
+                "Logs",
+                ValidationStatus.WARNING,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number is blank"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
         )
         BioMedDataPreviewTable(rows = sampleRows, modifier = Modifier.padding(10.dp))
     }
@@ -297,21 +410,117 @@ fun BioMedDataPreviewTablePreview() {
 
 @Preview(showBackground = true, device = "id:pixel_9", showSystemUi = false,
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedDataPreviewTableDarkPreview() {
     BioMedTheme {
         val sampleRows = listOf(
             DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Online", "Logs", ValidationStatus.VALID),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Service", "Logs", ValidationStatus.WARNING, "Warning: Serial number format is unusual"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
-            DataPreviewRow("1", false,"Fresenius", "4008S", "4545885N70", "Dialysis", "Dialysis Machine", "Down", "Logs", ValidationStatus.ERROR, "Error: Overriding an already existing equipment"),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number is blank"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Service",
+                "Logs",
+                ValidationStatus.WARNING,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number is blank"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
+            DataPreviewRow(
+                "1",
+                false,
+                "Fresenius",
+                "4008S",
+                "4545885N70",
+                "Dialysis",
+                "Dialysis Machine",
+                "Down",
+                "Logs",
+                ValidationStatus.ERROR,
+                "Serial Number already exists in the file"
+            ),
         )
         BioMedDataPreviewTable(rows = sampleRows, modifier = Modifier.padding(10.dp))
     }

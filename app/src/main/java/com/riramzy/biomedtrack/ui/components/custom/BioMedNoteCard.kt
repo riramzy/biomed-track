@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,13 +38,12 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 @Composable
 fun BioMedNoteCard(
     modifier: Modifier = Modifier,
-    note: String,
     onNoteButtonClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
-            .width(386.dp)
-            .height(95.dp),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.5f)
@@ -51,7 +53,6 @@ fun BioMedNoteCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
-                .fillMaxSize()
                 .padding(10.dp)
         ) {
             Row(
@@ -81,7 +82,7 @@ fun BioMedNoteCard(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = note,
+                        text = stringResource(R.string.import_note_format),
                         style = MaterialTheme.typography.bodyMedium,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
@@ -127,7 +128,7 @@ fun BioMedNoteCard(
                             )
 
                             Text(
-                                text = "Download Template",
+                                text = stringResource(R.string.import_note_download_template),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Normal,
@@ -146,25 +147,21 @@ fun BioMedNoteCard(
     }
 }
 
-@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedNoteCardPreview() {
     BioMedTheme {
-        BioMedNoteCard(
-            note = "Excel format must match the exact format of the template for easy and successful data extraction"
-        )
+        BioMedNoteCard()
     }
 }
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedNoteCardDarkPreview() {
     BioMedTheme {
-        BioMedNoteCard(
-            note = "Excel format must match the exact format of the template for easy and successful data extraction"
-        )
+        BioMedNoteCard()
     }
 }

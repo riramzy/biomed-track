@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed class ImportingUiState {
     object Idle: ImportingUiState()
@@ -113,10 +115,16 @@ class ImportingEquipmentVm @Inject constructor(
                     selectedCount = rawEquipment.size
                 )
 
-                _snackbarEvent.emit("Excel file parsed successfully")
+                _snackbarEvent.emit(getApplication<Application>().getString(R.string.import_excel_parsed_success))
             } catch (e: Exception) {
-                _uiState.value = ImportingUiState.Error(e.message ?: "Failed to parse Excel file")
-                _snackbarEvent.emit(e.message ?: "Failed to parse Excel file")
+                _uiState.value = ImportingUiState.Error(
+                    e.message
+                        ?: getApplication<Application>().getString(R.string.import_excel_parse_failed)
+                )
+                _snackbarEvent.emit(
+                    e.message
+                        ?: getApplication<Application>().getString(R.string.import_excel_parse_failed)
+                )
             }
         }
     }
@@ -133,13 +141,14 @@ class ImportingEquipmentVm @Inject constructor(
             .filter { selectedSerials.contains(it.serialNumber) }
 
         if (equipmentToImport.isEmpty()) {
-            viewModelScope.launch { _snackbarEvent.emit("No equipment selected to import") }
+            viewModelScope.launch { _snackbarEvent.emit(getApplication<Application>().getString(R.string.import_no_equipment_selected)) }
             return
         }
 
         if (cachedRawEquipment.isEmpty()) {
-            _uiState.value = ImportingUiState.Error("No valid equipment to import")
-            viewModelScope.launch { _snackbarEvent.emit("No valid equipment to import") }
+            _uiState.value =
+                ImportingUiState.Error(getApplication<Application>().getString(R.string.import_no_valid_equipment))
+            viewModelScope.launch { _snackbarEvent.emit(getApplication<Application>().getString(R.string.import_no_valid_equipment)) }
             return
         }
 
@@ -156,7 +165,10 @@ class ImportingEquipmentVm @Inject constructor(
 
             try {
                 _uiState.value = ImportingUiState.CreatingDepartments
-                addLog("Creating departments...", LogType.SUCCESS)
+                addLog(
+                    getApplication<Application>().getString(R.string.import_log_creating_departments),
+                    LogType.SUCCESS
+                )
 
                 val existingDepartments = departmentRepo.getAllDepartmentsOnce()
                 val existingDepartmentsNames = existingDepartments
@@ -171,7 +183,12 @@ class ImportingEquipmentVm @Inject constructor(
                     }
 
                 if (missingDepartments.isNotEmpty()) {
-                    addLog("Created ${missingDepartments.size} new departments", LogType.SUCCESS)
+                    addLog(
+                        getApplication<Application>().getString(
+                            R.string.import_log_created_departments,
+                            missingDepartments.size
+                        ), LogType.SUCCESS
+                    )
                 }
 
                 for (deptName in missingDepartments) {
@@ -189,10 +206,15 @@ class ImportingEquipmentVm @Inject constructor(
                 val finalDepartments = getAllDepartmentsOnceUseCase()
                 val departmentsMap = finalDepartments.associateBy { it.name.trim().lowercase() }
 
-                val currentUserId = sessionManager.currentUser.value?.id ?: throw Exception("User not logged in")
+                val currentUserId = sessionManager.currentUser.value?.id ?: throw Exception(
+                    getApplication<Application>().getString(R.string.user_mgmt_error_no_user)
+                )
 
                 val equipmentListToImport = equipmentToImport.map { raw ->
-                    val matchedDepartments = departmentsMap[raw.departmentName.trim().lowercase()] ?: throw Exception("Department not found")
+                    val matchedDepartments =
+                        departmentsMap[raw.departmentName.trim().lowercase()] ?: throw Exception(
+                            getApplication<Application>().getString(R.string.import_log_department_not_found)
+                        )
 
                     Equipment(
                         id = UUID.randomUUID().toString(),
@@ -200,13 +222,14 @@ class ImportingEquipmentVm @Inject constructor(
                         model = raw.model,
                         serialNumber = raw.serialNumber,
                         manufacturer = raw.manufacturer,
-                        agent = raw.agent.ifBlank { "None" },
+                        agent = raw.agent.ifBlank { getApplication<Application>().getString(R.string.none) },
                         category = raw.category,
                         department = matchedDepartments,
                         location = raw.location.ifBlank { matchedDepartments.name },
                         status = try {
                             EquipmentStatus.valueOf(raw.status.uppercase())
                         } catch (e: Exception) {
+                            e.printStackTrace()
                             EquipmentStatus.ONLINE
                         },
                         installDate = parseDateToLong(raw.installDate),
@@ -232,7 +255,14 @@ class ImportingEquipmentVm @Inject constructor(
 
                 for ((index, chunk) in chunks.withIndex()) {
                     try {
-                        addLog("Saving batch ${index + 1} of $totalChunks (${chunk.size} items)", LogType.SUCCESS)
+                        addLog(
+                            getApplication<Application>().getString(
+                                R.string.import_log_saving_batch,
+                                index + 1,
+                                totalChunks,
+                                chunk.size
+                            ), LogType.SUCCESS
+                        )
 
                         val currentProgress = index.toFloat() / totalChunks.toFloat()
 
@@ -247,7 +277,12 @@ class ImportingEquipmentVm @Inject constructor(
 
                         totalImported += chunk.size
 
-                        addLog("Batch ${index + 1} saved successfully", LogType.SUCCESS)
+                        addLog(
+                            getApplication<Application>().getString(
+                                R.string.import_log_batch_saved_success,
+                                index + 1
+                            ), LogType.SUCCESS
+                        )
 
                         val newProgress = (index + 1).toFloat() / totalChunks.toFloat()
 
@@ -258,9 +293,15 @@ class ImportingEquipmentVm @Inject constructor(
                             liveLogs = currentLogs.toList()
                         )
 
-                        delay(700)
+                        delay(700.milliseconds)
                     } catch (e: Exception) {
-                        addLog("Failed to save batch ${index + 1}: ${e.message}", LogType.ERROR)
+                        addLog(
+                            getApplication<Application>().getString(
+                                R.string.import_log_batch_save_failed,
+                                index + 1,
+                                e.message
+                            ), LogType.ERROR
+                        )
 
                         totalFailed += chunk.size
 
@@ -278,7 +319,10 @@ class ImportingEquipmentVm @Inject constructor(
                 cachedRawEquipment = emptyList()
                 cachedUniqueDepartments = emptySet()
 
-                addLog("All batches saved successfully", LogType.SUCCESS)
+                addLog(
+                    getApplication<Application>().getString(R.string.import_log_all_batches_saved),
+                    LogType.SUCCESS
+                )
 
                 val statsByDepartment = equipmentListToImport.groupBy { it.department.id }
 
@@ -303,10 +347,21 @@ class ImportingEquipmentVm @Inject constructor(
                     failedCount = totalFailed
                 )
 
-                _snackbarEvent.emit("${equipmentListToImport.size} Equipment imported successfully")
+                _snackbarEvent.emit(
+                    getApplication<Application>().getString(
+                        R.string.import_success_equipment,
+                        equipmentListToImport.size
+                    )
+                )
             } catch (e: Exception) {
-                _uiState.value = ImportingUiState.Error(e.message ?: "Failed to import equipment")
-                _snackbarEvent.emit(e.message ?: "Failed to parse Excel file")
+                _uiState.value = ImportingUiState.Error(
+                    e.message
+                        ?: getApplication<Application>().getString(R.string.import_failed_equipment)
+                )
+                _snackbarEvent.emit(
+                    e.message
+                        ?: getApplication<Application>().getString(R.string.import_excel_parse_failed)
+                )
             }
         }
     }
@@ -350,10 +405,16 @@ class ImportingEquipmentVm @Inject constructor(
                     }
                 }
 
-                _snackbarEvent.emit("Template downloaded successfully")
+                _snackbarEvent.emit(getApplication<Application>().getString(R.string.import_template_downloaded))
             } catch (e: Exception) {
-                _uiState.value = ImportingUiState.Error(e.message ?: "Failed to download template")
-                _snackbarEvent.emit(e.message ?: "Failed to download template")
+                _uiState.value = ImportingUiState.Error(
+                    e.message
+                        ?: getApplication<Application>().getString(R.string.import_template_download_failed)
+                )
+                _snackbarEvent.emit(
+                    e.message
+                        ?: getApplication<Application>().getString(R.string.import_template_download_failed)
+                )
             }
         }
     }

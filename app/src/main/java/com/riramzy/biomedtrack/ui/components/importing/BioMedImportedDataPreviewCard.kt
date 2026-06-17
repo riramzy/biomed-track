@@ -17,10 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.components.custom.BioMedStatusIndicator
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
@@ -63,7 +65,7 @@ fun BioMedImportedDataPreviewCard(
                 )
 
                 Text(
-                    text = "Total rows found in file",
+                    text = stringResource(R.string.import_total_rows),
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal
@@ -75,21 +77,21 @@ fun BioMedImportedDataPreviewCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BioMedStatusIndicator(
-                    status = "$validRows Valid",
+                    status = stringResource(R.string.import_valid_rows, validRows),
                     color = MaterialTheme.indicatorColors.green,
                     changeable = false,
-                    onStatusClicked = {}
+                    onStatusClicked = {},
                 )
 
                 BioMedStatusIndicator(
-                    status = "$warningRows Warnings",
+                    status = stringResource(R.string.import_warning_rows, warningRows),
                     color = MaterialTheme.indicatorColors.yellow,
                     changeable = false,
                     onStatusClicked = {}
                 )
 
                 BioMedStatusIndicator(
-                    status = "$errorRows Errors",
+                    status = stringResource(R.string.import_error_rows, errorRows),
                     color = MaterialTheme.indicatorColors.red,
                     changeable = false,
                     onStatusClicked = {}
@@ -99,7 +101,7 @@ fun BioMedImportedDataPreviewCard(
     }
 }
 
-@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9")
+@Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedImportedDataPreviewCardPreview() {
     BioMedTheme {
@@ -109,7 +111,7 @@ fun BioMedImportedDataPreviewCardPreview() {
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedImportedDataPreviewCardDarkPreview() {

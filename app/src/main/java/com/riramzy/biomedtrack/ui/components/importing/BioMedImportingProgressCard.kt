@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -103,7 +104,7 @@ fun BioMedImportingProgressCard(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Importing Equipment",
+                text = stringResource(R.string.import_progress_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
@@ -114,7 +115,7 @@ fun BioMedImportingProgressCard(
                 }
             )
             Text(
-                text = "Please do not close the app",
+                text = stringResource(R.string.import_progress_warning),
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
@@ -133,7 +134,7 @@ fun BioMedImportingProgressCard(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Live Log",
+                    text = stringResource(R.string.import_progress_live_log),
                     style = MaterialTheme.typography.titleLarge,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -198,7 +199,7 @@ private fun ImportLogItem(
     }
 }
 
-@Preview(showBackground = true, device = "id:pixel_9")
+@Preview(showBackground = true, device = "id:pixel_9", locale = "ar")
 @Composable
 fun BioMedImportingProgressCardPreview() {
     BioMedTheme {
@@ -214,7 +215,7 @@ fun BioMedImportingProgressCardPreview() {
 }
 
 @Preview(showBackground = true, device = "id:pixel_9", backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedImportingProgressCardDarkPreview() {
