@@ -1,7 +1,7 @@
 package com.riramzy.biomedtrack.domain.usecase.equipment
 
-import com.riramzy.biomedtrack.ui.components.importing.DataPreviewRow
-import com.riramzy.biomedtrack.ui.components.importing.ValidationStatus
+import com.riramzy.biomedtrack.utils.DataPreviewRow
+import com.riramzy.biomedtrack.utils.ValidationStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.poi.ss.usermodel.DataFormatter

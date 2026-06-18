@@ -44,25 +44,8 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedRadioButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
-import java.util.UUID
-
-data class DataPreviewRow(
-    val id: String = UUID.randomUUID().toString(),
-    val isSelected: Boolean = false,
-    val name: String,
-    val model: String,
-    val serialNumber: String,
-    val department: String,
-    val category: String,
-    val status: String,
-    val logs: String,
-    val validationStatus: ValidationStatus = ValidationStatus.VALID,
-    val message: String? = null
-)
-
-enum class ValidationStatus {
-    VALID, ERROR, WARNING
-}
+import com.riramzy.biomedtrack.utils.DataPreviewRow
+import com.riramzy.biomedtrack.utils.ValidationStatus
 
 @Composable
 fun BioMedDataPreviewTable(
