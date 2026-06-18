@@ -16,15 +16,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.components.equipment.BioMedOverdueEquipmentCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+
 import com.riramzy.biomedtrack.utils.TaskStatus
 
 @Composable
@@ -58,7 +61,10 @@ fun BioMedOverdueExpandedSection(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = "Overdue Maintenance (${overdueTasks.size})",
+                    text = stringResource(
+                        R.string.scheduler_overdue_maintenance,
+                        overdueTasks.size
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -82,7 +88,7 @@ fun BioMedOverdueExpandedSection(
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar")
 @Composable
 fun BioMedOverdueExpandedSectionPreview() {
     BioMedTheme {

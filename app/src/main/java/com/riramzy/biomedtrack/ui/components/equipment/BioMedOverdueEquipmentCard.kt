@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
 import com.riramzy.biomedtrack.utils.TaskStatus
 import com.riramzy.biomedtrack.utils.Timestamps.toDateString
+import com.riramzy.biomedtrack.utils.getLocalizedDepartmentName
 
 @Composable
 fun BioMedOverdueEquipmentCard(
@@ -70,7 +72,7 @@ fun BioMedOverdueEquipmentCard(
                     .size(34.dp)
                     .clip(CircleShape)
                     .background(
-                        when(task.status) {
+                        when (task.status) {
                             TaskStatus.PENDING -> MaterialTheme.indicatorColors.yellow
                             TaskStatus.IN_PROGRESS -> MaterialTheme.indicatorColors.red
                             TaskStatus.DONE -> MaterialTheme.indicatorColors.green
@@ -111,7 +113,7 @@ fun BioMedOverdueEquipmentCard(
                 )
 
                 Text(
-                    text = task.equipmentSerial,
+                    text = stringResource(R.string.task_serial_format, task.equipmentSerial),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.labelSmall,
@@ -123,7 +125,7 @@ fun BioMedOverdueEquipmentCard(
                 )
 
                 Text(
-                    text = task.department.name,
+                    text = getLocalizedDepartmentName(task.department.name),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
                     style = MaterialTheme.typography.labelSmall,
@@ -169,7 +171,7 @@ fun BioMedOverdueEquipmentCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedOverdueEquipmentCardPreview() {
     BioMedTheme {
