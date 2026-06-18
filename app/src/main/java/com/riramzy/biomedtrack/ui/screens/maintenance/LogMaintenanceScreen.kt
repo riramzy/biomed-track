@@ -31,12 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
@@ -86,7 +88,9 @@ fun LogMaintenanceScreenContent(
     changePassword: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, _ -> },
     logout: (() -> Unit) -> Unit = {}
 ) {
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val dismissLabel = stringResource(R.string.dismiss)
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
@@ -99,7 +103,7 @@ fun LogMaintenanceScreenContent(
             snackbarHostState.showSnackbar(
                 message,
                 withDismissAction = true,
-                actionLabel = "Dismiss",
+                actionLabel = dismissLabel,
                 duration = SnackbarDuration.Short
             )
         }
@@ -107,8 +111,6 @@ fun LogMaintenanceScreenContent(
     }
 
     val sheetState = rememberModalBottomSheetState()
-
-    val context = LocalContext.current
 
     var showProfileBottomSheet by remember { mutableStateOf(false) }
     var showMyProfileDialog by remember { mutableStateOf(false) }
@@ -171,7 +173,11 @@ fun LogMaintenanceScreenContent(
                 changePassword(current, new) { result ->
                     when (result) {
                         is Result.Success -> {
-                            Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                R.string.password_updated_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             showChangePasswordDialog = false
                         }
                         is Result.Error -> {
@@ -266,7 +272,7 @@ fun LogMaintenanceScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9")
+@Preview(device = "id:pixel_9", locale = "ar")
 @Composable
 fun LogMaintenanceScreenPreview() {
     BioMedTheme {

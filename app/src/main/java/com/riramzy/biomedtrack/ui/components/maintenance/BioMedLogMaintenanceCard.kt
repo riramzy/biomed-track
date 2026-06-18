@@ -201,10 +201,10 @@ fun BioMedLogMaintenanceCard(
                     )
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 BioMedButton(
-                    modifier = Modifier.padding(end = 10.dp),
+                    modifier = Modifier.weight(1f),
                     text = stringResource(R.string.btn_save),
                     customColor = MaterialTheme.colorScheme.primary,
                     customTextColor = MaterialTheme.colorScheme.onPrimary,
@@ -212,6 +212,7 @@ fun BioMedLogMaintenanceCard(
                 )
 
                 BioMedButton(
+                    modifier = Modifier.weight(1f),
                     text = stringResource(R.string.btn_cancel),
                     customColor = MaterialTheme.colorScheme.primaryContainer,
                     customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,

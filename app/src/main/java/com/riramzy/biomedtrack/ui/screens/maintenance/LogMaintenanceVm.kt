@@ -1,9 +1,11 @@
 package com.riramzy.biomedtrack.ui.screens.maintenance
 
+import android.content.Context
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
@@ -16,6 +18,7 @@ import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.MaintenanceType
 import com.riramzy.biomedtrack.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,6 +60,7 @@ sealed class LogMaintenanceAction {
 
 @HiltViewModel
 class LogMaintenanceVm @Inject constructor(
+    @param:ApplicationContext val context: Context,
     stateHandle: SavedStateHandle,
     private val getEquipmentByIdUseCase: GetEquipmentByIdUseCase,
     private val addMaintenanceLogUseCase: AddMaintenanceLogUseCase,
@@ -82,12 +86,22 @@ class LogMaintenanceVm @Inject constructor(
             val equipment = getEquipmentByIdUseCase(equipmentId)
 
             if (user == null) {
-                _uiState.update { it.copy(isError = "Session expired", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_session_expired),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
             if (equipment == null) {
-                _uiState.update { it.copy(isError = "Equipment not found", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.no_equipment_found),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 
@@ -126,16 +140,48 @@ class LogMaintenanceVm @Inject constructor(
             _uiState.update {
                 it.copy(
                     checklist = listOf(
-                        ChecklistItem("1", "Visual Inspection", false),
-                        ChecklistItem("2", "Electrical Safety Check", false),
-                        ChecklistItem("3", "Cleaning", false),
-                        ChecklistItem("4", "Functional Test", false),
-                        ChecklistItem("5", "Alarm Verification,", false),
-                        ChecklistItem("6", "Filters Inspection", false),
-                        ChecklistItem("7", "Calibration", false),
-                        ChecklistItem("8", "Wear Parts Evaluation", false),
-                        ChecklistItem("9", "Software Check", false),
-                        ChecklistItem("10", "Documentation", false)
+                        ChecklistItem(
+                            "1",
+                            context.getString(R.string.checklist_visual_inspection),
+                            false
+                        ),
+                        ChecklistItem(
+                            "2",
+                            context.getString(R.string.checklist_electrical_safety),
+                            false
+                        ),
+                        ChecklistItem("3", context.getString(R.string.checklist_cleaning), false),
+                        ChecklistItem(
+                            "4",
+                            context.getString(R.string.checklist_functional_test),
+                            false
+                        ),
+                        ChecklistItem(
+                            "5",
+                            context.getString(R.string.checklist_alarm_verification),
+                            false
+                        ),
+                        ChecklistItem(
+                            "6",
+                            context.getString(R.string.checklist_filters_inspection),
+                            false
+                        ),
+                        ChecklistItem(
+                            "7",
+                            context.getString(R.string.checklist_calibration),
+                            false
+                        ),
+                        ChecklistItem("8", context.getString(R.string.checklist_wear_parts), false),
+                        ChecklistItem(
+                            "9",
+                            context.getString(R.string.checklist_software_check),
+                            false
+                        ),
+                        ChecklistItem(
+                            "10",
+                            context.getString(R.string.checklist_documentation),
+                            false
+                        )
                     )
                 )
             }
@@ -166,7 +212,12 @@ class LogMaintenanceVm @Inject constructor(
             var finalPhotoUrl: String? = null
 
             if (user == null) {
-                _uiState.update { it.copy(isError = "Session expired", isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isError = context.getString(R.string.error_session_expired),
+                        isLoading = false
+                    )
+                }
                 return@launch
             }
 

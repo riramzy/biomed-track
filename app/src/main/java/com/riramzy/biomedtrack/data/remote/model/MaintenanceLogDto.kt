@@ -32,11 +32,21 @@ data class MaintenanceLogDto(
         equipmentModel = equipmentModel,
         equipmentSerial = equipmentSerial,
         department = department.toDomain(),
-        type = MaintenanceType.valueOf(type),
+        type = try {
+            MaintenanceType.valueOf(type)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            MaintenanceType.ROUTINE
+        },
         technicianId = technicianId,
         technicianName = technicianName,
         date = date,
-        currentStatus = EquipmentStatus.valueOf(currentStatus),
+        currentStatus = try {
+            EquipmentStatus.valueOf(currentStatus)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            EquipmentStatus.ONLINE
+        },
         checklist = checklist.map { map ->
             ChecklistItem(
                 id = map["id"] as? String ?: "",
