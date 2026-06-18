@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -55,7 +53,8 @@ fun BioMedEquipmentStatusCard(
     equipmentStatus: EquipmentStatus = EquipmentStatus.SERVICE,
     equipmentLastServiceDate: Long = 1/1/2026,
     isAbbreviated: Boolean = true,
-    notes: String? = null
+    notes: String? = null,
+    onCardClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -67,7 +66,8 @@ fun BioMedEquipmentStatusCard(
             } else {
                 MaterialTheme.colorScheme.primaryContainer.copy(0.7f)
             }
-        )
+        ),
+        onClick = onCardClick
     ) {
         Row(
             modifier = Modifier.padding(10.dp),
@@ -80,7 +80,7 @@ fun BioMedEquipmentStatusCard(
                     .size(if (isAbbreviated) (24.dp) else (35.dp))
                     .clip(CircleShape)
                     .background(
-                        when(equipmentStatus) {
+                        when (equipmentStatus) {
                             EquipmentStatus.ONLINE -> MaterialTheme.indicatorColors.green
                             EquipmentStatus.DOWN -> MaterialTheme.indicatorColors.red
                             EquipmentStatus.SERVICE -> MaterialTheme.indicatorColors.yellow

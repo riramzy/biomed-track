@@ -308,10 +308,10 @@ fun BioMedEditEquipmentCard(
                     )
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 BioMedButton(
-                    modifier = Modifier.padding(end = 10.dp),
+                    modifier = Modifier.weight(1f),
                     text = stringResource(R.string.btn_save),
                     customColor = if (isSystemInDarkTheme()) {
                         MaterialTheme.colorScheme.primary
@@ -340,7 +340,8 @@ fun BioMedEditEquipmentCard(
                     } else {
                         MaterialTheme.colorScheme.onPrimaryContainer
                     },
-                    onClick = { onCancel() }
+                    onClick = { onCancel() },
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

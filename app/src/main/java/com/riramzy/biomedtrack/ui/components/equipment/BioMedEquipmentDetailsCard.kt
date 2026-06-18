@@ -5,7 +5,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -18,10 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.ui.components.custom.BioMedDeleteButton
@@ -30,6 +34,7 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedHeader
 import com.riramzy.biomedtrack.ui.components.custom.BioMedStatusIndicator
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.EquipmentStatus
+import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 
 @Composable
 fun BioMedEquipmentDetailsCard(
@@ -37,8 +42,10 @@ fun BioMedEquipmentDetailsCard(
     equipment: Equipment,
     canEditEquipment: Boolean,
     canDeleteEquipment: Boolean,
+    canChangeStatus: Boolean,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onStatusClick: () -> Unit
 ) {
     Card(
         modifier = modifier
@@ -101,18 +108,23 @@ fun BioMedEquipmentDetailsCard(
 
                     BioMedStatusIndicator(
                         status = equipment.status.name,
-                        changeable = true
+                        changeable = canChangeStatus,
+                        onStatusClicked = { onStatusClick() }
                     )
                 }
 
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.SpaceAround,
                     horizontalAlignment = Alignment.End,
                     modifier = Modifier
                         .weight(1f)
                 ) {
                     if (canEditEquipment) {
                         BioMedEditButton(onClick = { onEditClick() })
+                    }
+
+                    if (canDeleteEquipment && canEditEquipment) {
+                        Spacer(Modifier.height(8.dp))
                     }
 
                     if (canDeleteEquipment) {
@@ -123,30 +135,42 @@ fun BioMedEquipmentDetailsCard(
         }
 
         Section(
-            title = "Equipment Details",
+            title = stringResource(id = R.string.label_equipment_details),
             items = listOf(
-                Pair("Model", equipment.model),
-                Pair("Manufacturer", equipment.manufacturer),
-                Pair("Agent", equipment.agent),
-                Pair("Category", equipment.category),
-                Pair("Department", equipment.department.name)
+                Pair(stringResource(id = R.string.field_model), equipment.model),
+                Pair(stringResource(id = R.string.field_manufacturer), equipment.manufacturer),
+                Pair(stringResource(id = R.string.field_agent), equipment.agent),
+                Pair(stringResource(id = R.string.field_category), equipment.category),
+                Pair(stringResource(id = R.string.field_department), equipment.department.name)
             )
         )
 
         Section(
-            title = "Location and Dates",
+            title = stringResource(id = R.string.label_location_and_dates),
             items = listOf(
-                Pair("Location", equipment.location),
-                Pair("Installation Date", equipment.installDate),
-                Pair("Contract", equipment.contractInfo ?: "No contract")
+                Pair(stringResource(id = R.string.field_location), equipment.location),
+                Pair(
+                    stringResource(id = R.string.field_install_date),
+                    equipment.installDate.toDateString()
+                ),
+                Pair(
+                    stringResource(id = R.string.field_contract_info),
+                    equipment.contractInfo ?: "No contract"
+                )
             )
         )
 
         Section(
-            title = "Maintenance Schedule",
+            title = stringResource(R.string.maintenance_schedule),
             items = listOf(
-                Pair("Next Service", equipment.nextMaintenanceDate ?: "None"),
-                Pair("Last Service", equipment.lastMaintenanceDate ?: "Never"),
+                Pair(
+                    stringResource(R.string.label_next_service),
+                    equipment.nextMaintenanceDate?.toDateString() ?: "Not set"
+                ),
+                Pair(
+                    stringResource(R.string.field_last_maintenance_date),
+                    equipment.lastMaintenanceDate?.toDateString() ?: "Never"
+                ),
             )
         )
     }
@@ -231,9 +255,9 @@ fun BioMedEquipmentDetailsCardPreview() {
                 ),
                 status = EquipmentStatus.SERVICE,
                 location = "Dialysis Unit",
-                installDate = "12/2/2014",
-                nextMaintenanceDate = "21/3/2026",
-                lastMaintenanceDate = "12/1/2026",
+                installDate = 12 / 2 / 2014,
+                nextMaintenanceDate = 21 / 3 / 2026,
+                lastMaintenanceDate = 12 / 1 / 2026,
                 manufacturer = "Fresenius Medical Group",
                 agent = "EGMED",
                 category = "Dialysis Machine",
@@ -242,14 +266,16 @@ fun BioMedEquipmentDetailsCardPreview() {
             ),
             canEditEquipment = true,
             canDeleteEquipment = true,
+            canChangeStatus = true,
             onEditClick = {},
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onStatusClick = {}
         )
     }
 }
 
 @Preview(device = "id:pixel_9", showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedEquipmentDetailsCardDarkPreview() {
@@ -269,9 +295,9 @@ fun BioMedEquipmentDetailsCardDarkPreview() {
                 ),
                 status = EquipmentStatus.SERVICE,
                 location = "Dialysis Unit",
-                installDate = "12/2/2014",
-                nextMaintenanceDate = "21/3/2026",
-                lastMaintenanceDate = "12/1/2026",
+                installDate = 12 / 2 / 2014,
+                nextMaintenanceDate = 21 / 3 / 2026,
+                lastMaintenanceDate = 12 / 1 / 2026,
                 manufacturer = "Fresenius Medical Group",
                 agent = "EGMED",
                 category = "Dialysis Machine",
@@ -280,6 +306,8 @@ fun BioMedEquipmentDetailsCardDarkPreview() {
             ),
             canEditEquipment = true,
             canDeleteEquipment = true,
+            canChangeStatus = true,
+            onStatusClick = {},
             onEditClick = {},
             onDeleteClick = {}
         )

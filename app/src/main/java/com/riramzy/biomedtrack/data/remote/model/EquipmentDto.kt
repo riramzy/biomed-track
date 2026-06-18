@@ -34,7 +34,12 @@ data class EquipmentDto(
         agent = agent,
         category = category,
         department = department.toDomain(),
-        status = EquipmentStatus.valueOf(status),
+        status = try {
+            EquipmentStatus.valueOf(status)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            EquipmentStatus.ONLINE
+        },
         location = location,
         installDate = installDate,
         lastMaintenanceDate = lastMaintenanceDate,

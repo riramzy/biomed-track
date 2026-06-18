@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.ui.screens.equipment.details
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
@@ -94,6 +97,7 @@ fun EquipmentDetailScreen(
     )
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EquipmentDetailsScreenContent(
@@ -163,7 +167,7 @@ fun EquipmentDetailsScreenContent(
                             )
 
                             BioMedButton(
-                                text = "Retry",
+                                text = stringResource(R.string.retry),
                                 onClick = { onRetryClick() },
                                 customColor = MaterialTheme.colorScheme.error,
                                 customTextColor = MaterialTheme.colorScheme.onError,
@@ -268,7 +272,11 @@ fun EquipmentDetailsScreenContent(
                         changePassword(current, new) { result ->
                             when (result) {
                                 is Result.Success -> {
-                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.password_updated_success,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     showChangePasswordDialog = false
                                 }
                                 is Result.Error -> {
@@ -303,11 +311,11 @@ fun EquipmentDetailsScreenContent(
             if (showDeleteDialog) {
                 AlertDialog(
                     onDismissRequest = { showDeleteDialog = false },
-                    text = { Text("Are you sure you want to delete this equipment? This procedure cannot be undone") },
-                    title = { Text("Delete") },
+                    text = { Text(stringResource(R.string.delete_dialog_body)) },
+                    title = { Text(stringResource(R.string.delete_dialog_title)) },
                     confirmButton = {
                         BioMedButton(
-                            text = "Delete",
+                            text = stringResource(R.string.delete_dialog_title),
                             customColor = MaterialTheme.indicatorColors.red,
                             customTextColor = Color.White,
                             onClick = {
@@ -318,7 +326,7 @@ fun EquipmentDetailsScreenContent(
                     },
                     dismissButton = {
                         BioMedButton(
-                            text = "Cancel",
+                            text = stringResource(R.string.btn_cancel),
                             onClick = { showDeleteDialog= false }
                         )
                     }
@@ -332,14 +340,14 @@ fun EquipmentDetailsScreenContent(
                     when(result) {
                         is Result.Success -> {
                             snackbarHostState.showSnackbar(
-                                "Equipment deleted successfully",
+                                context.getString(R.string.equipment_deleted_success),
                                 duration = SnackbarDuration.Short
                             )
                             navController.popBackStack(Screen.Inventory.route, false)
                         }
                         is Result.Error -> {
                             snackbarHostState.showSnackbar(
-                                "Failed to delete: ${result.message}",
+                                context.getString(R.string.equipment_delete_failed, result.message),
                                 duration = SnackbarDuration.Short
                             )
                         }
@@ -363,8 +371,8 @@ fun EquipmentDetailsScreenContent(
                     BioMedNavBar(
                         selectedPage = "Inventory",
                         withActionButton = true,
-                        isActionButtonText = true,
-                        actionButtonText = "Log",
+                        isActionButtonText = false,
+                        actionButtonIcon = R.drawable.activity_log,
                         onActionButtonClick = { navController.navigate(Screen.LogMaintenance.createRoute(state.equipment.id)) },
                         onDashboardClick = { navController.navigate(Screen.Dashboard.route) },
                         onSchedulerClick = { navController.navigate(Screen.Scheduler.route) },
@@ -416,7 +424,7 @@ fun EquipmentDetailsScreenContent(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Maintenance History",
+                                text = stringResource(R.string.section_maintenance_history),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.ExtraBold,
@@ -445,7 +453,7 @@ fun EquipmentDetailsScreenContent(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Status Changes History",
+                                text = stringResource(R.string.section_status_history),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.ExtraBold,
@@ -568,7 +576,7 @@ fun EquipmentDetailsScreenPreview() {
 }
 
 @Preview(device = "id:pixel_9", showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun EquipmentDetailsScreenDarkPreview() {
