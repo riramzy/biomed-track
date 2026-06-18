@@ -155,6 +155,8 @@ fun BioMedDataPreviewTable(
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
+                            val rowScrollState = rememberScrollState()
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -179,7 +181,7 @@ fun BioMedDataPreviewTable(
 
                                 Row(
                                     modifier = Modifier
-                                        .horizontalScroll(scrollState)
+                                        .horizontalScroll(rowScrollState)
                                         .fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(30.dp)
                                 ) {
