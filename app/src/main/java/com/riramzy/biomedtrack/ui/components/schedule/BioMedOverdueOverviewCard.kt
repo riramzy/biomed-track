@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.ui.theme.indicatorColors
+
 
 @Composable
 fun BioMedOverdueOverviewCard(
@@ -97,7 +100,11 @@ fun BioMedOverdueOverviewCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "$overdueCount equipment ${if (overdueCount == 1) "is" else "are"} overdue for maintenance",
+                        text = pluralStringResource(
+                            R.plurals.scheduler_equipment_overdue_message,
+                            overdueCount,
+                            overdueCount
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -105,13 +112,14 @@ fun BioMedOverdueOverviewCard(
                             Color.White
                         } else {
                             Color(0xFF980000)
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(Modifier.height(10.dp))
 
                     Text(
-                        text = "Please schedule maintenance as soon as possible",
+                        text = stringResource(R.string.scheduler_overdue_prompt),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
@@ -119,7 +127,8 @@ fun BioMedOverdueOverviewCard(
                             Color.White
                         } else {
                             Color(0xFF980000)
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 
@@ -138,7 +147,7 @@ fun BioMedOverdueOverviewCard(
                     } else {
                         Color.White
                     },
-                    text = "View All",
+                    text = stringResource(R.string.view_all),
                     onClick = onViewAllClick
                 )
             }
@@ -146,7 +155,7 @@ fun BioMedOverdueOverviewCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar")
 @Composable
 fun BioMedOverdueOverviewCardPreview() {
     BioMedTheme {
