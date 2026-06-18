@@ -1,6 +1,5 @@
 package com.riramzy.biomedtrack.data.repo
 
-import android.content.Context
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.riramzy.biomedtrack.data.local.dao.MaintenanceLogDao
@@ -8,11 +7,11 @@ import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.MaintenanceLogDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.MaintenanceLog
 import com.riramzy.biomedtrack.domain.repo.MaintenanceRepo
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.riramzy.biomedtrack.utils.FcmDispatcher
+import com.riramzy.biomedtrack.utils.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -25,7 +24,7 @@ import javax.inject.Inject
 class MaintenanceRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val maintenanceDao: MaintenanceLogDao,
-    @param:ApplicationContext private val context: Context
+    private val dispatcher: FcmDispatcher
 ): MaintenanceRepo {
     override fun getAllMaintenanceLogs(): Flow<List<MaintenanceLog>> = callbackFlow {
         val listener = firebaseFirestore
@@ -130,7 +129,6 @@ class MaintenanceRepoImpl @Inject constructor(
                 .await()
 
             try {
-                val dispatcher = com.riramzy.biomedtrack.utils.FcmDispatcher(context)
                 dispatcher.pushNotification(
                     targetToken = "/topics/admin_alerts",
                     title = "Maintenance Completed",

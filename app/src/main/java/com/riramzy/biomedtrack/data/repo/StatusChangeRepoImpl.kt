@@ -1,6 +1,5 @@
 package com.riramzy.biomedtrack.data.repo
 
-import android.content.Context
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -9,11 +8,10 @@ import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.StatusChangeLogDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.StatusChangeLog
 import com.riramzy.biomedtrack.domain.repo.StatusChangeRepo
 import com.riramzy.biomedtrack.utils.FcmDispatcher
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.riramzy.biomedtrack.utils.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -26,7 +24,7 @@ import javax.inject.Inject
 class StatusChangeRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val statusChangeDao: StatusChangeLogDao,
-    @param:ApplicationContext private val context: Context
+    private val dispatcher: FcmDispatcher
 ): StatusChangeRepo {
     override fun getRecentStatusChanges(limit: Int): Flow<List<StatusChangeLog>> = callbackFlow {
         val listener = firebaseFirestore
@@ -91,8 +89,6 @@ class StatusChangeRepoImpl @Inject constructor(
                     .collection(FirestoreCollections.TECHNICIANS)
                     .get()
                     .await()
-
-                val dispatcher = FcmDispatcher(context)
 
                 for (doc in usersSnap.documents) {
                     val role = doc.getString("role")

@@ -2,9 +2,7 @@ package com.riramzy.biomedtrack.utils
 
 import android.content.Context
 import com.google.auth.oauth2.GoogleCredentials
-import com.riramzy.biomedtrack.R
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -13,11 +11,14 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FcmDispatcher(
-    private val context: Context
+@Singleton
+class FcmDispatcher @Inject constructor(
+    private val context: Context,
+    private val client: HttpClient
 ) {
-    private val client = HttpClient(CIO)
     private val projectId = "biomed-track"
 
     suspend fun pushNotification(
