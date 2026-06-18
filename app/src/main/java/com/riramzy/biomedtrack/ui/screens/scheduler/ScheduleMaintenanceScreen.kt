@@ -17,11 +17,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.ui.components.custom.BioMedNavBar
 import com.riramzy.biomedtrack.ui.components.custom.BioMedSnackbar
@@ -29,6 +31,7 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.schedule.BioMedScheduleMaintenanceCard
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.Screen
+
 
 @Composable
 fun ScheduleMaintenanceScreen(
@@ -51,6 +54,7 @@ fun ScheduleMaintenanceScreenContent(
     onAction: (ScheduleMaintenanceAction) -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val dismissLabel = stringResource(R.string.dismiss)
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
@@ -66,7 +70,7 @@ fun ScheduleMaintenanceScreenContent(
         state.isError?.let { message ->
             snackbarHostState.showSnackbar(
                 message,
-                actionLabel = "Dismiss",
+                actionLabel = dismissLabel,
                 withDismissAction = true
             )
             onAction(ScheduleMaintenanceAction.ResetError)
@@ -145,7 +149,7 @@ fun ScheduleMaintenanceScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun ScheduleMaintenanceScreenPreview() {
     BioMedTheme {

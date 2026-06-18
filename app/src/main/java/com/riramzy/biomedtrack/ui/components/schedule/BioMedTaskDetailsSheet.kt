@@ -27,15 +27,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+
 import com.riramzy.biomedtrack.utils.TaskStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +64,7 @@ fun BioMedTaskDetailsSheet(
         )
 
         Text(
-            text = "Serial Number: ${task.equipmentSerial}",
+            text = stringResource(R.string.task_details_serial, task.equipmentSerial),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium,
@@ -81,7 +84,7 @@ fun BioMedTaskDetailsSheet(
                     modifier = Modifier.padding(15.dp)
                 ) {
                     Text(
-                        text = "Supervisor Notes",
+                        text = stringResource(R.string.task_details_notes_title),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -101,7 +104,10 @@ fun BioMedTaskDetailsSheet(
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "Configured Safety Checklist (${task.scheduledChecklist.size} steps)",
+            text = stringResource(
+                R.string.task_details_checklist_title,
+                task.scheduledChecklist.size
+            ),
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
@@ -141,9 +147,9 @@ fun BioMedTaskDetailsSheet(
         Spacer(modifier = Modifier.height(15.dp))
 
         val buttonText = when (task.status) {
-            TaskStatus.PENDING -> "Start Service"
-            TaskStatus.IN_PROGRESS -> "Resume Service"
-            TaskStatus.DONE -> "Completed"
+            TaskStatus.PENDING -> stringResource(R.string.task_details_btn_start)
+            TaskStatus.IN_PROGRESS -> stringResource(R.string.task_details_btn_resume)
+            TaskStatus.DONE -> stringResource(R.string.status_done)
         }
 
         val isButtonEnabled = task.status != TaskStatus.DONE
@@ -159,7 +165,7 @@ fun BioMedTaskDetailsSheet(
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar")
 @Composable
 fun BioMedTaskDetailsSheetPreview() {
     BioMedTheme {

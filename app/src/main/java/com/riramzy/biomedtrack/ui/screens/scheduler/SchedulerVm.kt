@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
+import java.util.Date
 import javax.inject.Inject
 
 sealed class SchedulerUiState {
@@ -174,6 +175,6 @@ class SchedulerVm @Inject constructor(
 
     private fun formatWeekRange(start: Long, end: Long): String {
         val sdf = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
-        return "${sdf.format(java.util.Date(start))} - ${sdf.format(java.util.Date(end))}"
+        return "${sdf.format(Date(start))} - ${sdf.format(Date(end))}"
     }
 }

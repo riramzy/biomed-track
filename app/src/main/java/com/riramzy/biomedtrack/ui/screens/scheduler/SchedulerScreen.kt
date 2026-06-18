@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.riramzy.biomedtrack.R
+
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
@@ -220,7 +222,7 @@ fun SchedulerScreenContent(
                                 is Result.Success -> {
                                     Toast.makeText(
                                         context,
-                                        "Password updated successfully!",
+                                        R.string.password_updated_success,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     showChangePasswordDialog = false
@@ -307,14 +309,14 @@ fun SchedulerScreenContent(
                             horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
-                                text = "Scheduler",
+                                text = stringResource(R.string.scheduler_title),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.ExtraBold,
                             )
 
                             Text(
-                                text = "Plan and track equipment maintenance schedules",
+                                text = stringResource(R.string.scheduler_subtitle),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -344,24 +346,33 @@ fun SchedulerScreenContent(
                             horizontalAlignment = Alignment.Start,
                         ) {
                             BioMedViewToggle(
-                                selectedView = if (state.isListView) "List" else "Week",
+                                selectedView = if (state.isListView) R.string.scheduler_view_list.toString() else R.string.scheduler_view_week.toString(),
                                 onViewChange = { onToggleViewClick() }
                             )
                         }
                     }
 
                     item {
-                        val selectedWeekItem = when {
-                            state.isCustomRangeActive -> "Custom Range"
-                            state.currentWeekOffset > 0 -> "Next Week"
-                            state.currentWeekOffset < 0 -> "Previous Week"
-                            else -> "Current Week"
+                        val selectorItems = if (state.isCustomRangeActive) {
+                            listOf(
+                                stringResource(R.string.scheduler_week_previous),
+                                stringResource(R.string.scheduler_week_current),
+                                stringResource(R.string.scheduler_week_next),
+                                stringResource(R.string.scheduler_week_custom_range)
+                            )
+                        } else {
+                            listOf(
+                                stringResource(R.string.scheduler_week_previous),
+                                stringResource(R.string.scheduler_week_current),
+                                stringResource(R.string.scheduler_week_next)
+                            )
                         }
 
-                        val selectorItems = if (state.isCustomRangeActive) {
-                            listOf("Previous Week", "Current Week", "Next Week", "Custom Range")
-                        } else {
-                            listOf("Previous Week", "Current Week", "Next Week")
+                        val selectedWeekItem = when {
+                            state.isCustomRangeActive -> stringResource(R.string.scheduler_week_custom_range)
+                            state.currentWeekOffset > 0 -> stringResource(R.string.scheduler_week_next)
+                            state.currentWeekOffset < 0 -> stringResource(R.string.scheduler_week_previous)
+                            else -> stringResource(R.string.scheduler_week_current)
                         }
 
                         Row(
@@ -379,17 +390,21 @@ fun SchedulerScreenContent(
                                 items = selectorItems,
                                 selectedItem = selectedWeekItem,
                                 onItemSelected = { item ->
-                                    when (item) {
-                                        "Previous Week" -> onPreviousWeekClick()
-                                        "Next Week" -> onNextWeekClick()
-                                        "Current Week" -> onCurrentWeekClick()
+                                    val index = selectorItems.indexOf(item)
+                                    if (index >= 0) {
+                                        when (index) {
+                                            0 -> onPreviousWeekClick()
+                                            1 -> onCurrentWeekClick()
+                                            2 -> onNextWeekClick()
+                                        }
                                     }
                                 },
                                 modifier = Modifier.weight(3f)
+
                             )
 
                             BioMedButton(
-                                text = "Filter",
+                                text = stringResource(R.string.filter_button),
                                 withIcon = true,
                                 icon = R.drawable.filter,
                                 onClick = {
@@ -543,7 +558,7 @@ fun SchedulerScreenContent(
                             )
 
                             BioMedButton(
-                                text = "Retry",
+                                text = stringResource(R.string.retry),
                                 onClick = { onCurrentWeekClick() },
                                 customColor = MaterialTheme.colorScheme.error,
                                 customTextColor = MaterialTheme.colorScheme.onError,
@@ -558,7 +573,7 @@ fun SchedulerScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun SchedulerScreenPreview() {
     BioMedTheme {
