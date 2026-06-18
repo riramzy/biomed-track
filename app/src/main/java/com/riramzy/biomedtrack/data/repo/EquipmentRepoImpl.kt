@@ -6,7 +6,6 @@ import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.EquipmentDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
 import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
@@ -23,28 +22,35 @@ import javax.inject.Inject
 
 class EquipmentRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
-    private val equipmentDao: EquipmentDao,
-    private val sessionManager: SessionManager,
+    private val equipmentDao: EquipmentDao
 ): EquipmentRepo {
     override fun getAllEquipment(): Flow<List<Equipment>> = callbackFlow {
-        // Create a listener for the equipment collection
+        val cacheJob = launch(Dispatchers.IO) {
+            try {
+                val cachedList = equipmentDao.getAllEquipmentOnce().map { it.toDomain() }
+                if (cachedList.isNotEmpty()) {
+                    trySend(cachedList)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         val listener = firebaseFirestore
             .collection(FirestoreCollections.EQUIPMENT)
             .addSnapshotListener { snapshot, error ->
+                cacheJob.cancel()
+
                 if (error != null) {
-                    close(error)
                     return@addSnapshotListener
                 }
 
                 val equipment = snapshot?.documents?.mapNotNull {
-                    // Convert the document to an Equipment object
                     it.toObject(EquipmentDto::class.java)?.toDomain()
                 } ?: emptyList()
 
-                // Send the equipment to the flow
                 trySend(equipment)
 
-                // Update the local database
                 CoroutineScope(Dispatchers.IO).launch {
                     equipmentDao.insertAllEquipment(equipment.map { it.toEntity() })
                 }

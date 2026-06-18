@@ -13,6 +13,10 @@ interface EquipmentDao {
     @Query("SELECT * FROM equipment")
     fun getAllEquipment(): Flow<List<EquipmentEntity>>
 
+    @Query("SELECT * FROM equipment")
+    suspend fun getAllEquipmentOnce(): List<EquipmentEntity>
+
+
     @Query("SELECT * FROM equipment WHERE department = :department")
     fun getEquipmentByDepartment(department: String): Flow<List<EquipmentEntity>>
 
