@@ -1,5 +1,6 @@
 package com.riramzy.biomedtrack.ui.screens.notifications
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.riramzy.biomedtrack.R
@@ -13,6 +14,7 @@ import com.riramzy.biomedtrack.utils.NotificationHeader
 import com.riramzy.biomedtrack.utils.Timestamps.getGroupHeader
 import com.riramzy.biomedtrack.utils.Timestamps.toDateString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +50,7 @@ sealed class NotificationsAction {
 
 @HiltViewModel
 class NotificationsVm @Inject constructor(
+    @param:ApplicationContext val context: Context,
     private val statusChangeRepo: StatusChangeRepo,
     private val maintenanceRepo: MaintenanceRepo,
     private val tasksRepo: TaskRepo,
@@ -65,7 +68,8 @@ class NotificationsVm @Inject constructor(
     private fun loadNotifications() {
         viewModelScope.launch {
             if (user == null) {
-                NotificationsUiState.Error("Session expired")
+                _uiState.value =
+                    NotificationsUiState.Error(context.getString(R.string.error_session_expired))
                 return@launch
             }
 
@@ -152,7 +156,9 @@ class NotificationsVm @Inject constructor(
                     isLoading = false
                 )
             }.catch { e ->
-                _uiState.value = NotificationsUiState.Error(message = e.message ?: "Failed to connect to database")
+                _uiState.value = NotificationsUiState.Error(
+                    message = e.message ?: context.getString(R.string.error_database_connection)
+                )
             }.collect { state ->
                 _uiState.value = state
             }

@@ -20,7 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,11 +41,7 @@ fun BioMedInsightCard(
             .size(170.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondary
-            } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
         )
     ) {
         Column(
@@ -60,10 +58,10 @@ fun BioMedInsightCard(
             ) {
                 Text(
                     text = when(status) {
-                        "Online" -> "Healthy"
-                        "Down" -> "Currently Down"
-                        "Service" -> "Due Service"
-                        else -> "Total Equipment"
+                        "Online" -> stringResource(R.string.insight_healthy)
+                        "Down" -> stringResource(R.string.insight_down)
+                        "Service" -> stringResource(R.string.insight_service)
+                        else -> stringResource(R.string.insight_total)
                     },
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
@@ -72,7 +70,7 @@ fun BioMedInsightCard(
                         Color.White
                     } else {
                         Color.Black
-                    }
+                    },
                 )
 
                 Icon(
@@ -106,7 +104,7 @@ fun BioMedInsightCard(
                         end = 15.dp,
                         top = 10.dp,
                         bottom = 40.dp
-                        ),
+                    ),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -128,10 +126,10 @@ fun BioMedInsightCard(
                 )
                 Text(
                     text = when(status) {
-                        "Online" -> "Operating normally"
-                        "Down" -> "Requires repair"
-                        "Service" -> "Needs attention"
-                        else -> "Across all departments"
+                        "Online" -> stringResource(R.string.insight_healthy_desc)
+                        "Down" -> stringResource(R.string.insight_down_desc)
+                        "Service" -> stringResource(R.string.insight_service_desc)
+                        else -> stringResource(R.string.insight_total_desc)
                     },
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Normal,
@@ -140,7 +138,8 @@ fun BioMedInsightCard(
                         Color.White.copy(0.5f)
                     } else {
                         Color.Black.copy(0.5f)
-                    }
+                    },
+                    overflow = TextOverflow.Visible
                 )
             }
         }
@@ -149,14 +148,14 @@ fun BioMedInsightCard(
 
 @Preview(
     device = "spec:width=411dp,height=891dp", showSystemUi = false,
-    showBackground = true
+    showBackground = true, locale = "ar"
 )
 @Composable
 fun BioMedInsightCardPreview() {
     BioMedTheme {
         BioMedInsightCard(
             value = "220",
-            status = "Service"
+            status = ""
         )
     }
 }
@@ -164,7 +163,8 @@ fun BioMedInsightCardPreview() {
 @Preview(
     device = "spec:width=411dp,height=891dp", showSystemUi = false,
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    backgroundColor = 0xFF000000
 )
 @Composable
 fun BioMedInsightCardDarkPreview() {

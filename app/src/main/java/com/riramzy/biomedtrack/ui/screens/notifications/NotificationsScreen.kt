@@ -58,6 +58,9 @@ import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesD
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.ActivityItem
+import com.riramzy.biomedtrack.utils.ActivityType
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.NotificationHeader
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
@@ -138,7 +141,7 @@ fun NotificationsScreenContent(
                             )
 
                             BioMedButton(
-                                text = "Retry",
+                                text = stringResource(R.string.retry),
                                 onClick = { onAction(NotificationsAction.Refresh) },
                                 customColor = MaterialTheme.colorScheme.error,
                                 customTextColor = MaterialTheme.colorScheme.onError,
@@ -229,7 +232,11 @@ fun NotificationsScreenContent(
                         changePassword(current, new) { result ->
                             when (result) {
                                 is Result.Success -> {
-                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.password_updated_success,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     showChangePasswordDialog = false
                                 }
                                 is Result.Error -> {
@@ -395,6 +402,28 @@ fun NotificationsScreenPreview() {
                 assignedDepartments = emptyList(),
                 employeeId = "1",
                 isActive = true,
+            ),
+            state = NotificationsUiState.Success(
+                notifications = mapOf(
+                    NotificationHeader.StringHeader("Today") to listOf(
+                        ActivityItem(
+                            id = "1",
+                            type = ActivityType.STATUS_CHANGE,
+                            title = "Equipment 1",
+                            equipmentId = "",
+                            equipmentName = "Equipment 1",
+                            equipmentModel = "Model 1",
+                            equipmentSerial = "Serial 1",
+                            departmentName = "Department 1",
+                            technicianName = "Technician 1",
+                            equipmentStatus = EquipmentStatus.DOWN,
+                            previousStatus = EquipmentStatus.ONLINE,
+                            timestamp = 12 - 1 - 2015
+                        )
+                    )
+                ),
+                unreadCount = 3,
+                selectedCategory = NotificationCategory.ALL
             )
         )
     }
@@ -416,6 +445,28 @@ fun NotificationsScreenDarkPreview() {
                 assignedDepartments = emptyList(),
                 employeeId = "1",
                 isActive = true,
+            ),
+            state = NotificationsUiState.Success(
+                notifications = mapOf(
+                    NotificationHeader.StringHeader("Today") to listOf(
+                        ActivityItem(
+                            id = "1",
+                            type = ActivityType.STATUS_CHANGE,
+                            title = "Equipment 1",
+                            equipmentId = "",
+                            equipmentName = "Equipment 1",
+                            equipmentModel = "Model 1",
+                            equipmentSerial = "Serial 1",
+                            departmentName = "Department 1",
+                            technicianName = "Technician 1",
+                            equipmentStatus = EquipmentStatus.DOWN,
+                            previousStatus = EquipmentStatus.ONLINE,
+                            timestamp = 12 - 1 - 2015
+                        )
+                    )
+                ),
+                unreadCount = 3,
+                selectedCategory = NotificationCategory.ALL
             )
         )
     }
