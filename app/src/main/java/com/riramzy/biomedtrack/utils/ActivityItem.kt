@@ -13,7 +13,9 @@ data class ActivityItem(
     val timestamp: Long,
     val dueDate: String? = null,
     val equipmentStatus: EquipmentStatus? = null,
+    val previousStatus: EquipmentStatus? = null,
     val taskStatus: TaskStatus? = null,
+    val taskAssigneeName: String? = null,
     val isRead: Boolean = false
 )
 
