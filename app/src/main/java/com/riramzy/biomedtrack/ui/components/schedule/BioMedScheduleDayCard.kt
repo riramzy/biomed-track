@@ -18,14 +18,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.ChecklistItem
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+
 import com.riramzy.biomedtrack.utils.TaskStatus
 
 @Composable
@@ -84,7 +87,7 @@ fun BioMedScheduleDayCard(
 
             tasks.ifEmpty {
                 Text(
-                    text = "No maintenance",
+                    text = stringResource(R.string.scheduler_no_maintenance),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
@@ -111,7 +114,7 @@ fun BioMedScheduleDayCard(
 }
 
 @Preview(
-    device = "id:pixel_9", showSystemUi = false, showBackground = true
+    device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar"
 )
 @Composable
 fun BioMedScheduleDayCardPreview() {

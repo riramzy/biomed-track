@@ -182,20 +182,23 @@ fun BioMedScheduleMaintenanceCard(
                             end = 20.dp,
                             top = 20.dp
                         ),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     BioMedButton(
                         text = stringResource(R.string.schedule_maint_btn_schedule),
                         customColor = MaterialTheme.colorScheme.primary,
                         customTextColor = MaterialTheme.colorScheme.onPrimary,
-                        onClick = onScheduleClick
+                        onClick = onScheduleClick,
+                        modifier = Modifier.weight(1f)
                     )
 
                     BioMedButton(
                         text = stringResource(R.string.schedule_maint_btn_cancel),
                         customColor = MaterialTheme.colorScheme.primaryContainer,
                         customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        onClick = onCancelClick
+                        onClick = onCancelClick,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }

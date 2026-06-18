@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,7 @@ fun BioMedReportExportFormatCard(
             BioMedExportFormatItem(
                 title = "PDF",
                 icon = R.drawable.pdf,
-                note = "Best for sharing and printing",
+                note = stringResource(R.string.export_format_pdf_note),
                 isSelected = selectedFormat == "PDF",
                 modifier = Modifier.clickable { onFormatSelected("PDF") }
             )
@@ -60,14 +61,14 @@ fun BioMedReportExportFormatCard(
             BioMedExportFormatItem(
                 title = "Excel",
                 icon = R.drawable.excel,
-                note = "Best for editing and analysis",
+                note = stringResource(R.string.export_format_excel_note),
                 isSelected = selectedFormat == "Excel",
                 modifier = Modifier.clickable { onFormatSelected("Excel") }
             )
         }
 
         BioMedButton(
-            text = "Generate Report",
+            text = stringResource(R.string.btn_generate_report),
             modifier = Modifier
                 .width(356.dp),
             customColor = if (isSystemInDarkTheme()) {
@@ -175,7 +176,8 @@ fun BioMedExportFormatItem(
                     } else {
                         Color.Black
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -192,7 +194,7 @@ fun BioMedReportExportFormatCardPreview() {
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    backgroundColor = 0xFF000000
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedReportExportFormatCardDarkPreview() {

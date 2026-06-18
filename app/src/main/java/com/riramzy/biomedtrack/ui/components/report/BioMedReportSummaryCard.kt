@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,30 +66,34 @@ fun BioMedReportSummaryCard(
         ) {
             BioMedReportItemCard(
                 icon = R.drawable.inventory,
-                title = "Total Equipment",
-                value = totalEquipment.toString()
+                title = stringResource(R.string.summary_total_equipment),
+                value = totalEquipment.toString(),
+                iconColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.secondary
             )
 
             BioMedReportItemCard(
                 icon = R.drawable.activity_online,
-                title = "Healthy",
-                value = healthy.toString()
+                title = stringResource(R.string.summary_healthy),
+                value = healthy.toString(),
+                iconColor = MaterialTheme.indicatorColors.green
             )
 
             BioMedReportItemCard(
                 icon = R.drawable.activity_service,
-                title = "Service Due",
-                value = dueService.toString()
+                title = stringResource(R.string.summary_service_due),
+                value = dueService.toString(),
+                iconColor = MaterialTheme.indicatorColors.yellow
             )
 
             BioMedReportItemCard(
                 icon = R.drawable.activity_down,
-                title = "Down",
-                value = down.toString()
+                title = stringResource(R.string.summary_down),
+                value = down.toString(),
+                iconColor = MaterialTheme.indicatorColors.red
             )
 
             Text(
-                text = "Reports will include $logsCount maintenance log entries for Down and Service Due Equipment",
+                text = stringResource(R.string.summary_log_entries, logsCount),
                 style = MaterialTheme.typography.labelSmall,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Normal,
@@ -96,7 +101,8 @@ fun BioMedReportSummaryCard(
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.primary
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -107,7 +113,8 @@ fun BioMedReportItemCard(
     modifier: Modifier = Modifier,
     icon: Int = R.drawable.inventory,
     title: String = "Total Equipment",
-    value: String = "275"
+    value: String = "275",
+    iconColor: Color
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -123,25 +130,7 @@ fun BioMedReportItemCard(
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(30.dp)
-                    .background(
-                        color = if (isSystemInDarkTheme()) {
-                            when (title) {
-                                "Total Equipment" -> MaterialTheme.colorScheme.onSecondary
-                                "Healthy" -> MaterialTheme.indicatorColors.green
-                                "Service Due" -> MaterialTheme.indicatorColors.yellow
-                                "Down" -> MaterialTheme.indicatorColors.red
-                                else -> MaterialTheme.colorScheme.primary
-                            }
-                        } else {
-                            when (title) {
-                                "Total Equipment" -> MaterialTheme.colorScheme.secondary
-                                "Healthy" -> MaterialTheme.indicatorColors.green
-                                "Service Due" -> MaterialTheme.indicatorColors.yellow
-                                "Down" -> MaterialTheme.indicatorColors.red
-                                else -> MaterialTheme.colorScheme.primary
-                            }
-                        }
-                    ),
+                    .background(color = iconColor),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -192,7 +181,7 @@ fun BioMedReportSummaryCardPreview() {
 
 @Preview(showSystemUi = false, showBackground = true, device = "id:pixel_9",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    backgroundColor = 0xFF000000
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedReportSummaryCardDarkPreview() {
