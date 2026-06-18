@@ -25,10 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
@@ -39,6 +42,7 @@ fun BioMedProfileSelection(
     modifier: Modifier = Modifier,
     selectionText: String = "Logout",
     selectionIcon: Int = R.drawable.logout,
+    selectionId: String,
     onClick: () -> Unit = {}
 ) {
     Card(
@@ -72,23 +76,25 @@ fun BioMedProfileSelection(
                         .size(34.dp)
                         .background(
                             color = if (isSystemInDarkTheme()) {
-                                when (selectionText) {
-                                    "Notifications Preferences" -> Color(0xFF00B3FF)
-                                    "My Profile" -> MaterialTheme.colorScheme.tertiaryContainer
-                                    "Change Password" -> Color.Black
-                                    "Manage Users" -> Color(0xFF7D7D7D)
-                                    "Import Equipment" -> Color.Green
-                                    "Logout" -> Color.Red
+                                when (selectionId) {
+                                    "notifications" -> Color(0xFF00B3FF)
+                                    "profile" -> MaterialTheme.colorScheme.tertiaryContainer
+                                    "password" -> Color.Black
+                                    "manage" -> Color(0xFF7D7D7D)
+                                    "import" -> Color.Green
+                                    "logout" -> Color.Red
+                                    "language" -> Color(0xFF9C27B0)
                                     else -> Color.White
                                 }
                             } else {
-                                when (selectionText) {
-                                    "Notifications Preferences" -> Color(0xFF00B3FF)
-                                    "My Profile" -> MaterialTheme.colorScheme.tertiary
-                                    "Change Password" -> Color.Black
-                                    "Manage Users" -> Color(0xFF7D7D7D)
-                                    "Import Equipment" -> Color.Green
-                                    "Logout" -> Color.Red
+                                when (selectionId) {
+                                    "notifications" -> Color(0xFF00B3FF)
+                                    "profile" -> MaterialTheme.colorScheme.tertiaryContainer
+                                    "password" -> Color.Black
+                                    "manage" -> Color(0xFF7D7D7D)
+                                    "import" -> Color.Green
+                                    "logout" -> Color.Red
+                                    "language" -> Color(0xFF9C27B0)
                                     else -> Color.White
                                 }
                             }
@@ -122,11 +128,13 @@ fun BioMedProfileSelection(
                     .size(24.dp),
                 onClick = {}
             ) {
+                val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
                 Icon(
                     painter = painterResource(R.drawable.go),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(24.dp),
+                        .size(24.dp)
+                        .scale(if (isRtl) -1f else 1f),
                     tint = if (isSystemInDarkTheme()) {
                         Color.White
                     } else {
@@ -138,26 +146,50 @@ fun BioMedProfileSelection(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedProfileSelectionPreview() {
     BioMedTheme {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            BioMedProfileSelection(selectionText = "Notifications Preferences", selectionIcon = R.drawable.profile_notifications)
-            BioMedProfileSelection(selectionText = "My Profile", selectionIcon = R.drawable.profile)
-            BioMedProfileSelection(selectionText = "Change Password", selectionIcon = R.drawable.profile_password)
-            BioMedProfileSelection(selectionText = "Manage Users", selectionIcon = R.drawable.profile_manage)
-            BioMedProfileSelection(selectionText = "Import Equipment", selectionIcon = R.drawable.profile_import)
-            BioMedProfileSelection(selectionText = "Logout", selectionIcon = R.drawable.logout)
+            BioMedProfileSelection(
+                selectionText = "Notifications Preferences",
+                selectionIcon = R.drawable.profile_notifications,
+                selectionId = "notifications"
+            )
+            BioMedProfileSelection(
+                selectionText = "My Profile",
+                selectionIcon = R.drawable.profile,
+                selectionId = "profile"
+            )
+            BioMedProfileSelection(
+                selectionText = "Change Password",
+                selectionIcon = R.drawable.profile_password,
+                selectionId = "password"
+            )
+            BioMedProfileSelection(
+                selectionText = "Manage Users",
+                selectionIcon = R.drawable.profile_manage,
+                selectionId = "manage"
+            )
+            BioMedProfileSelection(
+                selectionText = "Import Equipment",
+                selectionIcon = R.drawable.profile_import,
+                selectionId = "import"
+            )
+            BioMedProfileSelection(
+                selectionText = "Logout",
+                selectionIcon = R.drawable.logout,
+                selectionId = "logout"
+            )
         }
     }
 }
 
 @Preview(device = "id:pixel_9", showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    backgroundColor = 0xFF000000
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedProfileSelectionDarkPreview() {
@@ -165,12 +197,36 @@ fun BioMedProfileSelectionDarkPreview() {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            BioMedProfileSelection(selectionText = "Notifications Preferences", selectionIcon = R.drawable.profile_notifications)
-            BioMedProfileSelection(selectionText = "My Profile", selectionIcon = R.drawable.profile)
-            BioMedProfileSelection(selectionText = "Change Password", selectionIcon = R.drawable.profile_password)
-            BioMedProfileSelection(selectionText = "Manage Users", selectionIcon = R.drawable.profile_manage)
-            BioMedProfileSelection(selectionText = "Import Equipment", selectionIcon = R.drawable.profile_import)
-            BioMedProfileSelection(selectionText = "Logout", selectionIcon = R.drawable.logout)
+            BioMedProfileSelection(
+                selectionText = "Notifications Preferences",
+                selectionIcon = R.drawable.profile_notifications,
+                selectionId = "notifications"
+            )
+            BioMedProfileSelection(
+                selectionText = "My Profile",
+                selectionIcon = R.drawable.profile,
+                selectionId = "profile"
+            )
+            BioMedProfileSelection(
+                selectionText = "Change Password",
+                selectionIcon = R.drawable.profile_password,
+                selectionId = "password"
+            )
+            BioMedProfileSelection(
+                selectionText = "Manage Users",
+                selectionIcon = R.drawable.profile_manage,
+                selectionId = "manage"
+            )
+            BioMedProfileSelection(
+                selectionText = "Import Equipment",
+                selectionIcon = R.drawable.profile_import,
+                selectionId = "import"
+            )
+            BioMedProfileSelection(
+                selectionText = "Logout",
+                selectionIcon = R.drawable.logout,
+                selectionId = "logout"
+            )
         }
     }
 }

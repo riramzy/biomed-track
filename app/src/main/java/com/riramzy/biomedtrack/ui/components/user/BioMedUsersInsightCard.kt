@@ -1,22 +1,22 @@
 package com.riramzy.biomedtrack.ui.components.user
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,24 +26,20 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedUsersInsightCard(
     modifier: Modifier = Modifier,
     numberOfUsers: Int = 12,
-    usersRole: String = "Technicians"
+    usersRole: String = "اجمالي المستخدمون"
 ) {
-    Card(
+    Box(
         modifier = modifier
-            .width(86.dp)
-            .height(78.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.primary
-            }
-        )
+            .widthIn(min = 86.dp)
+            .heightIn(min = 78.dp)
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(
+                color = MaterialTheme.colorScheme.primary
+            ),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(10.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -51,25 +47,19 @@ fun BioMedUsersInsightCard(
             Text(
                 text = numberOfUsers.toString(),
                 style = MaterialTheme.typography.titleMedium,
-                color = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
+                color = MaterialTheme.colorScheme.primaryContainer,
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Black
+                fontWeight = FontWeight.Black,
+                textAlign = TextAlign.Center
             )
 
             Text(
                 text = usersRole,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center
             )
         }
     }

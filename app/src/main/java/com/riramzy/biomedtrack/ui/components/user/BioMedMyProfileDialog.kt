@@ -123,7 +123,7 @@ fun BioMedMyProfileDialog(
                 BioMedButton(
                     text = "Close",
                     onClick = onDismiss,
-                    customColor = MaterialTheme.colorScheme.primaryContainer.copy(0.5f),
+                    customColor = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
