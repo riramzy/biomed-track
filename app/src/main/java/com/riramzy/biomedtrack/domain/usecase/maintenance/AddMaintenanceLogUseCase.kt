@@ -12,6 +12,7 @@ import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.TaskStatus
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 
 class AddMaintenanceLogUseCase @Inject constructor(
@@ -45,7 +46,8 @@ class AddMaintenanceLogUseCase @Inject constructor(
         val updatedEquipmentResult = equipmentRepository.updateEquipment(
             equipment.copy(
                 lastMaintenanceDate = log.date,
-                nextMaintenanceDate = nextMaintenanceDate.toEpochDay(),
+                nextMaintenanceDate = nextMaintenanceDate.atStartOfDay(ZoneId.systemDefault())
+                    .toInstant().toEpochMilli(),
                 status = log.currentStatus
             )
         )
