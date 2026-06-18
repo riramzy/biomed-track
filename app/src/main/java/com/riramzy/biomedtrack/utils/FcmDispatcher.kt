@@ -2,6 +2,7 @@ package com.riramzy.biomedtrack.utils
 
 import android.content.Context
 import com.google.auth.oauth2.GoogleCredentials
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class FcmDispatcher @Inject constructor(
-    private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val client: HttpClient
 ) {
     private val projectId = "biomed-track"

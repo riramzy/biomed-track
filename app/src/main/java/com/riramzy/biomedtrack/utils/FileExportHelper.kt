@@ -18,33 +18,27 @@ object FileExportHelper {
         fileName: String,
         mimeType: String
     ): ExportTarget? {
-        val resolver = context.contentResolver
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Downloads.EXTERNAL_CONTENT_URI
-        } else {
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        }
-
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
-            put(MediaStore.Downloads.MIME_TYPE, mimeType)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = context.contentResolver
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, mimeType)
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             }
-        }
-
-        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-        } else {
-            null
-        }
-
-        return uri?.let { uri ->
-            resolver.openOutputStream(uri)?.let { stream ->
-                ExportTarget(uri, stream)
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            return uri?.let { u ->
+                resolver.openOutputStream(u)?.let { stream ->
+                    ExportTarget(u, stream)
+                }
             }
+        } else {
+            val directory =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (!directory.exists()) directory.mkdirs()
+            val file = java.io.File(directory, fileName)
+            val stream = java.io.FileOutputStream(file)
+            val uri = Uri.fromFile(file)
+            return ExportTarget(uri, stream)
         }
     }
 }
