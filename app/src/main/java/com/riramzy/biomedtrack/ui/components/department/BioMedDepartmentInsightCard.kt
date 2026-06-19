@@ -21,12 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.getLocalizedDepartmentName
 
 @Composable
 fun BioMedDepartmentInsightCard(
@@ -68,7 +70,7 @@ fun BioMedDepartmentInsightCard(
                 )
 
                 Text(
-                    text = "$department Department",
+                    text = getLocalizedDepartmentName(department),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -92,7 +94,7 @@ fun BioMedDepartmentInsightCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Total Equipment",
+                        text = stringResource(R.string.dept_total_equipment),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
@@ -122,7 +124,7 @@ fun BioMedDepartmentInsightCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Due Service",
+                        text = stringResource(R.string.dept_due_service),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
@@ -152,7 +154,7 @@ fun BioMedDepartmentInsightCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Down",
+                        text = stringResource(R.string.dept_down),
                         style = MaterialTheme.typography.labelSmall,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
@@ -180,7 +182,7 @@ fun BioMedDepartmentInsightCard(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedDepartmentInsightCardPreview() {
     BioMedTheme {

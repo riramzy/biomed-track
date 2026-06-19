@@ -45,8 +45,6 @@ import com.riramzy.biomedtrack.ui.components.custom.BioMedProgressIndicator
 import com.riramzy.biomedtrack.ui.components.custom.BioMedTopAppBar
 import com.riramzy.biomedtrack.ui.components.importing.BioMedDataPreviewTable
 import com.riramzy.biomedtrack.ui.components.importing.BioMedImportedDataPreviewCard
-import com.riramzy.biomedtrack.ui.components.importing.DataPreviewRow
-import com.riramzy.biomedtrack.ui.components.importing.ValidationStatus
 import com.riramzy.biomedtrack.ui.components.user.BioMedChangePasswordDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedLogoutDialog
 import com.riramzy.biomedtrack.ui.components.user.BioMedMyProfileDialog
@@ -54,9 +52,11 @@ import com.riramzy.biomedtrack.ui.components.user.BioMedNotificationPreferencesD
 import com.riramzy.biomedtrack.ui.components.user.BioMedProfileSheet
 import com.riramzy.biomedtrack.ui.screens.auth.AuthVm
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+import com.riramzy.biomedtrack.utils.DataPreviewRow
 import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.utils.Screen
 import com.riramzy.biomedtrack.utils.UserRole
+import com.riramzy.biomedtrack.utils.ValidationStatus
 
 @Composable
 fun ImportEquipmentDataPreviewScreen(

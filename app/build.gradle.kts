@@ -50,9 +50,9 @@ android {
 }
 
 dependencies {
-
     // ── Core ──────────────────────────────────────────────────
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
 
     // ── Compose ───────────────────────────────────────────────
     implementation(platform(libs.androidx.compose.bom))
@@ -60,16 +60,26 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // ── Navigation ────────────────────────────────────────────
     implementation(libs.androidx.navigation.compose)
+
+    // ── Google Auth (FCM Token Generation) ───────────────────
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.20.0")
+
+    // ── Ktor (FCM Direct Send) ──────────────────────────────
+    implementation("io.ktor:ktor-client-core:3.1.3")
+    implementation("io.ktor:ktor-client-cio:3.1.3")
 
     // ── Room ──────────────────────────────────────────────────
     implementation(libs.androidx.room.runtime)

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,8 +40,6 @@ import com.riramzy.biomedtrack.ui.theme.indicatorColors
 @Composable
 fun BioMedPhotoDocumentationCard(
     modifier: Modifier = Modifier,
-    title: String = "Photo Documentation",
-    description: String = "Take photos of reports of documentations",
     capturedPhotoUri: String? = null,
     addPhotoClick: () -> Unit = {}
 ) {
@@ -49,7 +48,7 @@ fun BioMedPhotoDocumentationCard(
             .fillMaxWidth()
     ) {
         Text(
-            text = title,
+            text = stringResource(R.string.photo_doc_title),
             style = MaterialTheme.typography.labelLarge,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -116,7 +115,9 @@ fun BioMedPhotoDocumentationCard(
                     }
 
                     BioMedButton(
-                        text = if (capturedPhotoUri != null) "Change Photo" else "Add Photo",
+                        text = if (capturedPhotoUri != null) stringResource(R.string.photo_doc_change_photo) else stringResource(
+                            R.string.photo_doc_add_photo
+                        ),
                         modifier = Modifier
                             .width(120.dp)
                             .padding(bottom = 8.dp),
@@ -132,7 +133,7 @@ fun BioMedPhotoDocumentationCard(
                                 )
                         ) {
                             Text(
-                                text = "Picture captured successfully",
+                                text = stringResource(R.string.photo_doc_photo_captured_successfully),
                                 style = MaterialTheme.typography.bodySmall,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
@@ -143,7 +144,7 @@ fun BioMedPhotoDocumentationCard(
                         }
                     } else {
                         Text(
-                            text = description,
+                            text = stringResource(R.string.photo_doc_description),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Normal,
@@ -167,7 +168,8 @@ fun BioMedPhotoDocumentationCardPreview() {
 }
 
 @Preview(device = "id:pixel_9", showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedPhotoDocumentationCardDarkPreview() {

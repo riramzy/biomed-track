@@ -15,7 +15,8 @@ data class TechnicianDto(
     val assignedDepartments: List<DepartmentDto> = emptyList(),
     @get:PropertyName("isActive")
     @set:PropertyName("isActive")
-    var isActive: Boolean = false
+    var isActive: Boolean = false,
+    val fcmToken: String = ""
 ) {
     fun toDomain() = Technician(
         id = id,
@@ -39,5 +40,5 @@ fun Technician.toDto() = TechnicianDto(
     assignedDepartments = assignedDepartments.map {
         it.toDto()
     },
-    isActive = isActive
+    isActive = isActive,
 )

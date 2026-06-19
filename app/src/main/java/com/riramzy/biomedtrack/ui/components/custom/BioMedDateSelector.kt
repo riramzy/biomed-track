@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -169,13 +170,13 @@ fun BioMedDateRangeSelector(
 
     AlertDialog(
         onDismissRequest = onCancel,
-        title = { Text("Select Custom Date Range") },
+        title = { Text(stringResource(R.string.date_range_title)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 BioMedDateSelector(
-                    title = "Start Date",
+                    title = stringResource(R.string.date_range_start),
                     selectedDate = selectedStartDate,
                     onDateSelected = {
                         selectedStartDate = it
@@ -184,7 +185,7 @@ fun BioMedDateRangeSelector(
                 )
 
                 BioMedDateSelector(
-                    title = "End Date",
+                    title = stringResource(R.string.date_range_end),
                     selectedDate = selectedEndDate,
                     onDateSelected = {
                         selectedEndDate = it
@@ -195,7 +196,7 @@ fun BioMedDateRangeSelector(
         },
         confirmButton = {
             BioMedButton(
-                text = "Confirm",
+                text = stringResource(R.string.date_selector_ok),
                 onClick = {
                     onConfirm(selectedStartDate, selectedEndDate)
                 },
@@ -205,7 +206,7 @@ fun BioMedDateRangeSelector(
         },
         dismissButton = {
             BioMedButton(
-                text = "Cancel",
+                text = stringResource(R.string.date_selector_cancel),
                 onClick = onCancel
             )
         },
@@ -213,11 +214,11 @@ fun BioMedDateRangeSelector(
     )
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedDateSelectorPreview() {
     BioMedTheme {
-        BioMedDateRangeSelector()
+        BioMedDateSelector()
     }
 }
 

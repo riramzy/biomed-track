@@ -190,7 +190,7 @@ fun BioMedChangePasswordDialog(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(15.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         BioMedButton(
                             text = "Submit",
@@ -216,7 +216,7 @@ fun BioMedChangePasswordDialog(
                             text = "Cancel",
                             onClick = onDismiss,
                             modifier = Modifier.weight(1f),
-                            customColor = MaterialTheme.colorScheme.primaryContainer.copy(0.5f),
+                            customColor = MaterialTheme.colorScheme.primaryContainer,
                             customTextColor = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }

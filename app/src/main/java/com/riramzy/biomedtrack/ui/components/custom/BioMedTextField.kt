@@ -36,6 +36,7 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 fun BioMedTextField(
     modifier: Modifier = Modifier,
     label: String = "By",
+    isWithLabel: Boolean = true,
     placeholder: String = "Placeholder",
     value: String = "",
     onValueChange: (String) -> Unit = {},
@@ -48,22 +49,26 @@ fun BioMedTextField(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.onSecondaryContainer
-            } else {
-                MaterialTheme.colorScheme.onPrimaryContainer
-            }
-        )
+        if (isWithLabel) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.onSecondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                },
+                modifier = Modifier.padding(
+                    bottom = 10.dp
+                )
+            )
+        }
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Card(

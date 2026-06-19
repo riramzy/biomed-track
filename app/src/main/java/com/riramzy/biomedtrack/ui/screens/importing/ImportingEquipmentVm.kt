@@ -15,13 +15,13 @@ import com.riramzy.biomedtrack.domain.repo.EquipmentRepo
 import com.riramzy.biomedtrack.domain.usecase.department.GetAllDepartmentsOnceUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.ExcelParserUseCase
 import com.riramzy.biomedtrack.domain.usecase.equipment.RawEquipment
-import com.riramzy.biomedtrack.ui.components.importing.DataPreviewRow
 import com.riramzy.biomedtrack.ui.components.importing.ImportLog
 import com.riramzy.biomedtrack.ui.components.importing.LogType
-import com.riramzy.biomedtrack.ui.components.importing.ValidationStatus
+import com.riramzy.biomedtrack.utils.DataPreviewRow
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.FileExportHelper
 import com.riramzy.biomedtrack.utils.Timestamps.parseDateToLong
+import com.riramzy.biomedtrack.utils.ValidationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

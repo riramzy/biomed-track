@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -137,7 +138,7 @@ fun BioMedGeneratedFileCard(
                         }
 
                         Text(
-                            text = "File ready for preview",
+                            text = stringResource(R.string.generated_file_card_ready_for_preview),
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -236,7 +237,7 @@ fun BioMedGeneratedFileCardPreview() {
 
 @Preview(showBackground = true, showSystemUi = false, device = "id:pixel_9",
     backgroundColor = 0xFF000000,
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "ar"
 )
 @Composable
 fun BioMedGeneratedFileCardDarkPreview() {

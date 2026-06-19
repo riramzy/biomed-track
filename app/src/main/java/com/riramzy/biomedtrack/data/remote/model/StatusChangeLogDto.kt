@@ -1,8 +1,8 @@
 package com.riramzy.biomedtrack.data.remote.model
 
 import androidx.annotation.Keep
-import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.domain.model.StatusChangeLog
+import com.riramzy.biomedtrack.utils.EquipmentStatus
 
 @Keep
 data class StatusChangeLogDto(
@@ -27,8 +27,18 @@ data class StatusChangeLogDto(
         equipmentModel = equipmentModel,
         equipmentSerial = equipmentSerial,
         department = department.toDomain(),
-        previousStatus = EquipmentStatus.valueOf(previousStatus),
-        newStatus = EquipmentStatus.valueOf(newStatus),
+        previousStatus = try {
+            EquipmentStatus.valueOf(previousStatus)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            EquipmentStatus.ONLINE
+        },
+        newStatus = try {
+            EquipmentStatus.valueOf(newStatus)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            EquipmentStatus.ONLINE
+        },
         changedBy = changedBy,
         changedByName = changedByName,
         timestamp = timestamp,

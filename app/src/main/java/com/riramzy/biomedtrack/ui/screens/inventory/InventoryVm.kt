@@ -1,8 +1,10 @@
 package com.riramzy.biomedtrack.ui.screens.inventory
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Equipment
@@ -14,6 +16,7 @@ import com.riramzy.biomedtrack.domain.usecase.equipment.GetAllEquipmentUseCase
 import com.riramzy.biomedtrack.utils.EquipmentStatus
 import com.riramzy.biomedtrack.utils.UserRole
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +52,7 @@ data class InventoryFilters(
 
 @HiltViewModel
 class InventoryVm @Inject constructor(
+    @param:ApplicationContext val context: Context,
     private val getAllEquipmentsUseCase: GetAllEquipmentUseCase,
     private val changeEquipmentStatusUseCase: ChangeEquipmentStatusUseCase,
     private val departmentRepo: DepartmentRepo,
@@ -90,8 +94,9 @@ class InventoryVm @Inject constructor(
                 val currentUser = sessionManager.currentUser.value
 
                 if (currentUser == null) {
-                    _uiState.value = InventoryUiState.Error("Failed to get current user")
-                    return@combine InventoryUiState.Error("Failed to get current user")
+                    _uiState.value =
+                        InventoryUiState.Error(context.getString(R.string.error_failed_to_get_user))
+                    return@combine InventoryUiState.Error(context.getString(R.string.error_failed_to_get_user))
                 }
 
                 val accessibleEquipment = if (currentUser.role == UserRole.TECHNICIAN) {
@@ -155,7 +160,9 @@ class InventoryVm @Inject constructor(
                     canDeleteEquipment = sessionManager.hasPermission(Permission.DELETE_EQUIPMENT)
                 )
             }.catch { e ->
-                _uiState.value = InventoryUiState.Error(e.message ?: "Failed to connect to database")
+                _uiState.value = InventoryUiState.Error(
+                    e.message ?: context.getString(R.string.error_database_connection)
+                )
             }.collect { state ->
                 _uiState.value = state
             }

@@ -3,8 +3,8 @@ package com.riramzy.biomedtrack.domain.usecase.auth
 import com.riramzy.biomedtrack.di.SessionManager
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.domain.repo.AuthRepo
-import javax.inject.Inject
 import com.riramzy.biomedtrack.utils.Result
+import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepo,
@@ -18,6 +18,7 @@ class LoginUseCase @Inject constructor(
         val result = authRepository.login(email, password)
         if (result is Result.Success) {
             sessionManager.setUser(technician = result.data)
+            authRepository.registerFcmToken(result.data.id)
             return result
         } else {
             return result

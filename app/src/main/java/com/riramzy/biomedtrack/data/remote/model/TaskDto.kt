@@ -33,7 +33,12 @@ data class TaskDto(
         assignedToName = assignedToName,
         assignedBy = assignedBy,
         dueDate = dueDate,
-        status = TaskStatus.valueOf(status),
+        status = try {
+            TaskStatus.valueOf(status)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            TaskStatus.PENDING
+        },
         notes = notes,
         scheduledChecklist = scheduledChecklist.map {
             ChecklistItem(

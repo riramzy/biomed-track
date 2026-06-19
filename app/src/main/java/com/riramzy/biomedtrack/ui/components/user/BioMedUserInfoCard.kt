@@ -1,7 +1,6 @@
 package com.riramzy.biomedtrack.ui.components.user
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,16 +18,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
+import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Technician
 import com.riramzy.biomedtrack.ui.components.custom.BioMedButton
 import com.riramzy.biomedtrack.ui.components.custom.BioMedToggle
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 import com.riramzy.biomedtrack.utils.UserRole
+import com.riramzy.biomedtrack.utils.getLocalizedDepartmentName
 
 @Composable
 fun BioMedUserInfoCard(
@@ -45,11 +48,7 @@ fun BioMedUserInfoCard(
             .wrapContentHeight(),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            } else {
-                MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f)
         )
     ) {
         Column(
@@ -89,15 +88,11 @@ fun BioMedUserInfoCard(
 
             if (user.role == UserRole.SUPERVISOR) {
                 Text(
-                    text = "Access to all departments",
+                    text = stringResource(R.string.user_card_access_all_depts),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
-                    color = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 15.dp),
@@ -109,15 +104,11 @@ fun BioMedUserInfoCard(
 
             if (user.role == UserRole.ADMIN) {
                 Text(
-                    text = "Full system access",
+                    text = stringResource(R.string.user_card_full_system_access),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
-                    color = if (isSystemInDarkTheme()) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 15.dp),
@@ -136,39 +127,21 @@ fun BioMedUserInfoCard(
                 if (user.role == UserRole.SUPERVISOR || user.role == UserRole.TECHNICIAN) {
                     BioMedButton(
                         modifier = Modifier
-                            .width(235.dp)
-                            .height(35.dp),
-                        text = "Manage Departments",
+                            .width(235.dp),
+                        text = stringResource(R.string.user_card_btn_manage_departments),
                         customTextSize = 12,
                         textAlignment = TextAlign.Start,
-                        customTextColor = if (isSystemInDarkTheme()) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        },
+                        customTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        customColor = MaterialTheme.colorScheme.primaryContainer,
                         onClick = { onManageDepartmentsClick() }
                     )
                 }
 
-                Card(
-                    modifier = Modifier
-                        .width(114.dp)
-                        .height(35.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSystemInDarkTheme()) {
-                            MaterialTheme.colorScheme.secondaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.primaryContainer
-                        }
-                    )
-                ) {
-                    BioMedToggle(
-                        text = "Active",
-                        isChecked = isUserActive,
-                        onCheckedChange = onActiveToggle
-                    )
-                }
+                BioMedToggle(
+                    text = stringResource(R.string.user_card_toggle_active),
+                    isChecked = isUserActive,
+                    onCheckedChange = onActiveToggle
+                )
             }
         }
     }
@@ -183,34 +156,31 @@ fun BioMedDepartmentPill(
         modifier = modifier,
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.secondaryContainer
-            } else {
-                MaterialTheme.colorScheme.primaryContainer
-            }
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
         Text(
-            text = departmentName,
+            text = getLocalizedDepartmentName(departmentName),
             style = MaterialTheme.typography.labelSmall,
             fontSize = 10.sp,
             fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
     }
 }
 
-@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true)
+@Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true, locale = "ar")
 @Composable
 fun BioMedUserInfoCardPreview() {
     BioMedTheme {
         BioMedUserInfoCard(
             user = Technician(
                 id = "1",
-                name = "Khaled",
+                name = "Mina",
                 email = "william.henry.harrison@example-pet-store.com",
-                role = UserRole.ADMIN,
+                role = UserRole.SUPERVISOR,
                 assignedDepartments = emptyList(),
                 employeeId = "1",
                 isActive = true,
@@ -221,7 +191,7 @@ fun BioMedUserInfoCardPreview() {
 
 @Preview(device = "id:pixel_9", showSystemUi = false, showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    backgroundColor = 0xFF000000
+    backgroundColor = 0xFF000000, locale = "ar"
 )
 @Composable
 fun BioMedUserInfoCardDarkPreview() {
@@ -229,10 +199,16 @@ fun BioMedUserInfoCardDarkPreview() {
         BioMedUserInfoCard(
             user = Technician(
                 id = "1",
-                name = "Khaled",
+                name = "Mina",
                 email = "william.henry.harrison@example-pet-store.com",
                 role = UserRole.TECHNICIAN,
-                assignedDepartments = emptyList(),
+                assignedDepartments = listOf(
+                    Department(
+                        id = "1",
+                        name = "Dialysis Unit",
+                        totalEquipment = 34
+                    )
+                ),
                 employeeId = "1",
                 isActive = true
             )

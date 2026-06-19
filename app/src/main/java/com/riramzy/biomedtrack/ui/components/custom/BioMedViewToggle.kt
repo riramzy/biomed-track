@@ -19,12 +19,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.ui.theme.BioMedTheme
+
 
 @Composable
 fun BioMedViewToggle(
@@ -54,7 +57,7 @@ fun BioMedViewToggle(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Week View",
+                text = stringResource(R.string.scheduler_view_week_toggle),
                 style = MaterialTheme.typography.labelLarge,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -66,30 +69,22 @@ fun BioMedViewToggle(
                     )
                     .background(
                         color = when (selectedView) {
-                            "Week" -> if (isDarkTheme) {
-                                MaterialTheme.colorScheme.secondary
-                            } else {
-                                MaterialTheme.colorScheme.primary
-                            }
+                            R.string.scheduler_view_week.toString() -> MaterialTheme.colorScheme.primary
                             else -> Color.Unspecified
                         }
                     )
                     .clickable {
-                        onViewChange("Week")
+                        onViewChange(R.string.scheduler_view_week.toString())
                     },
                 textAlign = TextAlign.Center,
                 color = when (selectedView) {
-                    "Week" -> if (isDarkTheme) {
-                        MaterialTheme.colorScheme.onSecondary
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    }
+                    R.string.scheduler_view_week.toString() -> MaterialTheme.colorScheme.onPrimary
                     else -> Color.Unspecified
                 }
             )
 
             Text(
-                text = "List View",
+                text = stringResource(R.string.scheduler_view_list_toggle),
                 style = MaterialTheme.typography.labelLarge,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -101,24 +96,16 @@ fun BioMedViewToggle(
                     )
                     .background(
                         color = when (selectedView) {
-                            "List" -> if (isDarkTheme) {
-                                MaterialTheme.colorScheme.secondary
-                            } else {
-                                MaterialTheme.colorScheme.primary
-                            }
+                            R.string.scheduler_view_list.toString() -> MaterialTheme.colorScheme.primary
                             else -> Color.Unspecified
                         }
                     )
                     .clickable {
-                        onViewChange("List")
+                        onViewChange(R.string.scheduler_view_list.toString())
                     },
                 textAlign = TextAlign.Center,
                 color = when (selectedView) {
-                    "List" -> if (isDarkTheme) {
-                        MaterialTheme.colorScheme.onSecondary
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    }
+                    R.string.scheduler_view_list.toString() -> MaterialTheme.colorScheme.onPrimary
                     else -> Color.Unspecified
                 }
             )
@@ -126,12 +113,12 @@ fun BioMedViewToggle(
     }
 }
 
-@Preview(device = "id:pixel_9", showBackground = true)
+@Preview(device = "id:pixel_9", showBackground = true, locale = "ar")
 @Composable
 fun BioMedViewTogglePreview() {
     BioMedTheme {
         BioMedViewToggle(
-            selectedView = "List",
+            selectedView = R.string.scheduler_view_list.toString(),
             onViewChange = {}
         )
     }
@@ -144,7 +131,7 @@ fun BioMedViewTogglePreview() {
 fun BioMedViewToggleDarkPreview() {
     BioMedTheme {
         BioMedViewToggle(
-            selectedView = "List",
+            selectedView = R.string.scheduler_view_week.toString(),
             onViewChange = {}
         )
     }

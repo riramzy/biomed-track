@@ -6,10 +6,9 @@ import com.riramzy.biomedtrack.data.local.entity.toEntity
 import com.riramzy.biomedtrack.data.remote.firebase.FirestoreCollections
 import com.riramzy.biomedtrack.data.remote.model.DepartmentDto
 import com.riramzy.biomedtrack.data.remote.model.toDto
-import com.riramzy.biomedtrack.di.SessionManager
-import com.riramzy.biomedtrack.utils.Result
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.repo.DepartmentRepo
+import com.riramzy.biomedtrack.utils.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -22,7 +21,6 @@ import javax.inject.Inject
 class DepartmentRepoImpl @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val departmentDao: DepartmentDao,
-    private val sessionManager: SessionManager,
 ): DepartmentRepo {
     override fun getAllDepartments(): Flow<List<Department>> = callbackFlow {
         val listener = firebaseFirestore
@@ -51,7 +49,7 @@ class DepartmentRepoImpl @Inject constructor(
 
     override suspend fun getAllDepartmentsOnce(): List<Department> {
         return firebaseFirestore
-            .collection(FirestoreCollections.EQUIPMENT)
+            .collection(FirestoreCollections.DEPARTMENT)
             .get()
             .await()
             .mapNotNull { it.toObject(DepartmentDto::class.java).toDomain() }
@@ -74,7 +72,7 @@ class DepartmentRepoImpl @Inject constructor(
     override suspend fun addDepartment(department: Department): Result<Unit> {
         return try {
             firebaseFirestore
-                .collection(FirestoreCollections.EQUIPMENT)
+                .collection(FirestoreCollections.DEPARTMENT)
                 .document(department.id)
                 .set(department.toDto())
                 .await()

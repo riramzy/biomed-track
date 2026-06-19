@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.riramzy.biomedtrack.R
 import com.riramzy.biomedtrack.domain.model.Department
 import com.riramzy.biomedtrack.domain.model.Task
 import com.riramzy.biomedtrack.domain.model.Technician
@@ -109,6 +111,8 @@ fun DashboardScreenContent(
     logout: (() -> Unit) -> Unit = {},
     onStartTaskClick: (String, String) -> Unit = { _, _ -> },
 ) {
+    val context = LocalContext.current
+
     when(state) {
         is DashboardUiState.Error -> {
             Scaffold(
@@ -164,7 +168,7 @@ fun DashboardScreenContent(
                             )
 
                             BioMedButton(
-                                text = "Retry",
+                                text = stringResource(R.string.retry),
                                 onClick = { onRetryClick() },
                                 customColor = MaterialTheme.colorScheme.error,
                                 customTextColor = MaterialTheme.colorScheme.onError,
@@ -205,7 +209,6 @@ fun DashboardScreenContent(
         }
         is DashboardUiState.Success -> {
             val sheetState = rememberModalBottomSheetState()
-            val context = LocalContext.current
 
             var showProfileBottomSheet by remember { mutableStateOf(false) }
             var showMyProfileDialog by remember { mutableStateOf(false) }
@@ -269,7 +272,11 @@ fun DashboardScreenContent(
                         changePassword(current, new) { result ->
                             when (result) {
                                 is Result.Success -> {
-                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.password_updated_success,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     showChangePasswordDialog = false
                                 }
                                 is Result.Error -> {
@@ -423,14 +430,14 @@ fun DashboardScreenContent(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = "Recent Activities",
+                                    text = stringResource(R.string.recent_activities),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.ExtraBold
                                 )
 
                                 Text(
-                                    text = "View All",
+                                    text = stringResource(R.string.view_all),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
@@ -442,13 +449,14 @@ fun DashboardScreenContent(
                                     BioMedActivityCard(
                                         type = activity.type,
                                         status = activity.equipmentStatus ?: EquipmentStatus.SERVICE,
-                                        title = activity.title,
+                                        previousStatus = activity.previousStatus,
                                         name = activity.equipmentName,
                                         model = activity.equipmentModel,
                                         serialNumber = activity.equipmentSerial,
                                         department = activity.departmentName,
                                         changedBy = activity.technicianName,
-                                        relativeTime = activity.timestamp.toRelativeTime(),
+                                        taskAssigneeName = activity.taskAssigneeName,
+                                        relativeTime = activity.timestamp.toRelativeTime(context),
                                         dateString = activity.dueDate ?: "",
                                         onClick = {
                                             navController.navigate(
@@ -484,14 +492,14 @@ fun DashboardScreenContent(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = "Upcoming Tasks",
+                                    text = stringResource(R.string.upcoming_maintenance),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.ExtraBold
                                 )
 
                                 Text(
-                                    text = "View All",
+                                    text = stringResource(R.string.view_all),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
@@ -528,14 +536,14 @@ fun DashboardScreenContent(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = "Departments Overview",
+                                    text = stringResource(R.string.departments_overview),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.ExtraBold
                                 )
 
                                 Text(
-                                    text = "View All",
+                                    text = stringResource(R.string.view_all),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
@@ -575,7 +583,7 @@ fun DashboardScreenContent(
     }
 }
 
-@Preview(device = "id:pixel_9")
+@Preview(device = "id:pixel_9", locale = "ar")
 @Composable
 fun DashboardScreenPreview() {
     BioMedTheme {

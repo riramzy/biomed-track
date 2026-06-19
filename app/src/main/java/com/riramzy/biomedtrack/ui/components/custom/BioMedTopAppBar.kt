@@ -31,7 +31,8 @@ import com.riramzy.biomedtrack.ui.theme.BioMedTheme
 @Composable
 fun BioMedTopAppBar(
     modifier: Modifier = Modifier,
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onNotificationsClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -71,7 +72,7 @@ fun BioMedTopAppBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { onNotificationsClick() },
                         modifier = Modifier.size(35.dp),
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = if (isSystemInDarkTheme()) {

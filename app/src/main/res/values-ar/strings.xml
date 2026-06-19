@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">بايوميد تراك</string>
+    <string name="recent_activities">الأنشطة الأخيرة</string>
+    <string name="upcoming_maintenance">المهام القادمة</string>
+    <string name="departments_overview">نظرة عامة على الأقسام</string>
+    <string name="view_all">عرض الكل</string>
+    <string name="log_maintenance">تسجيل صيانة</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="none">لا يوجد</string>
+    <string name="password_updated_success">تم تحديث كلمة المرور بنجاح!</string>
+
+    <!-- Notifications Screen -->
+    <string name="notifications_title">الإشعارات</string>
+    <string name="mark_all_read">تحديد الكل كمقروء</string>
+    <string name="error_session_expired">انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.</string>
+
+    <!-- Plurals for Unread Counts -->
+    <plurals name="unread_notifications_count">
+        <item quantity="zero">لا توجد إشعارات غير مقروءة</item>
+        <item quantity="one">إشعار واحد غير مقروء</item>
+        <item quantity="two">إشعاران غير مقروءين</item>
+        <item quantity="few">%1$d إشعارات غير مقروءة</item>
+        <item quantity="many">%1$d إشعاراً غير مقروء</item>
+        <item quantity="other">%1$d إشعار غير مقروء</item>
+    </plurals>
+
+    <!-- Notification Categories -->
+    <string name="category_all">الكل</string>
+    <string name="category_status_changes">تغيرات الحالة</string>
+    <string name="category_maintenance_logs">سجلات الصيانة</string>
+    <string name="category_service_reminders">تذكيرات الخدمة</string>
+
+    <!-- Notification Header -->
+    <string name="header_today">اليوم</string>
+    <string name="header_yesterday">أمس</string>
+    <string name="header_earlier">سابقاً</string>
+
+    <!-- Notification Card Formats -->
+    <string name="task_due_date_format">تاريخ الاستحقاق: %1$s</string>
+    <string name="label_by_name">بواسطة %1$s</string>
+
+    <!-- Inventory Screen & Filters -->
+    <string name="inventory_subtitle">إدارة ومتابعة جميع الأجهزة الطبية</string>
+    <string name="filter_button">تصفية</string>
+    <string name="advanced_filters">خيارات التصفية المتقدمة</string>
+    <string name="filter_by_status">تصفية حسب الحالة</string>
+    <string name="filter_by_category">تصفية حسب الفئة</string>
+    <string name="apply_button">تطبيق</string>
+    <string name="clear_all_filters">مسح جميع الفلاتر</string>
+    <string name="no_equipment_found">لم يتم العثور على أجهزة</string>
+    <string name="try_changing_filter_search">جرّب تغيير فلاتر الأقسام أو نص البحث</string>
+    <string name="search_placeholder_equipment">البحث بالاسم، الرقم التسلسلي، أو الموديل</string>
+
+    <!-- Dialog Labels -->
+    <string name="dismiss">إلغاء</string>
+    <string name="confirm">تأكيد</string>
+    <string name="select_new_status_format">يرجى تحديد الحالة الجديدة لـ %1$s</string>
+    <string name="reason_for_change">سبب التغيير</string>
+    <string name="reason_for_change_placeholder">مثال: تسريب مياه، موعد صيانة دورية</string>
+
+    <!-- Equipment Card Fields -->
+    <string name="label_serial_number">الرقم التسلسلي</string>
+    <string name="label_model">الموديل</string>
+    <string name="label_next_service">الصيانة القادمة</string>
+    <string name="label_none">لا يوجد</string>
+    <string name="label_category_prefix">الفئة: </string>
+    <string name="label_manufacturer_prefix">الشركة المصنعة: </string>
+
+    <!-- Insight Card Labels -->
+    <string name="insight_healthy">سليم</string>
+    <string name="insight_down">خارج الخدمة</string>
+    <string name="insight_service">صيانة</string>
+    <string name="insight_total">الإجمالي</string>
+    <string name="insight_healthy_desc">يعمل بشكل طبيعي</string>
+    <string name="insight_down_desc">يتطلب إصلاحاً</string>
+    <string name="insight_service_desc">بحاجة إلى اهتمام</string>
+    <string name="insight_total_desc">في جميع الأقسام</string>
+
+    <!-- User & Role Settings -->
+    <string name="welcome_user">مرحباً، %1$s</string>
+    <string name="role_admin">مسؤول</string>
+    <string name="role_supervisor">مشرف</string>
+    <string name="role_technician">فني</string>
+
+    <!-- Department Metadata -->
+    <string name="dept_total_equipment">إجمالي الأجهزة</string>
+    <string name="dept_due_service">صيانة مطلوبة</string>
+    <string name="dept_down">خارج الخدمة</string>
+
+    <!-- Navigation Labels -->
+    <string name="nav_dashboard">لوحة التحكم</string>
+    <string name="nav_scheduler">المجدول</string>
+    <string name="nav_inventory">المخزن</string>
+    <string name="nav_reports">التقارير</string>
+
+    <!-- Profile Options -->
+    <string name="profile_title_my_profile">ملفي الشخصي</string>
+    <string name="profile_title_notifications_preferences">تفضيلات الإشعارات</string>
+    <string name="profile_title_change_password">تغيير كلمة المرور</string>
+    <string name="profile_title_manage_users">إدارة المستخدمين</string>
+    <string name="profile_title_import_equipment">استيراد الأجهزة</string>
+    <string name="profile_title_logout">تسجيل الخروج</string>
+    <string name="profile_title_language">اللغة / Language</string>
+
+    <!-- Statuses -->
+    <string name="status_online">يعمل</string>
+    <string name="status_down">خارج الخدمة</string>
+    <string name="status_service">صيانة</string>
+    <string name="status_log">سجل</string>
+    <string name="status_assigned">مكلف</string>
+
+    <!-- Tasks -->
+    <string name="status_pending">قيد الانتظار</string>
+    <string name="status_in_progress">قيد التنفيذ</string>
+    <string name="status_done">مكتمل</string>
+    <string name="task_serial_format">الرقم التسلسلي: %1$s</string>
+    <string name="task_steps_format">%1d/%2d خطوات</string>
+
+    <!-- Relative Time -->
+    <string name="time_mins_ago">منذ %1$d دقيقة</string>
+    <string name="time_hours_ago">منذ %1$d ساعة</string>
+    <string name="time_days_ago">منذ %1$d يوم</string>
+
+    <!-- Activities -->
+    <string name="activity_status_changed">تغيرت الحالة إلى %1$s</string>
+    <string name="activity_status_changed_from_to">تغيرت الحالة من %1s إلى %2s</string>
+    <string name="activity_maintenance_logged">تم تسجيل الصيانة</string>
+    <string name="activity_task_assigned">تم التكليف بمهمة</string>
+    <string name="activity_task_assigned_to">تم تكليف المهمة لـ %1$s</string>
+    <string name="label_department">القسم</string>
+    <string name="label_by">بواسطة</string>
+
+    <!-- Hospital Departments -->
+    <string name="dept_dialysis_unit">وحدة غسيل الكلى</string>
+    <string name="dept_burn_unit">وحدة الحروق</string>
+    <string name="dept_cardiac_care_unit">وحدة العناية القلبية المركزة</string>
+    <string name="dept_central_sterilization_unit">وحدة التعقيم المركزي</string>
+    <string name="dept_dental_department">قسم الأسنان</string>
+    <string name="dept_dental_prosthetics_lab">مختبر تركيبات الأسنان</string>
+    <string name="dept_diabetic_foot_unit">وحدة القدم السكري</string>
+    <string name="dept_echocardiography_unit">وحدة تخطيط صدى القلب</string>
+    <string name="dept_emergency_room">قسم الطوارئ</string>
+    <string name="dept_intensive_care_unit_a">العناية المركزة (أ)</string>
+    <string name="dept_intensive_care_unit_b">العناية المركزة (ب)</string>
+    <string name="dept_laboratory">المختبر</string>
+    <string name="dept_neonatal_intensive_care_unit">العناية المركزة لحديثي الولادة</string>
+    <string name="dept_obstetrics_department">قسم النساء والتوليد</string>
+    <string name="dept_operating_room">غرفة العمليات</string>
+    <string name="dept_outpatient_clinics">العيادات الخارجية</string>
+    <string name="dept_pediatric_intensive_care_unit">العناية المركزة للأطفال</string>
+    <string name="dept_pediatrics_unit">قسم الأطفال</string>
+    <string name="dept_physiotherapy_department">قسم العلاج الطبيعي</string>
+    <string name="dept_radiology_department">قسم الأشعة</string>
+    <string name="dept_reception">الاستقبال</string>
+    <string name="dept_surgery_department">قسم الجراحة</string>
+
+    <!-- Scheduler Screen & Maintenance Form -->
+    <string name="scheduler_title">المجدول</string>
+    <string name="scheduler_subtitle">تخطيط ومتابعة جداول صيانة الأجهزة</string>
+    <string name="scheduler_view_list">قائمة</string>
+    <string name="scheduler_view_week">أسبوع</string>
+    <string name="scheduler_view_week_toggle">عرض الأسبوع</string>
+    <string name="scheduler_view_list_toggle">عرض القائمة</string>
+    <string name="scheduler_week_previous">الأسبوع السابق</string>
+    <string name="scheduler_week_current">الأسبوع الحالي</string>
+    <string name="scheduler_week_next">الأسبوع القادم</string>
+    <string name="scheduler_week_custom_range">نطاق مخصص</string>
+    <string name="scheduler_filter">تصفية</string>
+    <string name="scheduler_retry">إعادة المحاولة</string>
+    <string name="scheduler_no_maintenance">لا توجد أعمال صيانة</string>
+    <string name="scheduler_overdue_maintenance">الصيانة المتأخرة (%1$d)</string>
+    <plurals name="scheduler_equipment_overdue_message">
+        <item quantity="zero">لا توجد أجهزة متأخرة عن الصيانة</item>
+        <item quantity="one">جهاز واحد متأخر عن الصيانة</item>
+        <item quantity="two">جهازان متأخران عن الصيانة</item>
+        <item quantity="few">%1$d أجهزة متأخرة عن الصيانة</item>
+        <item quantity="many">%1$d جهازاً متأخراً عن الصيانة</item>
+        <item quantity="other">%1$d جهاز متأخر عن الصيانة</item>
+    </plurals>
+    <string name="scheduler_overdue_prompt">يرجى جدولة الصيانة في أقرب وقت ممكن</string>
+    <string name="task_details_serial">الرقم التسلسلي: %1$s</string>
+    <string name="task_details_notes_title">ملاحظات المشرف</string>
+    <string name="task_details_checklist_title">قائمة السلامة المهيأة (%1$d خطوات)</string>
+    <string name="task_details_btn_start">بدء الخدمة</string>
+    <string name="task_details_btn_resume">استئناف الخدمة</string>
+    <string name="schedule_maint_title">جدولة صيانة</string>
+    <string name="schedule_maint_equipment">الجهاز</string>
+    <string name="schedule_maint_select_equipment">اختر الجهاز</string>
+    <string name="schedule_maint_date">التاريخ</string>
+    <string name="schedule_maint_assign_to">تكليف إلى</string>
+    <string name="schedule_maint_select_technician">اختر الفني</string>
+    <string name="schedule_maint_notes">ملاحظات إضافية</string>
+    <string name="schedule_maint_notes_placeholder">أدخل الملاحظات هنا</string>
+    <string name="schedule_maint_tasks_required">المهام المطلوبة</string>
+    <string name="schedule_maint_btn_schedule">جدولة</string>
+    <string name="schedule_maint_btn_cancel">إلغاء</string>
+
+    <!-- Date Selector & Range Selector Dialogs -->
+    <string name="date_selector_ok">موافق</string>
+    <string name="date_selector_cancel">إلغاء</string>
+    <string name="date_range_title">تحديد نطاق تاريخ مخصص</string>
+    <string name="date_range_start">تاريخ البدء</string>
+    <string name="date_range_end">تاريخ الانتهاء</string>
+
+    <string name="splash_logo_desc">شعار</string>
+    <string name="login_email_label">البريد الإلكتروني</string>
+    <string name="login_email_placeholder">أدخل بريدك الإلكتروني</string>
+    <string name="login_password_label">كلمة المرور</string>
+    <string name="login_password_placeholder">أدخل كلمة مرورك</string>
+    <string name="login_button">تسجيل الدخول</string>
+    <string name="login_button_loading">جارٍ تسجيل الدخول…</string>
+
+    <string name="error_failed_to_get_user">فشل الحصول على المستخدم الحالي</string>
+    <string name="error_database_connection">فشل الاتصال بقاعدة البيانات</string>
+
+    <string name="add_equipment_title">إضافة جهاز</string>
+    <string name="add_equipment_subtitle">تسجيل جهاز طبي جديد</string>
+    <string name="edit_equipment_title">تعديل جهاز</string>
+    <string name="edit_equipment_subtitle">تحديث معلومات الجهاز الطبي</string>
+    <string name="label_equipment_details">معلومات الجهاز</string>
+    <string name="label_classification">التصنيف</string>
+    <string name="label_location_and_dates">المكان والتواريخ</string>
+    <string name="field_name">الاسم</string>
+    <string name="field_name_placeholder">أدخل الاسم</string>
+    <string name="field_model">الموديل</string>
+    <string name="field_model_placeholder">أدخل الموديل</string>
+    <string name="field_serial_number">الرقم التسلسلي</string>
+    <string name="field_serial_placeholder">أدخل الرقم التسلسلي</string>
+    <string name="field_manufacturer">الشركة المصنعة</string>
+    <string name="field_manufacturer_placeholder">أدخل الشركة المصنعة</string>
+    <string name="field_agent">الوكيل</string>
+    <string name="field_agent_placeholder">أدخل الوكيل</string>
+    <string name="field_department">القسم</string>
+    <string name="field_department_placeholder">اختر القسم</string>
+    <string name="field_category">الفئة</string>
+    <string name="field_category_placeholder">اختر الفئة</string>
+    <string name="field_status">الحالة</string>
+    <string name="field_status_placeholder">اختر الحالة</string>
+    <string name="field_location">المكان</string>
+    <string name="field_location_placeholder">اختر المكان</string>
+    <string name="field_purchase_date">تاريخ الشراء</string>
+    <string name="field_last_maintenance_date">تاريخ آخر صيانة</string>
+    <string name="field_warranty_expiry">تاريخ انتهاء الضمان</string>
+    <string name="field_install_date">تاريخ التركيب</string>
+    <string name="field_notes">ملاحظات</string>
+    <string name="field_photo_documents">توثيق بالصور</string>
+    <string name="field_contract_info">معلومات عقد الصيانة</string>
+    <string name="field_contract_info_placeholder">ادخل معلومات عقد الصيانة</string>
+    <string name="no_contract">لا يوجد عقد صيانة ساري</string>
+    <string name="btn_save">حفظ</string>
+    <string name="btn_cancel">إلغاء</string>
+
+    <!-- Photo Documentation Card -->
+    <string name="photo_doc_title">توثيق بالصور</string>
+    <string name="photo_doc_description">التقط صور للتقارير او المستندات</string>
+    <string name="photo_doc_captured_photo">الصورة الملتقطه</string>
+    <string name="photo_doc_change_photo">تغيير الصورة</string>
+    <string name="photo_doc_add_photo">اضف صورة</string>
+    <string name="photo_doc_photo_captured_successfully">تم القاط الصورة بنجاح</string>
+
+    <!-- Equipment Detail Screen -->
+    <string name="delete_dialog_title">حذف</string>
+    <string name="edit">تعديل</string>
+    <string name="delete_dialog_body">هل أنت متأكد من حذف هذا الجهاز؟ لا يمكن التراجع عن هذا الإجراء</string>
+    <string name="delete_dialog_btn_confirm">حذف</string>
+    <string name="equipment_deleted_success">تم حذف الجهاز بنجاح</string>
+    <string name="equipment_delete_failed">فشل الحذف: %1$s</string>
+    <string name="section_maintenance_history">سجل الصيانة</string>
+    <string name="section_status_history">سجل تغييرات الحالة</string>
+    <string name="maintenance_schedule">جدول الصيانة</string>
+
+    <!-- Log Maintenance Card -->
+    <string name="log_maint_title">تسجيل صيانة</string>
+    <string name="log_maint_subtitle">تسجيل أعمال الصيانة والإصلاحات والفحوصات</string>
+    <string name="log_maint_field_equipment">الجهاز</string>
+    <string name="log_maint_field_type">نوع الصيانة</string>
+    <string name="log_maint_field_type_placeholder">اختر نوع الصيانة</string>
+    <string name="log_maint_field_current_status">الحالة الراهنة</string>
+    <string name="log_maint_field_current_status_placeholder">اختر الحالة الراهنة</string>
+    <string name="log_maint_field_by">بواسطة</string>
+    <string name="log_maint_field_notes">الملاحظات والمشاهدات</string>
+    <string name="log_maint_tasks_completed">المهام المنجزة</string>
+    <string name="log_maint_photo_doc">توثيق صور</string>
+    <string name="log_maint_tasks_label">المهام المنجزة:</string>
+
+    <!-- Multiple Items Selector -->
+    <string name="multiple_selector_add_placeholder">إضافة مهمة جديدة</string>
+    <string name="multiple_selector_btn_add">إضافة</string>
+
+    <!-- Default Maintenance Checklist Items -->
+    <string name="checklist_visual_inspection">الفحص البصري</string>
+    <string name="checklist_electrical_safety">فحص السلامة الكهربائية</string>
+    <string name="checklist_cleaning">التنظيف</string>
+    <string name="checklist_functional_test">الاختبار الوظيفي</string>
+    <string name="checklist_alarm_verification">التحقق من الإنذارات</string>
+    <string name="checklist_filters_inspection">فحص الفلاتر</string>
+    <string name="checklist_calibration">المعايرة</string>
+    <string name="checklist_wear_parts">تقييم قطع التآكل</string>
+    <string name="checklist_software_check">فحص البرنامج</string>
+    <string name="checklist_documentation">التوثيق</string>
+
+    <!-- Reports Screen -->
+    <string name="reports_title">التقارير</string>
+    <string name="reports_subtitle">إنشاء وتصدير تقارير تفصيلية بسهولة</string>
+    <string name="reports_period_previous">الشهر الماضي</string>
+    <string name="reports_period_current">هذا الشهر</string>
+    <string name="reports_period_next">الشهر القادم</string>
+    <string name="reports_filter_btn">تصفية</string>
+    <string name="reports_status_all">الكل</string>
+    <string name="reports_status_healthy">يعمل</string>
+    <string name="reports_status_due_service">صيانة</string>
+    <string name="reports_dept_all">جميع الأقسام</string>
+    <string name="reports_toggle_include_logs">تضمين سجلات الصيانة</string>
+    <string name="reports_section_summary">ملخص التقرير</string>
+    <string name="reports_refresh_preview">تحديث المعاينة</string>
+    <string name="reports_section_export_format">صيغة التصدير</string>
+    <string name="reports_section_last_generated">آخر تقرير منشأ</string>
+    <string name="reports_download_success">تم تنزيل الملف بنجاح</string>
+    <string name="reports_download_failed">فشل تنزيل الملف</string>
+    <string name="reports_share_chooser_title">مشاركة التقرير</string>
+    <string name="reports_generated_success">تم إنشاء التقرير بنجاح</string>
+    <string name="reports_error_no_file">فشل إنشاء الملف الهدف</string>
+    <string name="reports_error_unknown">خطأ غير معروف</string>
+
+    <!-- Report Export Format Card -->
+    <string name="export_format_pdf">PDF</string>
+    <string name="export_format_pdf_note">الأفضل للمشاركة والطباعة</string>
+    <string name="export_format_excel">Excel</string>
+    <string name="export_format_excel_note">الأفضل للتعديل والتحليل</string>
+    <string name="btn_generate_report">إنشاء تقرير</string>
+
+    <!-- Report Summary Card -->
+    <string name="summary_total_equipment">إجمالي الأجهزة</string>
+    <string name="summary_healthy">يعمل</string>
+    <string name="summary_service_due">مطلوب صيانة</string>
+    <string name="summary_down">خارج الخدمة</string>
+    <string name="summary_log_entries">سيتضمن التقرير %1$d سجل صيانة للأجهزة خارج الخدمة والمطلوب صيانتها</string>
+
+    <!-- Report Generated File Card -->
+    <string name="generated_file_card_ready_for_preview">الملف جاهز للاطلاع</string>
+    <string name="generated_file_card_mb">%1$f ميجا بايت</string>
+    <string name="generated_file_card_kb">%1$f كيلو بايت</string>
+
+    <!-- User Management Screen -->
+    <string name="user_mgmt_title">إدارة المستخدمين</string>
+    <string name="user_mgmt_subtitle">إدارة المستخدمين والأدوار وصلاحيات الأقسام</string>
+    <string name="user_mgmt_role_all">الكل</string>
+    <string name="user_mgmt_role_admins">المسؤولون</string>
+    <string name="user_mgmt_role_supervisors">المشرفون</string>
+    <string name="user_mgmt_role_technicians">الفنيون</string>
+
+    <!-- BioMedUsersInsightCard -->
+    <string name="insight_card_admin">مسؤول</string>
+    <string name="insight_card_supervisors">مشرفون</string>
+    <string name="insight_card_technicians">فنيون</string>
+    <string name="insight_card_total">إجمالي المستخدمين</string>
+
+    <!-- BioMedUserInfoCard -->
+    <string name="user_card_access_all_depts">صلاحية الوصول لجميع الأقسام</string>
+    <string name="user_card_full_system_access">صلاحية كاملة للنظام</string>
+    <string name="user_card_btn_manage_departments">إدارة الأقسام</string>
+    <string name="user_card_toggle_active">نشط</string>
+
+    <!-- BioMedAddNewUserRoleSheet -->
+    <string name="add_user_title">إضافة مستخدم جديد</string>
+    <string name="add_user_field_first_name">الاسم الأول</string>
+    <string name="add_user_field_last_name">اسم العائلة</string>
+    <string name="add_user_field_employee_id">رقم الموظف</string>
+    <string name="add_user_field_email">البريد الإلكتروني</string>
+    <string name="add_user_field_password">كلمة المرور</string>
+    <string name="add_user_field_password_placeholder">أدخل كلمة المرور</string>
+    <string name="add_user_field_role">الدور الوظيفي</string>
+    <string name="add_user_field_role_placeholder">اختر الدور</string>
+    <string name="add_user_validation_first_name">الاسم الأول مطلوب</string>
+    <string name="add_user_validation_last_name">اسم العائلة مطلوب</string>
+    <string name="add_user_validation_employee_id">رقم الموظف مطلوب</string>
+    <string name="add_user_validation_email">البريد الإلكتروني مطلوب</string>
+    <string name="add_user_validation_email_format">صيغة البريد الإلكتروني غير صحيحة</string>
+    <string name="add_user_validation_password">كلمة المرور مطلوبة</string>
+    <string name="add_user_validation_password_length">يجب أن تكون كلمة المرور 6 أحرف على الأقل</string>
+
+    <!-- BioMedChangeRoleSheet -->
+    <string name="change_role_title">تغيير الدور الوظيفي</string>
+    <string name="change_role_supervisor">مشرف</string>
+    <string name="change_role_admin">مسؤول</string>
+    <string name="change_role_technician">فني</string>
+    <string name="change_role_supervisor_desc">صلاحية كاملة لجميع الأقسام، يمكنه تعيين المهام وإنشاء التقارير</string>
+    <string name="change_role_admin_desc">صلاحية كاملة للنظام تشمل إدارة المستخدمين والأجهزة</string>
+    <string name="change_role_technician_desc">يمكنه عرض جميع الأجهزة وتسجيل الصيانة في الأقسام المخصصة له فقط</string>
+
+    <!-- UserManagementVm snackbar strings -->
+    <string name="user_mgmt_error_self_deactivate">لا يمكنك تعطيل حسابك الخاص</string>
+    <string name="user_mgmt_error_no_user">المستخدم غير مسجل الدخول</string>
+    <string name="user_mgmt_error_self_role_change">لا يمكنك تغيير دورك الوظيفي الخاص</string>
+    <string name="user_mgmt_success_status_updated">تم تحديث حالة المستخدم بنجاح</string>
+    <string name="user_mgmt_success_role_updated">تم تحديث دور المستخدم بنجاح</string>
+    <string name="user_mgmt_success_departments_updated">تم تحديث أقسام المستخدم بنجاح</string>
+    <string name="user_mgmt_success_user_created">تم إنشاء المستخدم بنجاح</string>
+
+    <!-- Validation Errors -->
+    <string name="error_name_empty">لا يمكن أن يكون الاسم فارغاً</string>
+    <string name="error_model_empty">لا يمكن أن يكون الموديل فارغاً</string>
+    <string name="error_serial_empty">لا يمكن أن يكون الرقم التسلسلي فارغاً</string>
+    <string name="error_manufacturer_empty">لا يمكن أن تكون الشركة المصنعة فارغة</string>
+    <string name="error_agent_empty">لا يمكن أن يكون الوكيل فارغاً</string>
+    <string name="error_select_category">يرجى اختيار فئة</string>
+    <string name="error_select_status">يرجى اختيار حالة</string>
+    <string name="error_select_location">يرجى اختيار موقع</string>
+    <string name="error_select_install_date">يرجى اختيار تاريخ التركيب</string>
+    <string name="error_select_warranty_date">يرجى اختيار تاريخ انتهاء الضمان</string>
+    <string name="error_select_department">يرجى اختيار القسم</string>
+    <string name="error_equipment_not_found">الجهاز غير موجود</string>
+
+    <!-- Import Equipment Screens (shared) -->
+    <string name="import_title">استيراد الأجهزة</string>
+    <string name="import_subtitle">استيراد جماعي للأجهزة من ملف إكسل</string>
+    <string name="import_step_select_file">اختر الملف</string>
+    <string name="import_step_preview">معاينة</string>
+    <string name="import_step_import">استيراد</string>
+
+    <!-- Step 1: Select File -->
+    <string name="import_step1_header">الخطوة ١: اختيار الملف</string>
+    <string name="import_note_format">يجب أن يتطابق تنسيق الإكسل مع التنسيق الدقيق للقالب لضمان سهولة ونجاح استخراج البيانات</string>
+    <string name="import_note_download_template">تحميل القالب</string>
+    <string name="import_uploaded_files">الملفات المرفوعة</string>
+    <string name="import_file_size_kb">%1$d كيلو بايت</string>
+
+    <!-- Upload File Card -->
+    <string name="upload_excel_file">اختار مِلَفّ Excel الخاص بك</string>
+    <string name="upload_excel_file_desc">يدعم صيغه .xlsx و صيغه .xls</string>
+    <string name="upload_excel_file_success">تم رفع المِلَفّ الخاص بك بنجاح</string>
+    <string name="upload_excel_file_browse_files">تصفح ملفاتك</string>
+    <string name="upload_excel_file_reupload">اعاده رفع الملف</string>
+
+    <!-- Step 2: Data Preview -->
+    <string name="import_step2_header">الخطوة ٢: المعاينة</string>
+    <string name="import_data_preview_title">معاينة البيانات</string>
+    <string name="import_btn_return_to_select">العودة إلى اختيار الملف</string>
+    <string name="import_btn_import_rows">استيراد %1$d صف محدد</string>
+
+    <!-- Step 3: Progress -->
+    <string name="import_step3_header">الخطوة ٣: الاستيراد</string>
+    <string name="import_progress_title">جارٍ استيراد الأجهزة</string>
+    <string name="import_progress_warning">يرجى عدم إغلاق التطبيق</string>
+    <string name="import_progress_live_log">السجل المباشر</string>
+
+    <!-- Completion -->
+    <string name="import_complete_icon_desc">نجاح</string>
+    <string name="import_complete_title">اكتمل الاستيراد</string>
+    <string name="import_complete_success_count">تم استيراد %1$d جهاز بنجاح</string>
+    <string name="import_complete_skipped_count">تم تخطي %1$d صف بنجاح</string>
+    <string name="import_complete_failed_count">فشل استيراد %1$d صف</string>
+    <string name="import_btn_import_another">استيراد ملف آخر</string>
+    <string name="import_btn_go_to_inventory">الذهاب إلى المخزن</string>
+    <string name="import_file_ready">الملف جاهز للمعاينة</string>
+
+    <!-- Data Preview Table -->
+    <string name="table_header_name">الاسم</string>
+    <string name="table_header_model">الموديل</string>
+    <string name="table_header_serial">الرقم التسلسلي</string>
+    <string name="table_header_department">القسم</string>
+    <string name="table_header_category">الفئة</string>
+    <string name="table_header_status">الحالة</string>
+    <string name="table_header_logs">السجلات</string>
+    <string name="import_btn_select_all">تحديد الكل</string>
+    <string name="import_btn_deselect_all">إلغاء تحديد الكل</string>
+
+    <!-- Data Preview Card -->
+    <string name="import_total_rows">إجمالي الصفوف في الملف</string>
+    <string name="import_valid_rows">%1$d صالح</string>
+    <string name="import_warning_rows">%1$d تحذيرات</string>
+    <string name="import_error_rows">%1$d أخطاء</string>
+
+    <!-- Importing validation messages -->
+    <string name="import_validation_serial_blank">الرقم التسلسلي فارغ</string>
+    <string name="import_validation_serial_exists_db">الرقم التسلسلي موجود بالفعل</string>
+    <string name="import_validation_serial_exists_file">الرقم التسلسلي مكرر في الملف</string>
+
+    <!-- Importing ViewModel Logs/Messages -->
+    <string name="import_log_creating_departments">إنشاء الأقسام…</string>
+    <string name="import_log_created_departments">تم إنشاء %1$d قسم جديد</string>
+    <string name="import_log_department_not_found">لم يتم ايجاد القسم</string>
+    <string name="import_log_saving_batch">حفظ الدفعة %1$d من %2$d (%3$d عناصر)</string>
+    <string name="import_log_batch_saved_success">تم حفظ الدفعة %1$d بنجاح</string>
+    <string name="import_log_batch_save_failed">فشل حفظ الدفعة %1$d: %2$s</string>
+    <string name="import_log_all_batches_saved">تم حفظ جميع الدفعات بنجاح</string>
+    <string name="import_excel_parsed_success">تم تحليل ملف إكسل بنجاح</string>
+    <string name="import_excel_parse_failed">فشل تحليل ملف إكسل</string>
+    <string name="import_no_equipment_selected">لا توجد أجهزة محددة للاستيراد</string>
+    <string name="import_no_valid_equipment">لا توجد أجهزة صالحة للاستيراد</string>
+    <string name="import_failed_equipment">فشل استيراد الأجهزة</string>
+    <string name="import_success_equipment">%1$d اجهزة تم استاردها بنجاح</string>
+    <string name="import_template_downloaded">تم تنزيل القالب بنجاح</string>
+    <string name="import_template_download_failed">فشل تنزيل القالب</string>
+
+    <!-- Relative Time Plurals (Arabic) -->
+    <plurals name="time_mins_ago">
+        <item quantity="zero">منذ أقل من دقيقة</item>
+        <item quantity="one">منذ دقيقة واحدة</item>
+        <item quantity="two">منذ دقيقتين</item>
+        <item quantity="few">منذ %1$d دقائق</item>
+        <item quantity="many">منذ %1$d دقيقة</item>
+        <item quantity="other">منذ %1$d دقيقة</item>
+    </plurals>
+
+    <plurals name="time_hours_ago">
+        <item quantity="zero">منذ أقل من ساعة</item>
+        <item quantity="one">منذ ساعة واحدة</item>
+        <item quantity="two">منذ ساعتين</item>
+        <item quantity="few">منذ %1$d ساعات</item>
+        <item quantity="many">منذ %1$d ساعة</item>
+        <item quantity="other">منذ %1$d ساعة</item>
+    </plurals>
+
+    <plurals name="time_days_ago">
+        <item quantity="zero">اليوم</item>
+        <item quantity="one">منذ يوم واحد</item>
+        <item quantity="two">منذ يومين</item>
+        <item quantity="few">منذ %1$d أيام</item>
+        <item quantity="many">منذ %1$d يوماً</item>
+        <item quantity="other">منذ %1$d يوم</item>
+    </plurals>
+
+    <plurals name="time_days_future">
+        <item quantity="zero">اليوم</item>
+        <item quantity="one">مستحق خلال يوم واحد</item>
+        <item quantity="two">مستحق خلال يومين</item>
+        <item quantity="few">مستحق خلال %1$d أيام</item>
+        <item quantity="many">مستحق خلال %1$d يوماً</item>
+        <item quantity="other">مستحق خلال %1$d يوم</item>
+    </plurals>
+
+    <!-- Support Strings if missing -->
+    <string name="time_now">الآن</string>
+    <string name="status_scheduled">مجدول</string>
+</resources>

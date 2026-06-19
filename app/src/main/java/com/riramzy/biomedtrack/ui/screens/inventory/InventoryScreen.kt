@@ -166,7 +166,7 @@ fun InventoryScreenContent(
                             )
 
                             BioMedButton(
-                                text = "Retry",
+                                text = stringResource(R.string.retry),
                                 onClick = { onRetryClick() },
                                 customColor = MaterialTheme.colorScheme.error,
                                 customTextColor = MaterialTheme.colorScheme.onError,
@@ -211,6 +211,7 @@ fun InventoryScreenContent(
 
             val filterSheetState = rememberModalBottomSheetState()
             val sheetState = rememberModalBottomSheetState()
+
 
             var showFilterSheet by remember { mutableStateOf(false) }
             var showProfileBottomSheet by remember { mutableStateOf(false) }
@@ -274,7 +275,11 @@ fun InventoryScreenContent(
                         changePassword(current, new) { result ->
                             when (result) {
                                 is Result.Success -> {
-                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        R.string.password_updated_success,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     showChangePasswordDialog = false
                                 }
                                 is Result.Error -> {
@@ -386,9 +391,11 @@ fun InventoryScreenContent(
                             BioMedButton(
                                 text = stringResource(R.string.clear_all_filters),
                                 onClick = {
-                                    showFilterSheet = false
                                     onStatusSelected(null)
                                     onCategorySelected(null)
+                                    onSearchQueryChange("")
+                                    onDepartmentSelected(null)
+                                    showFilterSheet = false
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()

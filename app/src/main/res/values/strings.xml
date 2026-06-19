@@ -1,3 +1,514 @@
 <resources>
     <string name="app_name">BioMed Track</string>
+    <string name="recent_activities">Recent Activities</string>
+    <string name="upcoming_maintenance">Upcoming Tasks</string>
+    <string name="departments_overview">Departments Overview</string>
+    <string name="view_all">View All</string>
+    <string name="log_maintenance">Log Maintenance</string>
+    <string name="retry">Retry</string>
+    <string name="none">None</string>
+    <string name="password_updated_success">Password updated successfully!</string>
+
+    <!-- Notifications Screen -->
+    <string name="notifications_title">Notifications</string>
+    <string name="mark_all_read">Mark all as read</string>
+    <string name="error_session_expired">Session expired. Please log in again.</string>
+
+    <!-- Plurals for Unread Counts -->
+    <plurals name="unread_notifications_count">
+        <item quantity="one">%1$d Unread Notification</item>
+        <item quantity="other">%1$d Unread Notifications</item>
+    </plurals>
+
+    <!-- Notification Categories -->
+    <string name="category_all">All</string>
+    <string name="category_status_changes">Status Changes</string>
+    <string name="category_maintenance_logs">Maintenance Logs</string>
+    <string name="category_service_reminders">Service Reminders</string>
+
+    <!-- Notification Header -->
+    <string name="header_today">Today</string>
+    <string name="header_yesterday">Yesterday</string>
+    <string name="header_earlier">Earlier</string>
+
+    <!-- Notification Card Formats -->
+    <string name="task_due_date_format">Due: %1$s</string>
+    <string name="label_by_name">By %1$s</string>
+
+    <!-- Inventory Screen & Filters -->
+    <string name="inventory_subtitle">Manage and track all medical equipment</string>
+    <string name="filter_button">Filter</string>
+    <string name="advanced_filters">Advanced Filters</string>
+    <string name="filter_by_status">Filter by status</string>
+    <string name="filter_by_category">Filter by category</string>
+    <string name="apply_button">Apply</string>
+    <string name="clear_all_filters">Clear All Filters</string>
+    <string name="no_equipment_found">No equipment found</string>
+    <string name="try_changing_filter_search">Try changing the department filter or search query</string>
+    <string name="search_placeholder_equipment">Search by name, serial number or model</string>
+
+    <!-- Dialog Labels -->
+    <string name="dismiss">Dismiss</string>
+    <string name="confirm">Confirm</string>
+    <string name="select_new_status_format">Please select the new status of %1$s</string>
+    <string name="reason_for_change">Reason for change</string>
+    <string name="reason_for_change_placeholder">e.g., Water leak, PM due</string>
+
+    <!-- Equipment Card Fields -->
+    <string name="label_serial_number">Serial Number</string>
+    <string name="label_model">Model</string>
+    <string name="label_next_service">Next Service</string>
+    <string name="label_none">None</string>
+    <string name="label_category_prefix">Category: </string>
+    <string name="label_manufacturer_prefix">Manufacturer: </string>
+
+    <!-- Insight Card Labels -->
+    <string name="insight_healthy">Healthy</string>
+    <string name="insight_down">Down</string>
+    <string name="insight_service">Service</string>
+    <string name="insight_total">Total</string>
+    <string name="insight_healthy_desc">Operating normally</string>
+    <string name="insight_down_desc">Requires repair</string>
+    <string name="insight_service_desc">Needs attention</string>
+    <string name="insight_total_desc">Across all departments</string>
+
+    <!-- User & Role Settings -->
+    <string name="welcome_user">Welcome, %1$s</string>
+    <string name="role_admin">Admin</string>
+    <string name="role_supervisor">Supervisor</string>
+    <string name="role_technician">Technician</string>
+
+    <!-- Department Metadata -->
+    <string name="dept_total_equipment">Total Equipment</string>
+    <string name="dept_due_service">Due Service</string>
+    <string name="dept_down">Down</string>
+
+    <!-- Navigation Labels -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_scheduler">Scheduler</string>
+    <string name="nav_inventory">Inventory</string>
+    <string name="nav_reports">Reports</string>
+
+    <!-- Profile Options -->
+    <string name="profile_title_my_profile">My Profile</string>
+    <string name="profile_title_notifications_preferences">Notifications Preferences</string>
+    <string name="profile_title_change_password">Change Password</string>
+    <string name="profile_title_manage_users">Manage Users</string>
+    <string name="profile_title_import_equipment">Import Equipment</string>
+    <string name="profile_title_logout">Logout</string>
+    <string name="profile_title_language">Language / اللغة</string>
+
+    <!-- Statuses -->
+    <string name="status_online">Online</string>
+    <string name="status_down">Down</string>
+    <string name="status_service">Service</string>
+    <string name="status_log">Log</string>
+    <string name="status_assigned">Assigned</string>
+
+    <!-- Tasks -->
+    <string name="status_pending">Pending</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_done">Done</string>
+    <string name="task_serial_format">SN: %1$s</string>
+    <string name="task_steps_format">%1d/%2d steps</string>
+
+    <!-- Relative Time -->
+    <string name="time_mins_ago">%1$dm ago</string>
+    <string name="time_hours_ago">%1$dh ago</string>
+    <string name="time_days_ago">%1$dd ago</string>
+
+    <!-- Activities -->
+    <string name="activity_status_changed">Status Changed to %1$s</string>
+    <string name="activity_status_changed_from_to">The status changed from %1s to %2s</string>
+    <string name="activity_maintenance_logged">Maintenance Logged</string>
+    <string name="activity_task_assigned">Task Assigned</string>
+    <string name="activity_task_assigned_to">Task assigned to %1$s</string>
+    <string name="label_department">Department</string>
+    <string name="label_by">By</string>
+
+    <!-- Hospital Departments -->
+    <string name="dept_dialysis_unit">Dialysis Unit</string>
+    <string name="dept_burn_unit">Burn Unit</string>
+    <string name="dept_cardiac_care_unit">Cardiac Care Unit</string>
+    <string name="dept_central_sterilization_unit">Central Sterilization Unit</string>
+    <string name="dept_dental_department">Dental Department</string>
+    <string name="dept_dental_prosthetics_lab">Dental Prosthetics Lab</string>
+    <string name="dept_diabetic_foot_unit">Diabetic Foot Unit</string>
+    <string name="dept_echocardiography_unit">Echocardiography Unit</string>
+    <string name="dept_emergency_room">Emergency Room</string>
+    <string name="dept_intensive_care_unit_a">Intensive Care Unit A</string>
+    <string name="dept_intensive_care_unit_b">Intensive Care Unit B</string>
+    <string name="dept_laboratory">Laboratory</string>
+    <string name="dept_neonatal_intensive_care_unit">Neonatal Intensive Care Unit</string>
+    <string name="dept_obstetrics_department">Obstetrics Department</string>
+    <string name="dept_operating_room">Operating Room</string>
+    <string name="dept_outpatient_clinics">Outpatient Clinics</string>
+    <string name="dept_pediatric_intensive_care_unit">Pediatric Intensive Care Unit</string>
+    <string name="dept_pediatrics_unit">Pediatrics Unit</string>
+    <string name="dept_physiotherapy_department">Physiotherapy Department</string>
+    <string name="dept_radiology_department">Radiology Department</string>
+    <string name="dept_reception">Reception</string>
+    <string name="dept_surgery_department">Surgery Department</string>
+
+    <!-- Scheduler Screen & Maintenance Form -->
+    <string name="scheduler_title">Scheduler</string>
+    <string name="scheduler_subtitle">Plan and track equipment maintenance schedules</string>
+    <string name="scheduler_view_list">List</string>
+    <string name="scheduler_view_week">Week</string>
+    <string name="scheduler_view_week_toggle">Week View</string>
+    <string name="scheduler_view_list_toggle">List View</string>
+    <string name="scheduler_week_previous">Previous Week</string>
+    <string name="scheduler_week_current">Current Week</string>
+    <string name="scheduler_week_next">Next Week</string>
+    <string name="scheduler_week_custom_range">Custom Range</string>
+    <string name="scheduler_filter">Filter</string>
+    <string name="scheduler_retry">Retry</string>
+    <string name="scheduler_no_maintenance">No maintenance</string>
+    <string name="scheduler_overdue_maintenance">Overdue Maintenance (%1$d)</string>
+    <plurals name="scheduler_equipment_overdue_message">
+        <item quantity="one">%1$d equipment is overdue for maintenance</item>
+        <item quantity="other">%1$d equipment are overdue for maintenance</item>
+    </plurals>
+    <string name="scheduler_overdue_prompt">Please schedule maintenance as soon as possible</string>
+    <string name="task_details_serial">Serial Number: %1$s</string>
+    <string name="task_details_notes_title">Supervisor Notes</string>
+    <string name="task_details_checklist_title">Configured Safety Checklist (%1$d steps)</string>
+    <string name="task_details_btn_start">Start Service</string>
+    <string name="task_details_btn_resume">Resume Service</string>
+    <string name="schedule_maint_title">Schedule Maintenance</string>
+    <string name="schedule_maint_equipment">Equipment</string>
+    <string name="schedule_maint_select_equipment">Select Equipment</string>
+    <string name="schedule_maint_date">Date</string>
+    <string name="schedule_maint_assign_to">Assign To</string>
+    <string name="schedule_maint_select_technician">Select Technician</string>
+    <string name="schedule_maint_notes">Additional Notes</string>
+    <string name="schedule_maint_notes_placeholder">Enter notes here</string>
+    <string name="schedule_maint_tasks_required">Tasks Required</string>
+    <string name="schedule_maint_btn_schedule">Schedule</string>
+    <string name="schedule_maint_btn_cancel">Cancel</string>
+
+    <!-- Date Selector & Range Selector Dialogs -->
+    <string name="date_selector_ok">OK</string>
+    <string name="date_selector_cancel">Cancel</string>
+    <string name="date_range_title">Select Custom Date Range</string>
+    <string name="date_range_start">Start Date</string>
+    <string name="date_range_end">End Date</string>
+
+    <!-- Auth / Splash -->
+    <string name="splash_logo_desc">Logo</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_placeholder">Enter your email</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_password_placeholder">Enter your password</string>
+    <string name="login_button">Login</string>
+    <string name="login_button_loading">Logging in…</string>
+
+    <string name="error_failed_to_get_user">Failed to get current user</string>
+    <string name="error_database_connection">Failed to connect to database</string>
+
+    <!-- Add / Edit Equipment Card -->
+    <string name="add_equipment_title">Add Equipment</string>
+    <string name="add_equipment_subtitle">Register new medical equipment</string>
+    <string name="edit_equipment_title">Edit Equipment</string>
+    <string name="edit_equipment_subtitle">Update medical equipment information</string>
+    <string name="label_equipment_details">Equipment Details</string>
+    <string name="label_classification">Classification</string>
+    <string name="label_location_and_dates">Location and Dates</string>
+    <string name="field_name">Name</string>
+    <string name="field_name_placeholder">Enter Name</string>
+    <string name="field_model">Model</string>
+    <string name="field_model_placeholder">Enter Model</string>
+    <string name="field_serial_number">Serial Number</string>
+    <string name="field_serial_placeholder">Enter Serial Number</string>
+    <string name="field_manufacturer">Manufacturer</string>
+    <string name="field_manufacturer_placeholder">Enter Manufacturer</string>
+    <string name="field_agent">Agent</string>
+    <string name="field_agent_placeholder">Enter Agent</string>
+    <string name="field_department">Department</string>
+    <string name="field_department_placeholder">Select Department</string>
+    <string name="field_category">Category</string>
+    <string name="field_category_placeholder">Select Category</string>
+    <string name="field_status">Status</string>
+    <string name="field_status_placeholder">Select Status</string>
+    <string name="field_location">Location</string>
+    <string name="field_location_placeholder">Select Location</string>
+    <string name="field_purchase_date">Purchase Date</string>
+    <string name="field_last_maintenance_date">Last Maintenance Date</string>
+    <string name="field_warranty_expiry">Warranty Expiry Date</string>
+    <string name="field_install_date">Install Date</string>
+    <string name="field_notes">Notes</string>
+    <string name="field_photo_documents">Photo Documentation</string>
+    <string name="field_contract_info">Contract Information</string>
+    <string name="field_contract_info_placeholder">Enter contract Information</string>
+    <string name="no_contract">No Current Contract</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Photo Documentation Card -->
+    <string name="photo_doc_title">Photo Documentation</string>
+    <string name="photo_doc_description">Take photos of reports of documentations</string>
+    <string name="photo_doc_captured_photo">Captured Photo</string>
+    <string name="photo_doc_change_photo">Change Photo</string>
+    <string name="photo_doc_add_photo">Add Photo</string>
+    <string name="photo_doc_photo_captured_successfully">Picture captured successfully</string>
+
+    <!-- Equipment Detail Screen -->
+    <string name="delete_dialog_title">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="delete_dialog_body">Are you sure you want to delete this equipment? This procedure cannot be undone</string>
+    <string name="delete_dialog_btn_confirm">Delete</string>
+    <string name="equipment_deleted_success">Equipment deleted successfully</string>
+    <string name="equipment_delete_failed">Failed to delete: %1$s</string>
+    <string name="section_maintenance_history">Maintenance History</string>
+    <string name="section_status_history">Status Changes History</string>
+    <string name="maintenance_schedule">Maintenance Schedule</string>
+
+    <!-- Log Maintenance Card -->
+    <string name="log_maint_title">Log Maintenance</string>
+    <string name="log_maint_subtitle">Record maintenance, repairs, and inspections</string>
+    <string name="log_maint_field_equipment">Equipment</string>
+    <string name="log_maint_field_type">Maintenance Type</string>
+    <string name="log_maint_field_type_placeholder">Select Maintenance Type</string>
+    <string name="log_maint_field_current_status">Current Status</string>
+    <string name="log_maint_field_current_status_placeholder">Select Current Status</string>
+    <string name="log_maint_field_by">By</string>
+    <string name="log_maint_field_notes">Notes and Observations</string>
+    <string name="log_maint_tasks_completed">Tasks Completed</string>
+    <string name="log_maint_photo_doc">Photo Documentation</string>
+    <string name="log_maint_tasks_label">Tasks Completed:</string>
+
+    <!-- Multiple Items Selector -->
+    <string name="multiple_selector_add_placeholder">Add new task</string>
+    <string name="multiple_selector_btn_add">Add</string>
+
+    <!-- Default Maintenance Checklist Items -->
+    <string name="checklist_visual_inspection">Visual Inspection</string>
+    <string name="checklist_electrical_safety">Electrical Safety Check</string>
+    <string name="checklist_cleaning">Cleaning</string>
+    <string name="checklist_functional_test">Functional Test</string>
+    <string name="checklist_alarm_verification">Alarm Verification</string>
+    <string name="checklist_filters_inspection">Filters Inspection</string>
+    <string name="checklist_calibration">Calibration</string>
+    <string name="checklist_wear_parts">Wear Parts Evaluation</string>
+    <string name="checklist_software_check">Software Check</string>
+    <string name="checklist_documentation">Documentation</string>
+
+    <!-- Reports Screen -->
+    <string name="reports_title">Reports</string>
+    <string name="reports_subtitle">Generate and export detailed reports at ease</string>
+    <string name="reports_period_previous">Previous Month</string>
+    <string name="reports_period_current">This Month</string>
+    <string name="reports_period_next">Next Month</string>
+    <string name="reports_filter_btn">Filter</string>
+    <string name="reports_status_all">All</string>
+    <string name="reports_status_healthy">Healthy</string>
+    <string name="reports_status_due_service">Due Service</string>
+    <string name="reports_dept_all">All Departments</string>
+    <string name="reports_toggle_include_logs">Include Maintenance Logs</string>
+    <string name="reports_section_summary">Report Summary</string>
+    <string name="reports_refresh_preview">Refresh Preview</string>
+    <string name="reports_section_export_format">Export Format</string>
+    <string name="reports_section_last_generated">Last Generated</string>
+    <string name="reports_download_success">File downloaded successfully</string>
+    <string name="reports_download_failed">Failed to download file</string>
+    <string name="reports_share_chooser_title">Share Report</string>
+    <string name="reports_generated_success">Report generated successfully</string>
+    <string name="reports_error_no_file">Failed to create target file</string>
+    <string name="reports_error_unknown">Unknown error</string>
+
+    <!-- Report Export Format Card -->
+    <string name="export_format_pdf">PDF</string>
+    <string name="export_format_pdf_note">Best for sharing and printing</string>
+    <string name="export_format_excel">Excel</string>
+    <string name="export_format_excel_note">Best for editing and analysis</string>
+    <string name="btn_generate_report">Generate Report</string>
+
+    <!-- Report Summary Card -->
+    <string name="summary_total_equipment">Total Equipment</string>
+    <string name="summary_healthy">Healthy</string>
+    <string name="summary_service_due">Service Due</string>
+    <string name="summary_down">Down</string>
+    <string name="summary_log_entries">Reports will include %1$d maintenance log entries for Down and Service Due Equipment</string>
+
+    <!-- Report Generated File Card -->
+    <string name="generated_file_card_ready_for_preview">File ready for preview</string>
+    <string name="generated_file_card_mb">%1$f MB</string>
+    <string name="generated_file_card_kb">%1$f KB</string>
+
+    <!-- User Management Screen -->
+    <string name="user_mgmt_title">Users Management</string>
+    <string name="user_mgmt_subtitle">Manage users, roles and department access</string>
+    <string name="user_mgmt_role_all">All</string>
+    <string name="user_mgmt_role_admins">Admins</string>
+    <string name="user_mgmt_role_supervisors">Supervisors</string>
+    <string name="user_mgmt_role_technicians">Technicians</string>
+
+    <!-- BioMedUsersInsightCard -->
+    <string name="insight_card_admin">Admin</string>
+    <string name="insight_card_supervisors">Supervisors</string>
+    <string name="insight_card_technicians">Technicians</string>
+    <string name="insight_card_total">Total Users</string>
+
+    <!-- BioMedUserInfoCard -->
+    <string name="user_card_access_all_depts">Access to all departments</string>
+    <string name="user_card_full_system_access">Full system access</string>
+    <string name="user_card_btn_manage_departments">Manage Departments</string>
+    <string name="user_card_toggle_active">Active</string>
+
+    <!-- BioMedAddNewUserRoleSheet -->
+    <string name="add_user_title">Add New User</string>
+    <string name="add_user_field_first_name">First Name</string>
+    <string name="add_user_field_last_name">Last Name</string>
+    <string name="add_user_field_employee_id">Employee ID</string>
+    <string name="add_user_field_email">Email</string>
+    <string name="add_user_field_password">Password</string>
+    <string name="add_user_field_password_placeholder">Enter your password</string>
+    <string name="add_user_field_role">Role</string>
+    <string name="add_user_field_role_placeholder">Select Role</string>
+    <string name="add_user_validation_first_name">First name is required</string>
+    <string name="add_user_validation_last_name">Last name is required</string>
+    <string name="add_user_validation_employee_id">Employee ID is required</string>
+    <string name="add_user_validation_email">Email is required</string>
+    <string name="add_user_validation_email_format">Invalid email format</string>
+    <string name="add_user_validation_password">Password is required</string>
+    <string name="add_user_validation_password_length">Password must be at least 6 characters</string>
+
+    <!-- BioMedChangeRoleSheet -->
+    <string name="change_role_title">Change Role</string>
+    <string name="change_role_supervisor">Supervisor</string>
+    <string name="change_role_admin">Admin</string>
+    <string name="change_role_technician">Technician</string>
+    <string name="change_role_supervisor_desc">Full access to all department, can assign tasks and generate reports</string>
+    <string name="change_role_admin_desc">Full system access including users management and equipment administration</string>
+    <string name="change_role_technician_desc">Can view all equipment and log maintenancein assigned departments only</string>
+
+    <!-- UserManagementVm snackbar strings -->
+    <string name="user_mgmt_error_self_deactivate">You cannot deactivate your own account</string>
+    <string name="user_mgmt_error_no_user">User is not logged in</string>
+    <string name="user_mgmt_error_self_role_change">You cannot change your own role</string>
+    <string name="user_mgmt_success_status_updated">User active status updated successfully</string>
+    <string name="user_mgmt_success_role_updated">User role updated successfully</string>
+    <string name="user_mgmt_success_departments_updated">User departments updated successfully</string>
+    <string name="user_mgmt_success_user_created">User created successfully</string>
+
+    <!-- Validation Errors -->
+    <string name="error_name_empty">Name cannot be empty</string>
+    <string name="error_model_empty">Model cannot be empty</string>
+    <string name="error_serial_empty">Serial Number cannot be empty</string>
+    <string name="error_manufacturer_empty">Manufacturer cannot be empty</string>
+    <string name="error_agent_empty">Agent cannot be empty</string>
+    <string name="error_select_category">Please select a category</string>
+    <string name="error_select_status">Please select a status</string>
+    <string name="error_select_location">Please select a location</string>
+    <string name="error_select_install_date">Please select an install date</string>
+    <string name="error_select_warranty_date">Please select a warranty end date</string>
+    <string name="error_select_department">Please select a department</string>
+    <string name="error_equipment_not_found">Equipment not found</string>
+
+    <!-- Import Equipment Screens (shared) -->
+    <string name="import_title">Import Equipment</string>
+    <string name="import_subtitle">Bulk import equipment from an excel file</string>
+    <string name="import_step_select_file">Select File</string>
+    <string name="import_step_preview">Preview</string>
+    <string name="import_step_import">Import</string>
+
+    <!-- Step 1: Select File -->
+    <string name="import_step1_header">Step 1: Select File</string>
+    <string name="import_note_format">Excel format must match the exact format of the template for easy and successful data extraction</string>
+    <string name="import_note_download_template">Download Template</string>
+    <string name="import_uploaded_files">Uploaded Files</string>
+    <string name="import_file_size_kb">%1$d KB</string>
+
+    <!-- Upload File Card -->
+    <string name="upload_excel_file">Select your Excel file</string>
+    <string name="upload_excel_file_desc">Supports .xlsx and .xls formats</string>
+    <string name="upload_excel_file_success">Your file has been uploaded successfully</string>
+    <string name="upload_excel_file_browse_files">Browse Files</string>
+    <string name="upload_excel_file_reupload">Reupload File</string>
+
+    <!-- Step 2: Data Preview -->
+    <string name="import_step2_header">Step 2: Preview</string>
+    <string name="import_data_preview_title">Data Preview</string>
+    <string name="import_btn_return_to_select">Return to File Selection</string>
+    <string name="import_btn_import_rows">Import %1$d Selected Rows</string>
+
+    <!-- Step 3: Progress -->
+    <string name="import_step3_header">Step 3: Importing</string>
+    <string name="import_progress_title">Importing Equipment</string>
+    <string name="import_progress_warning">Please do not close the app</string>
+    <string name="import_progress_live_log">Live Log</string>
+
+    <!-- Completion -->
+    <string name="import_complete_icon_desc">Success</string>
+    <string name="import_complete_title">Import Complete</string>
+    <string name="import_complete_success_count">%1$d equipment imported successfully</string>
+    <string name="import_complete_skipped_count">%1$d rows skipped successfully</string>
+    <string name="import_complete_failed_count">Failed to import %1$d rows</string>
+    <string name="import_btn_import_another">Import Another File</string>
+    <string name="import_btn_go_to_inventory">Go to Inventory</string>
+    <string name="import_file_ready">File ready for preview</string>
+
+    <!-- Data Preview Table -->
+    <string name="table_header_name">Name</string>
+    <string name="table_header_model">Model</string>
+    <string name="table_header_serial">Serial Number</string>
+    <string name="table_header_department">Department</string>
+    <string name="table_header_category">Category</string>
+    <string name="table_header_status">Status</string>
+    <string name="table_header_logs">Logs</string>
+    <string name="import_btn_select_all">Select All</string>
+    <string name="import_btn_deselect_all">Deselect All</string>
+
+    <!-- Data Preview Card -->
+    <string name="import_total_rows">Total rows found in file</string>
+    <string name="import_valid_rows">%1$d Valid</string>
+    <string name="import_warning_rows">%1$d Warnings</string>
+    <string name="import_error_rows">%1$d Errors</string>
+
+    <!-- Importing validation messages -->
+    <string name="import_validation_serial_blank">Serial Number is blank</string>
+    <string name="import_validation_serial_exists_db">Serial Number already exists</string>
+    <string name="import_validation_serial_exists_file">Serial Number already exists in the file</string>
+
+    <!-- Importing ViewModel Logs/Messages -->
+    <string name="import_log_creating_departments">Creating departments…</string>
+    <string name="import_log_created_departments">Created %1$d new departments</string>
+    <string name="import_log_department_not_found">Department not found</string>
+    <string name="import_log_saving_batch">Saving batch %1$d of %2$d (%3$d items)</string>
+    <string name="import_log_batch_saved_success">Batch %1$d saved successfully</string>
+    <string name="import_log_batch_save_failed">Failed to save batch %1$d: %2$s</string>
+    <string name="import_log_all_batches_saved">All batches saved successfully</string>
+    <string name="import_excel_parsed_success">Excel file parsed successfully</string>
+    <string name="import_excel_parse_failed">Failed to parse Excel file</string>
+    <string name="import_no_equipment_selected">No equipment selected to import</string>
+    <string name="import_no_valid_equipment">No valid equipment to import</string>
+    <string name="import_failed_equipment">Failed to import equipment</string>
+    <string name="import_success_equipment">%1$d Equipment imported successfully</string>
+    <string name="import_template_downloaded">Template downloaded successfully</string>
+    <string name="import_template_download_failed">Failed to download template</string>
+
+    <!-- Relative Time Plurals (English) -->
+    <plurals name="time_mins_ago">
+        <item quantity="one">%1$d min ago</item>
+        <item quantity="other">%1$d mins ago</item>
+    </plurals>
+
+    <plurals name="time_hours_ago">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+
+    <plurals name="time_days_ago">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+
+    <plurals name="time_days_future">
+        <item quantity="one">Due in %1$d day</item>
+        <item quantity="other">Due in %1$d days</item>
+    </plurals>
+
+    <!-- Support Strings if missing -->
+    <string name="time_now">Just now</string>
+    <string name="status_scheduled">Scheduled</string>
 </resources>

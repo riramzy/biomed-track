@@ -129,6 +129,7 @@ class DashboardVm @Inject constructor(
                         technicianName = statusLog.changedByName,
                         timestamp = statusLog.timestamp,
                         equipmentStatus = statusLog.newStatus,
+                        previousStatus = statusLog.previousStatus,
                         dueDate = statusLog.timestamp.toDateString()
                     )
                 }.let { list ->

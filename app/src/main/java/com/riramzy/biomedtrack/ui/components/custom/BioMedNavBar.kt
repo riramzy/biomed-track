@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -270,7 +271,13 @@ fun BioMedNavItemExpanded(
             )
 
             Text(
-                text = itemName,
+                text = when (itemName) {
+                    "Dashboard" -> stringResource(R.string.nav_dashboard)
+                    "Scheduler" -> stringResource(R.string.nav_scheduler)
+                    "Inventory" -> stringResource(R.string.nav_inventory)
+                    "Reports" -> stringResource(R.string.nav_reports)
+                    else -> itemName
+                },
                 color = if (isSystemInDarkTheme()) {
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
@@ -284,7 +291,7 @@ fun BioMedNavItemExpanded(
     }
 }
 
-@Preview(device = "spec:width=411dp,height=891dp", showBackground = true)
+@Preview(device = "spec:width=411dp,height=891dp", showBackground = true, locale = "ar")
 @Composable
 fun BioMedNavBarPreview() {
     BioMedTheme {
