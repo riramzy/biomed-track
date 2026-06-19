@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/src/main/assets/fcm_service_account.json
+/app/google-services.json
